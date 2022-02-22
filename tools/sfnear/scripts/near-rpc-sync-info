@@ -1,0 +1,5 @@
+#!/bin/bash
+
+port=${RPC_PORT:-3030}
+
+curl -sS -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":"1","method":"status","params":[]}' "http://localhost:$port" | jq '.result.sync_info'

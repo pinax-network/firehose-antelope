@@ -1,0 +1,23 @@
+     ____ __                          _
+    / __// /_ ____ ___  ___ _ __ _   (_)___  ___ _
+   _\ \ / __// __// -_)/ _ `//  ' \ / // _ \/ _ `/
+  /___/ \__//_/   \__/ \_,_//_/_/_//_//_//_/\_, /
+                 ____           __         /___/
+                / __/___ _ ___ / /_
+               / _/ / _ `/(_-</ __/
+              /_/   \_,_//___/\__/
+
+Welcome to this node manager pod, common commands:
+ - Show version                       sfnear --version
+
+Node manager commands (near-... <tab> to show all):
+ - Check if running                   near-is-running
+
+ - Debug Deep Mind logs for 30s       near-debug-deep-mind-30s
+ - Stop instance                      near-maintenance
+ - Start or restart instance          near-resume
+
+ - RPC Syncing Info                   near-rpc-sync-info
+ - RPC Peers Info                     near-rpc-network-info
+ - RPC Node Status                    near-rpc-node-status
+ - RPC Head Block                     near-rpc-head-block

@@ -1,0 +1,15 @@
+#!/bin/bash
+
+port=${RPC_PORT:-3030}
+
+finality="optimistic"
+if [[ $# -gt 0 ]]; then
+    finality="$1"
+fi
+
+if [[ "$finality" != "final" && "$finality" != "optimistic" ]]; then
+    echo "Finality parameter should be either 'final' or 'optimistic', got '$finality'"
+    exit 1
+fi
+
+curl -sS -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":"1","method":"block","params":{"finality":"'"$finality"'"}}' "http://localhost:$port" | jq .
