@@ -1,4 +1,4 @@
-module github.com/streamingfast/sf-near
+module github.com/streamingfast/fire-dummy
 
 go 1.16
 
