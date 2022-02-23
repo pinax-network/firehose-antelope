@@ -2,17 +2,15 @@ package codec
 
 import (
 	"bufio"
-	"container/heap"
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
-	"github.com/streamingfast/bstream"
+	"google.golang.org/protobuf/proto"
 	"io"
 	"strconv"
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	pbcodec "github.com/streamingfast/sf-near/pb/sf/near/codec/v1"
+	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
 	"go.uber.org/zap"
 )
 
@@ -30,10 +28,7 @@ func NewConsoleReader(lines chan string, rpcUrl string) (*ConsoleReader, error) 
 	l := &ConsoleReader{
 		lines: lines,
 		close: func() {},
-		ctx: &parseCtx{
-			blockMetas: newBlockMetaHeap(NewRPCBlockMetaGetter(rpcUrl)),
-		},
-		done: make(chan interface{}),
+		done:  make(chan interface{}),
 	}
 	return l, nil
 }
@@ -80,48 +75,60 @@ func (s *parsingStats) inc(key string) {
 }
 
 type parseCtx struct {
-	blockMetas *blockMetaHeap
-	stats      *parsingStats
+	Height       uint64
+	currentBlock *pbcodec.Block
+
+	stats *parsingStats
+}
+
+func newContext(height uint64) *parseCtx {
+	return &parseCtx{
+		Height: height,
+	}
+
 }
 
 func (r *ConsoleReader) Read() (out interface{}, err error) {
-	return r.next(readBlock)
+	return r.next()
 }
 
 const (
-	readBlock = 1
+	LogPrefix     = "DMLOG"
+	LogBeginBlock = "BLOCK_BEGIN"
+	LogBlock      = "BLOCK_DATA"
+	LogEndBlock   = "BLOCK_END"
 )
 
-func (r *ConsoleReader) next(readType int) (out interface{}, err error) {
-	ctx := r.ctx
-
-	zlog.Debug("next", zap.Int("read_type", readType))
+func (r *ConsoleReader) next() (out interface{}, err error) {
+	zlog.Debug("next")
 
 	for line := range r.lines {
-		if !strings.HasPrefix(line, "DMLOG ") {
+		if !strings.HasPrefix(line, LogPrefix) {
 			continue
 		}
 
-		line = line[6:]
+		tokens := strings.Split(line[len(LogPrefix)+1:], " ")
+		if len(tokens) < 2 {
+			return nil, fmt.Errorf("invalid log line format: %s", line)
+		}
 
-		switch {
-		case strings.HasPrefix(line, "BLOCK"):
-			out, err = ctx.readBlock(line)
+		switch tokens[0] {
+		case LogBeginBlock:
+			err = r.blockBegin(tokens[1:])
+		case LogBlock:
+			err = r.ctx.readBlock(tokens[1:])
+		case LogEndBlock:
+			return r.ctx.readBlockEnd(tokens[1:])
 		default:
 			if traceEnabled {
 				zlog.Debug("skipping unknown deep mind log line", zap.String("line", line))
 			}
-
 			continue
 		}
 
 		if err != nil {
 			chunks := strings.SplitN(line, " ", 2)
 			return nil, fmt.Errorf("%s: %s (line %q)", chunks[0], err, line)
-		}
-
-		if out != nil {
-			return out, nil
 		}
 	}
 
@@ -152,81 +159,70 @@ func (r *ConsoleReader) buildScanner(reader io.Reader) *bufio.Scanner {
 	return scanner
 }
 
-// Formats
-// DMLOG BLOCK <NUM> <HASH> <PROTO_HEX>
-func (ctx *parseCtx) readBlock(line string) (*pbcodec.Block, error) {
-	chunks, err := SplitInChunks(line, 4)
-	if err != nil {
-		return nil, fmt.Errorf("split: %s", err)
+// Format:
+// DMLOG BLOCK_BEGIN <NUM>
+func (r *ConsoleReader) blockBegin(params []string) error {
+	if err := validateChunk(params, 1); err != nil {
+		return fmt.Errorf("invalid log line length: %w", err)
 	}
 
-	blockNum, err := strconv.ParseUint(chunks[0], 10, 64)
+	blockHeight, err := strconv.ParseUint(params[0], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("invalid block num: %w", err)
+		return fmt.Errorf("invalid block num: %w", err)
 	}
 
-	// We skip block hash for now
-	protoBytes, err := hex.DecodeString(chunks[2])
-	if err != nil {
-		return nil, fmt.Errorf("invalid block bytes: %w", err)
+	//Push new block meta
+	r.ctx = newContext(blockHeight)
+	return nil
+}
+
+// Format:
+// DMLOG BLOCK <PROTOBUf-BLOCK>
+func (ctx *parseCtx) readBlock(params []string) error {
+	if err := validateChunk(params, 1); err != nil {
+		return fmt.Errorf("invalid log line length: %w", err)
+	}
+
+	if ctx == nil {
+		return fmt.Errorf("did not process a BLOCK_BEGIN")
 	}
 
 	block := &pbcodec.Block{}
-	if err := proto.Unmarshal(protoBytes, block); err != nil {
-		return nil, fmt.Errorf("invalid block: %w", err)
+	buf, err := base64.StdEncoding.DecodeString(params[0])
+	if err != nil {
+		return fmt.Errorf("unable to base64 decode block: %w", err)
+	}
+	if err := proto.Unmarshal(buf, block); err != nil {
+		return fmt.Errorf("unable unmarshall block: %w", err)
 	}
 
-	newParsingStats(blockNum).log()
-
-	//Push new block meta
-	ctx.blockMetas.Push(&blockMeta{
-		id:           block.Header.Hash.AsBase58String(),
-		number:       block.Number(),
-		blockTime:    block.Time(),
-	})
-
-	//Setting previous height
-	prevHeightId := block.Header.PrevHash.AsBase58String()
-	if prevHeightId == "11111111111111111111111111111111" { // block id 0 (does not exist)
-		block.Header.PrevHeight = bstream.GetProtocolFirstStreamableBlock
-	} else {
-		prevHeightMeta, err := ctx.blockMetas.get(prevHeightId)
-		if err != nil {
-			return nil, fmt.Errorf("getting prev height meta: %w", err)
-		}
-		block.Header.PrevHeight = prevHeightMeta.number
-	}
-
-	//Setting LIB num
-	lastFinalBlockId := block.Header.LastFinalBlock.AsBase58String()
-	if lastFinalBlockId == "11111111111111111111111111111111" { // block id 0 (does not exist)
-		block.Header.LastFinalBlockHeight = bstream.GetProtocolFirstStreamableBlock
-	} else {
-		libBlockMeta, err := ctx.blockMetas.get(lastFinalBlockId)
-		if err != nil {
-			return nil, fmt.Errorf("getting lib block meta: %w", err)
-		}
-		block.Header.LastFinalBlockHeight = libBlockMeta.number
-	}
-
-	//Purging
-	for {
-		if ctx.blockMetas.Len() <= 2000 {
-			break
-		}
-		heap.Pop(ctx.blockMetas)
-	}
-	return block, err
+	ctx.currentBlock = block
+	return nil
 }
 
-// splitInChunks split the line in `count` chunks and returns the slice `chunks[1:count]` (so exclusive end), but verifies
-// that there are only exactly `count` chunks, and nothing more.
-
-func SplitInChunks(line string, count int) ([]string, error) {
-	chunks := strings.SplitN(line, " ", -1)
-	if len(chunks) != count {
-		return nil, fmt.Errorf("%d fields required but found %d fields for line %q", count, len(chunks), line)
+func (ctx *parseCtx) readBlockEnd(params []string) (*pbcodec.Block, error) {
+	if err := validateChunk(params, 1); err != nil {
+		return nil, fmt.Errorf("invalid log line length: %w", err)
 	}
 
-	return chunks[1:count], nil
+	if ctx.currentBlock == nil {
+		return nil, fmt.Errorf("current block not set")
+	}
+
+	blockHeight, err := strconv.ParseUint(params[0], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse blockNum: %s", err)
+	}
+	if blockHeight != ctx.Height {
+		return nil, fmt.Errorf("end block height does not match active block height, got block height %d but current is block height %d", blockHeight, ctx.Height)
+	}
+
+	return ctx.currentBlock, nil
+}
+
+func validateChunk(params []string, count int) error {
+	if len(params) != count {
+		return fmt.Errorf("%d fields required but found %d", count, len(params))
+	}
+	return nil
 }

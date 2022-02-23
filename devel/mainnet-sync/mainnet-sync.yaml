@@ -1,8 +1,0 @@
-start:
-  args:
-  - mindreader-node
-  flags:
-    mindreader-node-node-boot-nodes: ed25519:58Ra6ybSsjtAo8aHJk65Ed5mfUkVekR2aMBZo5Q8C8ir@127.0.0.1:24560
-    mindreader-node-config-file:  gs://staging.dfuseio-global.appspot.com/near-mainnet/mindreader/config.json
-    mindreader-node-genesis-file: gs://staging.dfuseio-global.appspot.com/near-mainnet/mindreader/genesis.json
-    mindreader-node-node-key-file: gs://staging.dfuseio-global.appspot.com/near-mainnet/mindreader/node_key.json

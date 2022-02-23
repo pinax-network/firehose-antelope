@@ -3,10 +3,10 @@ package codec
 import (
 	"fmt"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
+	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
-	pbcodec "github.com/streamingfast/sf-near/pb/sf/near/codec/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
@@ -20,8 +20,8 @@ func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
 		Number:         b.Number(),
 		PreviousId:     b.PreviousID(),
 		Timestamp:      b.Time(),
-		LibNum:         b.LIBNum(),
-		PayloadKind:    pbbstream.Protocol_NEAR,
+		LibNum:         b.Number(),
+		PayloadKind:    pbbstream.Protocol_UNKNOWN,
 		PayloadVersion: 1,
 	}
 	return bstream.GetBlockPayloadSetter(block, content)

@@ -31,7 +31,7 @@ type Superviser struct {
 }
 
 func (s *Superviser) GetName() string {
-	return "neard"
+	return "dummy-chain"
 }
 
 func NewSuperviser(
@@ -64,7 +64,7 @@ func NewSuperviser(
 		supervisor.RegisterLogPlugin(logplugin.NewToConsoleLogPlugin(debugDeepMind))
 	}
 
-	appLogger.Info("created near superviser", zap.Object("superviser", supervisor))
+	appLogger.Info("created acme superviser", zap.Object("superviser", supervisor))
 	return supervisor
 }
 
@@ -115,20 +115,20 @@ func (s *Superviser) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 }
 
 func (s *Superviser) lastBlockSeenLogPlugin(line string) {
-	// DMLOG BLOCK <HEIGHT> <HASH> <PROTO_HEX>
-	if !strings.HasPrefix(line, "DMLOG BLOCK") {
+	//DMLOG BLOCK_BEGIN <HEIGHT>
+	if !strings.HasPrefix(line, "DMLOG BLOCK_BEGIN") {
 		return
 	}
 
-	parts := strings.SplitN(line[12:], " ", 2)
-	if len(parts) != 2 {
-		s.Logger.Error("invalid block line, will fail at parsing time later on", zap.String("line[0:64]", line[0:64]))
-		return
-	}
+	blockNumStr := line[18:]
 
-	blockNum, err := strconv.ParseUint(parts[0], 10, 64)
+	blockNum, err := strconv.ParseUint(blockNumStr, 10, 64)
 	if err != nil {
-		s.Logger.Error("unable to extract last block num", zap.String("line[0:64]", line[0:64]), zap.Error(err))
+		s.Logger.Error("unable to extract last block num",
+			zap.String("line", line),
+			zap.String("block_num_str", blockNumStr),
+			zap.Error(err),
+		)
 		return
 	}
 

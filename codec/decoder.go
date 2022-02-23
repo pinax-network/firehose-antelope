@@ -16,16 +16,16 @@ package codec
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/proto"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
+	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
-	pbcodec "github.com/streamingfast/sf-near/pb/sf/near/codec/v1"
 )
 
 func BlockDecoder(blk *bstream.Block) (interface{}, error) {
-	if blk.Kind() != pbbstream.Protocol_NEAR {
-		return nil, fmt.Errorf("expected kind %s, got %s", pbbstream.Protocol_NEAR, blk.Kind())
+	if blk.Kind() != pbbstream.Protocol_UNKNOWN {
+		return nil, fmt.Errorf("expected kind %s, got %s", pbbstream.Protocol_UNKNOWN, blk.Kind())
 	}
 
 	if blk.Version() != 1 {

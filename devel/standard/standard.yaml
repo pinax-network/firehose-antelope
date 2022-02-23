@@ -2,4 +2,5 @@ start:
   args:
   - mindreader-node
   flags:
-    mindreader-node-node-boot-nodes: ed25519:58Ra6ybSsjtAo8aHJk65Ed5mfUkVekR2aMBZo5Q8C8ir@127.0.0.1:24560
+    mindreader-node-path: "/Users/julien/codebase/sf/dummy-blockchain/dchain"
+    mindreader-node-arguments: +--dm-enabled

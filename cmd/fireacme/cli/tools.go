@@ -12,21 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package codec
+package cli
 
-import (
-	"time"
-
-	"github.com/streamingfast/bstream"
-)
+import "github.com/streamingfast/firehose-acme/tools"
 
 func init() {
-	bstream.GetBlockWriterFactory = bstream.BlockWriterFactoryFunc(blockWriterFactory)
-	bstream.GetBlockReaderFactory = bstream.BlockReaderFactoryFunc(blockReaderFactory)
-	bstream.GetBlockDecoder = bstream.BlockDecoderFunc(BlockDecoder)
-	bstream.GetProtocolFirstStreamableBlock = 3
-	bstream.GetBlockWriterHeaderLen = 10
-
-	bstream.GetBlockPayloadSetter = bstream.MemoryBlockPayloadSetter
-	bstream.GetMemoizeMaxAge = 200 * 15 * time.Second
+	RootCmd.AddCommand(tools.Cmd)
 }

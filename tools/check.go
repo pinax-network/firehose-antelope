@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
-	pbcodec "github.com/streamingfast/sf-near/pb/sf/near/codec/v1"
+	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
 	sftools "github.com/streamingfast/sf-tools"
 )
 
@@ -75,20 +75,10 @@ func checkMergedBlocksE(cmd *cobra.Command, args []string) error {
 }
 
 func blockPrinter(block *bstream.Block) {
-	nearBlock := block.ToNative().(*pbcodec.Block)
-	shardCount := len(nearBlock.Shards)
-	transactionCount := 0
-
-	for _, shard := range nearBlock.Shards {
-		if shard.Chunk != nil {
-			transactionCount += len(shard.Chunk.Transactions)
-		}
-	}
-
-	fmt.Printf("Block %s, Prev: %s: %d shards, %d transactions\n",
+	dummBlock := block.ToProtocol().(*pbcodec.Block)
+	fmt.Printf("Block %s, Prev: %s: %d timestamp\n",
 		block.AsRef(),
 		block.PreviousRef(),
-		shardCount,
-		transactionCount,
+		dummBlock.Timestamp,
 	)
 }

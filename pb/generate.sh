@@ -17,7 +17,7 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 # Protobuf definitions
 PROTO=${1:-"$ROOT/../proto"}
-PROTO_NEAR=${2:-"$ROOT/../proto-dummy"}
+PROTO_ACME=${2:-"$ROOT/../proto-acme"}
 
 function main() {
   checks
@@ -26,11 +26,11 @@ function main() {
   trap "cd \"$current_dir\"" EXIT
   pushd "$ROOT/pb" &> /dev/null
 
-  generate "sf/dummy/codec/v1/codec.proto"
+  generate "sf/acme/codec/v1/codec.proto"
 
   echo "generate.sh - `date` - `whoami`" > $ROOT/pb/last_generate.txt
   echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
-  echo "streamingfast/proto-near revision: `GIT_DIR=$PROTO_NEAR/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
+  echo "streamingfast/proto-acme revision: `GIT_DIR=$PROTO_ACME/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
 }
 
 # usage:
@@ -43,12 +43,12 @@ function generate() {
     fi
 
     for file in "$@"; do
-      protoc -I$PROTO -I$PROTO_NEAR \
+      protoc -I$PROTO -I$PROTO_ACME \
         --go_out=. --go_opt=paths=source_relative \
         --go-grpc_out=. --go-grpc_opt=paths=source_relative,require_unimplemented_servers=false \
          $base$file
 
-      # protoc -I$PROTO -I$PROTO_NEAR $base$file --go_out=plugins=grpc,paths=source_relative:.
+      # protoc -I$PROTO -I$PROTO_ACME $base$file --go_out=plugins=grpc,paths=source_relative:.
     done
 }
 

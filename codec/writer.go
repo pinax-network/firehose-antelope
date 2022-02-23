@@ -16,9 +16,9 @@ package codec
 
 import (
 	"fmt"
+	"google.golang.org/protobuf/proto"
 	"io"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dbin"
 )

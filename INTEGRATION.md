@@ -1,8 +1,15 @@
-# Dummy on StreamingFast
-[![reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://pkg.go.dev/github.com/streamingfast/firehose-acme)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+# Chain Integration Document
 
-# Usage
+We have built an end-to-end template, to start the on-boarding process of new chains. 
+
+# Running the Acme
+
+
+
+Acme -> Chain name
+firehose-acme > fire
+// script names in /Users/julien/codebase/sf/firehose-acme/tools/firedummy/scripts
+"github.com/streamingfast/firehose-acme/pb/sf/dummy/codec/v1"
 
 ## Release
 

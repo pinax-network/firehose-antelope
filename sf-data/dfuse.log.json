@@ -1,0 +1,64 @@
+{"level":"info","ts":1645648180.762447,"logger":"common","caller":"dtracing@v0.0.0-20210811175635-d55665d3622a/api.go:139","msg":"registering development exporters from environment variables"}
+{"level":"info","ts":1645648180.7628732,"logger":"dfuse","caller":"cli/start.go:43","msg":"Starting StreamingFast on Acme with config file ''"}
+{"level":"info","ts":1645648180.763084,"logger":"dfuse","caller":"cli/start.go:124","msg":"Launching applications: mindreader"}
+{"level":"error","ts":1645648180.7631118,"logger":"common","caller":"derr@v0.0.0-20210811180100-9138d738bcec/cli.go:25","msg":"acme-blockchain","error":"unable to launch: cannot launch un-registered application \"mindreader\""}
+{"level":"info","ts":1645648188.1991081,"logger":"common","caller":"dtracing@v0.0.0-20210811175635-d55665d3622a/api.go:139","msg":"registering development exporters from environment variables"}
+{"level":"info","ts":1645648188.199213,"logger":"dfuse","caller":"cli/start.go:43","msg":"Starting StreamingFast on Acme with config file ''"}
+{"level":"info","ts":1645648188.1993291,"logger":"dfuse","caller":"cli/start.go:124","msg":"Launching applications: mindreader-node"}
+{"level":"info","ts":1645648188.1994061,"logger":"mindreader-node","caller":"superviser/superviser.go:74","msg":"adding superviser shutdown to plugins","plugin_name":"log plug func"}
+{"level":"info","ts":1645648188.19947,"logger":"mindreader-node","caller":"superviser/superviser.go:83","msg":"registered log plugin","plugin count":1}
+{"level":"info","ts":1645648188.199486,"logger":"mindreader-node","caller":"superviser/superviser.go:74","msg":"adding superviser shutdown to plugins","plugin_name":"ToZapLogPlugin"}
+{"level":"info","ts":1645648188.199499,"logger":"mindreader-node","caller":"superviser/superviser.go:83","msg":"registered log plugin","plugin count":2}
+{"level":"info","ts":1645648188.19951,"logger":"mindreader-node","caller":"nodemanager/superviser.go:67","msg":"created acme superviser","superviser":{"binary":"/Users/julien/codebase/sf/dummy-blockchain","arguments":["--dm-enabled"],"data_dir":"/Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data","last_block_seen":0,"server_id":""}}
+{"level":"info","ts":1645648188.199573,"logger":"mindreader-node","caller":"operator/operator.go:81","msg":"creating operator","options":{"Bootstrapper":{},"EnableSupervisorMonitoring":true,"ShutdownDelay":0}}
+{"level":"info","ts":1645648188.199682,"logger":"mindreader-node","caller":"mindreader/mindreader.go:94","msg":"creating mindreader plugin","archive_store_url":"file:///Users/julien/codebase/sf/firehose-acme/sf-data/storage/one-blocks","merge_archive_store_url":"file:///Users/julien/codebase/sf/firehose-acme/sf-data/storage/merged-blocks","oneblock_suffix":"","batch_mode":false,"merge_threshold_age":9223372036.854776,"working_directory":"/Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/work","start_block_num":0,"stop_block_num":0,"channel_capacity":100,"with_head_block_update_func":true,"with_shutdown_func":true,"fail_on_non_continuous_blocks":false,"wait_upload_complete_on_shutdown":30}
+{"level":"info","ts":1645648188.1999118,"logger":"common","caller":"dstore@v0.1.1-0.20220203133825-30eb2f9c5cd3/localstore.go:28","msg":"sanitized base path","original_base_path":"/Users/julien/codebase/sf/firehose-acme/sf-data/storage/one-blocks","sanitized_base_path":"/Users/julien/codebase/sf/firehose-acme/sf-data/storage/one-blocks"}
+{"level":"info","ts":1645648188.200156,"logger":"common","caller":"dstore@v0.1.1-0.20220203133825-30eb2f9c5cd3/localstore.go:28","msg":"sanitized base path","original_base_path":"/Users/julien/codebase/sf/firehose-acme/sf-data/storage/merged-blocks","sanitized_base_path":"/Users/julien/codebase/sf/firehose-acme/sf-data/storage/merged-blocks"}
+{"level":"info","ts":1645648188.2003,"logger":"mindreader-node","caller":"mindreader/mindreader.go:175","msg":"creating new mindreader plugin"}
+{"level":"info","ts":1645648188.2003388,"logger":"mindreader-node","caller":"superviser/superviser.go:74","msg":"adding superviser shutdown to plugins","plugin_name":"MindReaderPlugin"}
+{"level":"info","ts":1645648188.200397,"logger":"mindreader-node","caller":"superviser/superviser.go:83","msg":"registered log plugin","plugin count":3}
+{"level":"info","ts":1645648188.200444,"logger":"mindreader-node","caller":"node_manager2/app.go:72","msg":"running node manager app","config":{"StartupDelay":0,"HTTPAddr":":15009","ConnectionWatchdog":false,"GRPCAddr":":15010"},"mindreader":true}
+{"level":"info","ts":1645648188.2008371,"logger":"mindreader-node","caller":"node_manager2/app.go:75","msg":"retrieved hostname from os","hostname":"Juliens-MBP.localdomain"}
+{"level":"info","ts":1645648188.201463,"logger":"mindreader-node","caller":"node_manager2/app.go:143","msg":"starting mindreader gRPC server"}
+{"level":"info","ts":1645648188.201808,"logger":"mindreader-node","caller":"mindreader/publisher.go:27","msg":"starting grpc listener","listen_addr":":15010"}
+{"level":"info","ts":1645648189.2058601,"logger":"mindreader-node","caller":"mindreader/publisher.go:44","msg":"grpc server listener ready"}
+{"level":"info","ts":1645648189.205954,"logger":"mindreader-node","caller":"node_manager2/app.go:158","msg":"launching mindreader plugin"}
+{"level":"info","ts":1645648189.205975,"logger":"mindreader-node","caller":"node_manager2/app.go:110","msg":"launching operator"}
+{"level":"info","ts":1645648189.205992,"logger":"mindreader-node","caller":"operator/operator.go:116","msg":"launching operator HTTP server","http_listen_addr":":15009"}
+{"level":"info","ts":1645648189.206008,"logger":"mindreader-node","caller":"mindreader/mindreader.go:195","msg":"starting mindreader"}
+{"level":"info","ts":1645648189.206174,"logger":"mindreader-node","caller":"mindreader/mindreader.go:252","msg":"starting consume flow"}
+{"level":"info","ts":1645648189.206194,"logger":"mindreader-node","caller":"mindreader/archiver_selector.go:343","msg":"starting one block(s) uploads"}
+{"level":"info","ts":1645648189.206209,"logger":"mindreader-node","caller":"mindreader/archiver_selector.go:345","msg":"starting merged blocks(s) uploads"}
+{"level":"info","ts":1645648189.2062871,"logger":"mindreader-node","caller":"operator/http_server.go:51","msg":"starting webserver","http_addr":":15009"}
+{"level":"info","ts":1645648189.206314,"logger":"mindreader-node","caller":"operator/operator.go:129","msg":"Operator calling bootstrap function"}
+{"level":"info","ts":1645648189.206558,"logger":"mindreader-node","caller":"operator/operator.go:103","msg":"operator is terminating","error":"unable to bootstrap chain: config file /Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data/config.json does not exist"}
+{"level":"info","ts":1645648189.20658,"logger":"mindreader-node","caller":"superviser/superviser.go:54","msg":"superviser is terminating"}
+{"level":"info","ts":1645648189.206622,"logger":"mindreader-node","caller":"superviser/superviser.go:177","msg":"supervisor received a stop request, terminating node process"}
+{"level":"info","ts":1645648189.206634,"logger":"mindreader-node","caller":"superviser/superviser.go:180","msg":"underlying process is not running, nothing to do"}
+{"level":"info","ts":1645648189.206646,"logger":"mindreader-node","caller":"superviser/superviser.go:60","msg":"shutting down plugins","last_exit_code":0}
+{"level":"info","ts":1645648189.2066581,"logger":"mindreader-node","caller":"superviser/superviser.go:293","msg":"stopping plugin","plugin_name":"log plug func"}
+{"level":"info","ts":1645648189.20667,"logger":"mindreader-node","caller":"superviser/superviser.go:293","msg":"stopping plugin","plugin_name":"ToZapLogPlugin"}
+{"level":"info","ts":1645648189.206681,"logger":"mindreader-node","caller":"superviser/superviser.go:293","msg":"stopping plugin","plugin_name":"MindReaderPlugin"}
+{"level":"info","ts":1645648189.206694,"logger":"mindreader-node","caller":"mindreader/mindreader.go:231","msg":"mindreader is stopping"}
+{"level":"info","ts":1645648189.2067049,"logger":"mindreader-node","caller":"mindreader/mindreader.go:245","msg":"waiting until consume read flow (i.e. blocks) is actually done processing blocks..."}
+{"level":"info","ts":1645648189.2067158,"logger":"common","caller":"codec/consolereader.go:135","msg":"lines channel has been closed"}
+{"level":"info","ts":1645648189.206763,"logger":"mindreader-node","caller":"mindreader/mindreader.go:218","msg":"reached end of console reader stream, nothing more to do"}
+{"level":"info","ts":1645648189.2067761,"logger":"mindreader-node","caller":"mindreader/mindreader.go:259","msg":"all blocks in channel were drained, exiting read flow"}
+{"level":"info","ts":1645648189.20679,"logger":"mindreader-node","caller":"mindreader/archiver_selector.go:88","msg":"archiver selector is terminating"}
+{"level":"info","ts":1645648189.206801,"logger":"mindreader-node","caller":"mindreader/merge_archiver.go:65","msg":"merger archiver is terminating"}
+{"level":"error","ts":1645648189.206672,"logger":"dfuse","caller":"launcher/launcher.go:174","msg":"\n################################################################\nFatal error in app mindreader-node:\n\nunable to bootstrap chain: config file /Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data/config.json does not exist\n################################################################\n"}
+{"level":"info","ts":1645648189.2069619,"logger":"dfuse","caller":"cli/start.go:138","msg":"Application mindreader-node shutdown unexpectedly, quitting"}
+{"level":"info","ts":1645648189.2069929,"logger":"dfuse","caller":"launcher/launcher.go:259","msg":"Waiting for all apps termination..."}
+{"level":"info","ts":1645648189.207016,"logger":"mindreader-node","caller":"mindreader/merge_archiver.go:100","msg":"terminating upload loop"}
+{"level":"info","ts":1645648189.207098,"logger":"mindreader-node","caller":"mindreader/merge_archiver.go:73","msg":"merger archiver is terminated"}
+{"level":"info","ts":1645648189.2071402,"logger":"mindreader-node","caller":"mindreader/archiver.go:66","msg":"one block archiver is terminating"}
+{"level":"info","ts":1645648189.207231,"logger":"mindreader-node","caller":"mindreader/archiver.go:74","msg":"one block archiver is terminated"}
+{"level":"info","ts":1645648189.2072508,"logger":"mindreader-node","caller":"mindreader/archiver_selector.go:98","msg":"archiver selector is terminated"}
+{"level":"info","ts":1645648189.2072651,"logger":"mindreader-node","caller":"mindreader/mindreader.go:265","msg":"archiver Terminate done"}
+{"level":"info","ts":1645648189.2072802,"logger":"mindreader-node","caller":"mindreader/mindreader.go:247","msg":"consume read flow terminate"}
+{"level":"info","ts":1645648189.207291,"logger":"mindreader-node","caller":"superviser/superviser.go:296","msg":"all plugins closed"}
+{"level":"info","ts":1645648189.2073028,"logger":"mindreader-node","caller":"operator/operator.go:107","msg":"operator is waiting for superviser to shutdown","error":"unable to bootstrap chain: config file /Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data/config.json does not exist"}
+{"level":"info","ts":1645648189.207319,"logger":"mindreader-node","caller":"operator/operator.go:109","msg":"operator done waiting for superviser to shutdown","error":"unable to bootstrap chain: config file /Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data/config.json does not exist"}
+{"level":"info","ts":1645648189.2073321,"logger":"mindreader-node","caller":"node_manager2/app.go:86","msg":"chain operator terminated shutting down mindreader app"}
+{"level":"info","ts":1645648189.207347,"logger":"dfuse","caller":"launcher/launcher.go:273","msg":"All apps terminated gracefully"}
+{"level":"error","ts":1645648189.207387,"logger":"common","caller":"derr@v0.0.0-20210811180100-9138d738bcec/cli.go:25","msg":"acme-blockchain","error":"unable to launch: unable to bootstrap chain: config file /Users/julien/codebase/sf/firehose-acme/sf-data/mindreader/data/config.json does not exist"}
