@@ -42,7 +42,7 @@ func firehoseCmdStartE(cmd *cobra.Command, args []string) (err error) {
 	configFile := viper.GetString("global-config-file")
 	userLog.Printf("Starting StreamingFast on Acme with config file '%s'", configFile)
 
-	err = Start(configFile, dataDir, args)
+	err = Start(dataDir, args)
 	if err != nil {
 		return fmt.Errorf("unable to launch: %w", err)
 	}
@@ -52,7 +52,7 @@ func firehoseCmdStartE(cmd *cobra.Command, args []string) (err error) {
 	return
 }
 
-func Start(configFile string, dataDir string, args []string) (err error) {
+func Start(dataDir string, args []string) (err error) {
 	dataDirAbs, err := filepath.Abs(dataDir)
 	if err != nil {
 		return fmt.Errorf("unable to setup directory structure: %w", err)
@@ -63,28 +63,11 @@ func Start(configFile string, dataDir string, args []string) (err error) {
 		return err
 	}
 
-	//meshClient, err := dmeshClient.New(viper.GetString("search-common-mesh-dsn"))
-	//if err != nil {
-	//	return fmt.Errorf("unable to create dmesh client: %w", err)
-	//}
-
 	tracker := bstream.NewTracker(50)
-
-	//blockmetaAddr := viper.GetString("common-blockmeta-addr")
-	//if blockmetaAddr != "" {
-	//	conn, err := dgrpc.NewInternalClient(blockmetaAddr)
-	//	if err != nil {
-	//		userLog.Warn("cannot get grpc connection to blockmeta, disabling this startBlockResolver for search indexer", zap.Error(err), zap.String("blockmeta_addr", blockmetaAddr))
-	//	} else {
-	//		blockmetaCli := pbblockmeta.NewBlockIDClient(conn)
-	//		tracker.AddResolver(pbblockmeta.StartBlockResolver(blockmetaCli))
-	//	}
-	//}
 
 	tracker.AddResolver(bstream.OffsetStartBlockResolver(200))
 
 	modules := &launcher.Runtime{
-		//SearchDmeshClient: meshClient,
 		AbsDataDir: dataDirAbs,
 		Tracker:    tracker,
 	}
@@ -110,16 +93,11 @@ func Start(configFile string, dataDir string, args []string) (err error) {
 	launch := launcher.NewLauncher(modules)
 	userLog.Debug("launcher created")
 
-	runByDefault := func(app string) bool {
-		if app == "search-forkresolver" {
-			return false
-		}
-		return true
-	}
+	runByDefault := func(app string) bool { return true }
 
 	apps := launcher.ParseAppsFromArgs(args, runByDefault)
 	if len(args) == 0 {
-		apps = launcher.ParseAppsFromArgs(launcher.DfuseConfig["start"].Args, runByDefault)
+		apps = launcher.ParseAppsFromArgs(launcher.Config["start"].Args, runByDefault)
 	}
 	userLog.Printf("Launching applications: %s", strings.Join(apps, ","))
 	if err = launch.Launch(apps); err != nil {
