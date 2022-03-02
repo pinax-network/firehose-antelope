@@ -13,13 +13,7 @@ main() {
       version=`cat .version`
     fi
 
-    commit=`git rev-list -1 HEAD`
-    dirty=
-    if [[ ! -z "$(git status --untracked-files=no --porcelain)" ]]; then
-      dirty="dirty"
-    fi
-
-    go install -ldflags "-X main.Version=$version -X main.Commit=$commit -X main.IsDirty=$dirty" ./cmd/fireacme
+    go install -ldflags "-X main.Version=$version -X main.Commit=`git rev-list -1 HEAD`" ./cmd/fireacme
   popd &> /dev/null
 
   if [[ $KILL_AFTER != "" ]]; then
