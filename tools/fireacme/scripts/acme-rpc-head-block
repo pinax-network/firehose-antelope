@@ -12,4 +12,6 @@ if [[ "$finality" != "final" && "$finality" != "optimistic" ]]; then
     exit 1
 fi
 
+# This need to be adapted to the protocol being instrumented, this is an example taken from NEAR integration
+# which uses JSON-RPC to query data from the RPC node itself.
 curl -sS -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":"1","method":"block","params":{"finality":"'"$finality"'"}}' "http://localhost:$port" | jq .
