@@ -1,4 +1,4 @@
-# Dummy on StreamingFast
+# Firehose on Dummy Blockchain
 [![reference](https://img.shields.io/badge/godoc-reference-5272B4.svg?style=flat-square)](https://pkg.go.dev/github.com/streamingfast/firehose-acme)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
@@ -14,7 +14,7 @@ Releases are performed using [goreleaser](https://goreleaser.com/).
 
 ## Contributing
 
-**Issues and PR in this repo related strictly to the Dummy on StreamingFast.**
+**Issues and PR in this repo related strictly to the Firehose on Dummy Blockchain.**
 
 Report any protocol-specific issues in their
 [respective repositories](https://github.com/streamingfast/streamingfast#protocols)
