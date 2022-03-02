@@ -2,5 +2,5 @@ start:
   args:
   - mindreader-node
   flags:
-    mindreader-node-path: "/Users/julien/codebase/sf/dummy-blockchain/dchain"
+    mindreader-node-path: "PATH_TO_DCHAIN"
     mindreader-node-arguments: +--dm-enabled
