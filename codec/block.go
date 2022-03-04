@@ -20,7 +20,7 @@ func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
 		Number:         b.Number(),
 		PreviousId:     b.PreviousID(),
 		Timestamp:      b.Time(),
-		LibNum:         b.Number(),
+		LibNum:         b.Number() - 1,
 		PayloadKind:    pbbstream.Protocol_UNKNOWN,
 		PayloadVersion: 1,
 	}

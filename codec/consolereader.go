@@ -101,8 +101,6 @@ const (
 )
 
 func (r *ConsoleReader) next() (out interface{}, err error) {
-	zlog.Debug("next")
-
 	for line := range r.lines {
 		if !strings.HasPrefix(line, LogPrefix) {
 			continue
@@ -218,6 +216,12 @@ func (ctx *parseCtx) readBlockEnd(params []string) (*pbcodec.Block, error) {
 		return nil, fmt.Errorf("end block height does not match active block height, got block height %d but current is block height %d", blockHeight, ctx.Height)
 	}
 
+	zlog.Debug("console reader read block",
+		zap.Uint64("height", ctx.currentBlock.Height),
+		zap.String("hash", ctx.currentBlock.Hash),
+		zap.String("prev_hash", ctx.currentBlock.PrevHash),
+		zap.Int("trx_count", len(ctx.currentBlock.Transactions)),
+	)
 	return ctx.currentBlock, nil
 }
 

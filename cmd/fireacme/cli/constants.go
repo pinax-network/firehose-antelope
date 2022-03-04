@@ -23,7 +23,7 @@ const (
 	OneBlockStoreURL     string = "file://{sf-data-dir}/storage/one-blocks"
 
 	// Tweak this for your chain
-	FirstStreamableBlock int = 3
+	FirstStreamableBlock int = 1
 
 	// Native node instance port definitions, adjust those for your chain
 	// usually all chains have a P2P and RPC port available

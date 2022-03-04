@@ -24,9 +24,9 @@ func init() {
 	bstream.GetBlockWriterFactory = bstream.BlockWriterFactoryFunc(blockWriterFactory)
 	bstream.GetBlockReaderFactory = bstream.BlockReaderFactoryFunc(blockReaderFactory)
 	bstream.GetBlockDecoder = bstream.BlockDecoderFunc(BlockDecoder)
-	bstream.GetProtocolFirstStreamableBlock = 3
+	// WARNING: We do not set this value anymore here. It is set in the `FirstStreamableBlock` constant located `cmd/fireacme/cli/constants.go:26`
+	//bstream.GetProtocolFirstStreamableBlock = 1
 	bstream.GetBlockWriterHeaderLen = 10
-
 	bstream.GetBlockPayloadSetter = bstream.MemoryBlockPayloadSetter
 	bstream.GetMemoizeMaxAge = 200 * 15 * time.Second
 }

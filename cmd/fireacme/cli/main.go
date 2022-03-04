@@ -29,7 +29,7 @@ func Main() {
 		allFlags = flags.AutoBind(RootCmd, "fireacme")
 	})
 
-	RootCmd.PersistentFlags().StringP("data-dir", "d", "./sf-data", "Path to data storage for all components of dfuse")
+	RootCmd.PersistentFlags().StringP("data-dir", "d", "./fire-data", "Path to data storage for all components of dfuse")
 	RootCmd.PersistentFlags().StringP("config-file", "c", "./sf.yaml", "Configuration file to use. No config file loaded if set to an empty string.")
 	RootCmd.PersistentFlags().String("log-format", "text", "Format for logging to stdout. Either 'text' or 'stackdriver'")
 	RootCmd.PersistentFlags().Bool("log-to-file", true, "Also write logs to {data-dir}/dfuse.log.json ")
