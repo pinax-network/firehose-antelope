@@ -2,5 +2,5 @@ start:
   args:
   - mindreader-node
   flags:
-    mindreader-node-path: "PATH_TO_DCHAIN"
+    mindreader-node-path: "dummy-blockchain"
     mindreader-node-arguments: +--dm-enabled

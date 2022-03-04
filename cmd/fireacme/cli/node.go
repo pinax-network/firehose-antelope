@@ -18,7 +18,6 @@ import (
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	pbheadinfo "github.com/streamingfast/pbgo/sf/headinfo/v1"
 	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 )
 
@@ -30,9 +29,6 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")
 	cmd.Flags().String(flagPrefix+"arguments", "", "If not empty, overrides the list of default node arguments (computed from node type and role). Start with '+' to append to default args instead of replacing. ")
-
-	// FIXME: Right now our near-dm-indexer doesn't support it, we should plan on adding it!
-	// cmd.Flags().String(flagPrefix+"node-boot-nodes", "", "Set the node's boot nodes to bootstrap network from")
 }
 
 func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) error, managerAPIaddr string) {
@@ -42,21 +38,14 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 
 	app := fmt.Sprintf("%s-node", kind)
 	flagPrefix := fmt.Sprintf("%s-", app)
-	appLogger := zap.NewNop()
-	nodeLogger := zap.NewNop()
 
-	logging.Register(fmt.Sprintf("github.com/streamingfast/firehose-acme/%s", app), &appLogger)
-	logging.Register(fmt.Sprintf("github.com/streamingfast/firehose-acme/%s/node", app), &nodeLogger)
+	appLogger, _ := logging.PackageLogger(app, fmt.Sprintf("github.com/streamingfast/firehose-acme/%s", app))
+	nodeLogger, _ := logging.PackageLogger("dummy-chain", fmt.Sprintf("github.com/streamingfast/firehose-acme/%s/node", app), logging.LoggerDefaultLevel(zap.InfoLevel))
 
-	launcher.RegisterApp(&launcher.AppDef{
+	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          app,
 		Title:       fmt.Sprintf("Acme Node (%s)", kind),
 		Description: fmt.Sprintf("Acme %s node with built-in operational manager", kind),
-		MetricsID:   app,
-		Logger: launcher.NewLoggingDef(
-			fmt.Sprintf("github.com/streamingfast/firehose-acme/%s.*", app),
-			[]zapcore.Level{zap.WarnLevel, zap.WarnLevel, zap.InfoLevel, zap.DebugLevel},
-		),
 		RegisterFlags: func(cmd *cobra.Command) error {
 			registerCommonNodeFlags(cmd, flagPrefix, managerAPIaddr)
 			extraFlagRegistration(cmd)
@@ -67,7 +56,6 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 		},
 		FactoryFunc: nodeFactoryFunc(flagPrefix, kind, &appLogger, &nodeLogger),
 	})
-
 }
 
 func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger) func(*launcher.Runtime) (launcher.App, error) {

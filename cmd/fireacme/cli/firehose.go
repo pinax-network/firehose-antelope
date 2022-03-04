@@ -14,7 +14,6 @@ import (
 	"github.com/streamingfast/dmetrics"
 	firehoseApp "github.com/streamingfast/firehose/app/firehose"
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
 var metricset = dmetrics.NewSet()
@@ -22,15 +21,12 @@ var headBlockNumMetric = metricset.NewHeadBlockNumber("firehose")
 var headTimeDriftmetric = metricset.NewHeadTimeDrift("firehose")
 
 func init() {
-	appLogger := zap.NewNop()
-	logging.Register("github.com/streamingfast/firehose-acme/firehose", &appLogger)
+	appLogger, _ := logging.PackageLogger("firehose", "github.com/streamingfast/firehose-acme/firehose")
 
-	launcher.RegisterApp(&launcher.AppDef{
+	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          "firehose",
 		Title:       "Block Firehose",
 		Description: "Provides on-demand filtered blocks, depends on common-blocks-store-url and common-blockstream-addr",
-		MetricsID:   "merged-filter",
-		Logger:      launcher.NewLoggingDef("github.com/streamingfast/firehose-acme/firehose.*", nil),
 		RegisterFlags: func(cmd *cobra.Command) error {
 			cmd.Flags().String("firehose-grpc-listen-addr", FirehoseGRPCServingAddr, "Address on which the firehose will listen")
 			cmd.Flags().StringSlice("firehose-blocks-store-urls", nil, "If non-empty, overrides common-blocks-store-url with a list of blocks stores")

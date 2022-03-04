@@ -16,12 +16,6 @@ package codec
 
 import (
 	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
 )
 
-var traceEnabled = logging.IsTraceEnabled("fire-dummr", "github.com/streamingfast/firehose-acme/codec")
-var zlog *zap.Logger
-
-func init() {
-	logging.Register("github.com/streamingfast/firehose-acme/codec", &zlog)
-}
+var zlog, tracer = logging.PackageLogger("codec", "github.com/streamingfast/firehose-acme/codec")

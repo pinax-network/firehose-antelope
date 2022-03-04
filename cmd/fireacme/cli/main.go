@@ -9,6 +9,7 @@ import (
 	_ "github.com/streamingfast/dauth/authenticator/null"   // auth null plugin
 	_ "github.com/streamingfast/dauth/authenticator/secret" // auth secret/hard-coded plugin
 	_ "github.com/streamingfast/dauth/ratelimiter/null"     // ratelimiter plugin
+	"github.com/streamingfast/logging"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -17,6 +18,8 @@ import (
 	"github.com/streamingfast/dlauncher/launcher"
 	"go.uber.org/zap"
 )
+
+var rootLog, _ = logging.RootLogger("fireacme", "github.com/streamingfast/firehose-acme/cmd/fireacme/cli")
 
 var RootCmd = &cobra.Command{Use: "fireacme", Short: "Acme on StreamingFast"}
 var allFlags = make(map[string]bool) // used as global because of async access to cobra init functions
@@ -37,7 +40,7 @@ func Main() {
 	RootCmd.PersistentFlags().String("pprof-listen-addr", "localhost:6060", "If non-empty, the process will listen on this address for pprof analysis (see https://golang.org/pkg/net/http/pprof/)")
 	RootCmd.PersistentFlags().Duration("startup-delay", 0, "delay before launching dfuse process")
 
-	derr.Check("registering application flags", launcher.RegisterFlags(StartCmd))
+	derr.Check("registering application flags", launcher.RegisterFlags(rootLog, StartCmd))
 
 	var availableCmds []string
 	for app := range launcher.AppRegistry {
@@ -52,7 +55,7 @@ func Main() {
 		}
 		startupDelay := viper.GetDuration("global-startup-delay")
 		if startupDelay.Microseconds() > 0 {
-			zlog.Info("sleeping before starting apps", zap.Duration("delay", startupDelay))
+			rootLog.Info("sleeping before starting apps", zap.Duration("delay", startupDelay))
 			time.Sleep(startupDelay)
 		}
 		return nil

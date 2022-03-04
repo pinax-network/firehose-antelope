@@ -2,37 +2,52 @@ package nodemanager
 
 import (
 	"regexp"
-	"strings"
 
 	logplugin "github.com/streamingfast/node-manager/log_plugin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-var logLevelRegex = regexp.MustCompile("^(INFO|WARN|ERROR)")
+// This file configures a logging extractor that transforms log lines received from the blockchain process running
+// and then logs them inside the Firehose stack logging system.
+//
+// A simple regex is going to identify the level of the line and turn it into our internal level value.
+//
+// You **must** adapt this line to fit with the log lines of your chain. For example, the dummy blockchain we
+// instrumented in `firehose-acme`, log lines look like:
+//
+//    time="2022-03-04T12:49:34-05:00" level=info msg="initializing node"
+//
+// So our regex look like the one below, extracting the `info` value from a group in the regexp.
+var logLevelRegex = regexp.MustCompile("level=(debug|info|warn|warning|error)")
 
 func newToZapLogPlugin(debugDeepMind bool, logger *zap.Logger) *logplugin.ToZapLogPlugin {
-	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(logLevelExtractor))
+	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(logLevelExtractor), logplugin.ToZapLogPluginTransformer(stripTimeTransformer))
 }
 
 func logLevelExtractor(in string) zapcore.Level {
-	if strings.Contains(in, "Upgrade blockchain database version") {
-		return zap.InfoLevel
-	}
-
+	// If the regex does not match the line, log to `INFO` so at least we see something by default.
 	groups := logLevelRegex.FindStringSubmatch(in)
 	if len(groups) <= 1 {
-		return zap.DebugLevel
+		return zap.InfoLevel
 	}
 
 	switch groups[1] {
-	case "INFO":
+	case "debug", "DEBUG":
+		return zap.DebugLevel
+	case "info", "INFO":
 		return zap.InfoLevel
-	case "WARN":
+	case "warn", "warning", "WARN", "WARNING":
 		return zap.WarnLevel
-	case "ERROR":
+	case "error", "ERROR":
 		return zap.ErrorLevel
 	default:
-		return zap.DebugLevel
+		return zap.InfoLevel
 	}
+}
+
+var timeRegex = regexp.MustCompile(`time="[0-9]{4}-[^"]+"\s*`)
+
+func stripTimeTransformer(in string) string {
+	return timeRegex.ReplaceAllString(in, "")
 }

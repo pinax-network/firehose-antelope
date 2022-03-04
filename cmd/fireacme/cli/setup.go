@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-
 	"github.com/spf13/viper"
 	"github.com/streamingfast/dgrpc"
 	"github.com/streamingfast/dlauncher/launcher"
@@ -33,7 +32,7 @@ func setupCmd(cmd *cobra.Command) error {
 		}
 
 		if !exists && isMatchingCommand(cmds, forceConfigOn) {
-			return fmt.Errorf("Config file %q not found. Did you 'fireacme init'?", configFile)
+			return fmt.Errorf("config file %q not found. Did you 'fireacme init'?", configFile)
 		}
 
 		if exists {
@@ -61,15 +60,15 @@ func setupCmd(cmd *cobra.Command) error {
 		}
 	}
 
-	launcher.SetupLogger(&launcher.LoggingOptions{
+	launcher.SetupLogger(rootLog, &launcher.LoggingOptions{
 		WorkingDir:    viper.GetString("global-data-dir"),
 		Verbosity:     viper.GetInt("global-verbose"),
 		LogFormat:     viper.GetString("global-log-format"),
 		LogToFile:     isMatchingCommand(cmds, logToFileOn) && viper.GetBool("global-log-to-file"),
 		LogListenAddr: viper.GetString("global-log-level-switcher-listen-addr"),
 	})
-	launcher.SetupTracing("firehose-acme")
-	launcher.SetupAnalyticsMetrics(viper.GetString("global-metrics-listen-addr"), viper.GetString("global-pprof-listen-addr"))
+	launcher.SetupTracing("fireacme")
+	launcher.SetupAnalyticsMetrics(rootLog, viper.GetString("global-metrics-listen-addr"), viper.GetString("global-pprof-listen-addr"))
 
 	return nil
 }

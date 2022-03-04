@@ -17,10 +17,11 @@ package cli
 import (
 	"github.com/spf13/cobra"
 	"github.com/streamingfast/dlauncher/launcher"
+	"go.uber.org/zap"
 )
 
 func init() {
-	launcher.RegisterCommonFlags = func(cmd *cobra.Command) error {
+	launcher.RegisterCommonFlags = func(logger *zap.Logger, cmd *cobra.Command) error {
 		//Common stores configuration flags
 		cmd.Flags().String("common-blocks-store-url", MergedBlocksStoreURL, "[COMMON] Store URL (with prefix) where to read/write. Used by: relayer, fluxdb, trxdb-loader, blockmeta, search-indexer, search-live, search-forkresolver")
 		cmd.Flags().String("common-oneblock-store-url", OneBlockStoreURL, "[COMMON] Store URL (with prefix) to read/write one-block files. Used by: mindreader, merger")

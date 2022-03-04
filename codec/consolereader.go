@@ -4,11 +4,12 @@ import (
 	"bufio"
 	"encoding/base64"
 	"fmt"
-	"google.golang.org/protobuf/proto"
 	"io"
 	"strconv"
 	"strings"
 	"time"
+
+	"google.golang.org/protobuf/proto"
 
 	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
 	"go.uber.org/zap"
@@ -120,7 +121,7 @@ func (r *ConsoleReader) next() (out interface{}, err error) {
 		case LogEndBlock:
 			return r.ctx.readBlockEnd(tokens[1:])
 		default:
-			if traceEnabled {
+			if tracer.Enabled() {
 				zlog.Debug("skipping unknown deep mind log line", zap.String("line", line))
 			}
 			continue
