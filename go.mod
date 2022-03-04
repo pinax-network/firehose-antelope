@@ -3,6 +3,8 @@ module github.com/streamingfast/firehose-acme
 go 1.16
 
 require (
+	cloud.google.com/go/monitoring v1.4.0 // indirect
+	cloud.google.com/go/trace v1.2.0 // indirect
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/abourget/llerrgroup v0.2.0 // indirect
 	github.com/golang/protobuf v1.5.2
@@ -17,6 +19,7 @@ require (
 	github.com/streamingfast/dlauncher v0.0.0-20220304184304-e5045b95f9ad
 	github.com/streamingfast/dmetering v0.0.0-20220301165106-a642bb6a21bd
 	github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447
+	github.com/streamingfast/dstore v0.1.1-0.20220304164644-696f9c5fc231 // indirect
 	github.com/streamingfast/firehose v0.1.1-0.20220301165907-a8296f77f3bd
 	github.com/streamingfast/logging v0.0.0-20220304183711-ddba33d79e27
 	github.com/streamingfast/merger v0.0.3-0.20220301162603-c0129b6f1ad4
@@ -31,5 +34,3 @@ require (
 )
 
 replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
-
-replace github.com/streamingfast/dstore => /Users/maoueh/work/sf/dstore
