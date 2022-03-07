@@ -70,17 +70,11 @@ func init() {
 				firehoseBlocksStoreURLs[i] = mustReplaceDataDir(sfDataDir, url)
 			}
 
-			shutdownSignalDelay := viper.GetDuration("common-system-shutdown-signal-delay")
-			grcpShutdownGracePeriod := time.Duration(0)
-			if shutdownSignalDelay.Seconds() > 5 {
-				grcpShutdownGracePeriod = shutdownSignalDelay - (5 * time.Second)
-			}
-
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
 				BlockStoreURLs:          firehoseBlocksStoreURLs,
 				BlockStreamAddr:         blockstreamAddr,
 				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
-				GRPCShutdownGracePeriod: grcpShutdownGracePeriod,
+				GRPCShutdownGracePeriod: 1 * time.Second,
 				RealtimeTolerance:       viper.GetDuration("firehose-real-time-tolerance"),
 			}, &firehoseApp.Modules{
 				Authenticator:         authenticator,

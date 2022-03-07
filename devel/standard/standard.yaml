@@ -1,6 +1,9 @@
 start:
   args:
+  - firehose
+  - merger
   - mindreader-node
+  - relayer
   flags:
     # Specifies the path to the dummy chain binary is
     mindreader-node-path: "/Users/julien/codebase/sf/dummy-blockchain/dchain"

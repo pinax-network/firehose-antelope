@@ -21,6 +21,12 @@ import (
 	"google.golang.org/grpc"
 )
 
+var nodeLogger, _ = logging.PackageLogger("node", "github.com/streamingfast/firehose-acme/node")
+var nodeDummyChainLogger, _ = logging.PackageLogger("node.dummy-chain", "github.com/streamingfast/firehose-acme/node/dummy-chain", DefaultLevelInfo)
+
+var mindreaderLogger, _ = logging.PackageLogger("mindreader", "github.com/streamingfast/firehose-acme/mindreader")
+var mindreaderDummyChainLogger, _ = logging.PackageLogger("mindreader.dummy-chain", "github.com/streamingfast/firehose-acme/mindreader/dummy-chain", DefaultLevelInfo)
+
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
 	cmd.Flags().String(flagPrefix+"path", "dummychain", "Command that will be launched by the node manager")
 	cmd.Flags().String(flagPrefix+"data-dir", "{sf-data-dir}/{node-role}/data", "Directory for node data ({node-role} is either mindreader, peering or dev-miner)")
@@ -39,9 +45,6 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 	app := fmt.Sprintf("%s-node", kind)
 	flagPrefix := fmt.Sprintf("%s-", app)
 
-	appLogger, _ := logging.PackageLogger(app, fmt.Sprintf("github.com/streamingfast/firehose-acme/%s", app))
-	nodeLogger, _ := logging.PackageLogger("dummy-chain", fmt.Sprintf("github.com/streamingfast/firehose-acme/%s/node", app), logging.LoggerDefaultLevel(zap.InfoLevel))
-
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          app,
 		Title:       fmt.Sprintf("Acme Node (%s)", kind),
@@ -54,12 +57,26 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 		InitFunc: func(runtime *launcher.Runtime) error {
 			return nil
 		},
-		FactoryFunc: nodeFactoryFunc(flagPrefix, kind, &appLogger, &nodeLogger),
+		FactoryFunc: nodeFactoryFunc(flagPrefix, kind),
 	})
 }
 
-func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger) func(*launcher.Runtime) (launcher.App, error) {
+func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.App, error) {
 	return func(runtime *launcher.Runtime) (launcher.App, error) {
+		var appLogger *zap.Logger
+		var supervisedProcessLogger *zap.Logger
+
+		switch kind {
+		case "node":
+			appLogger = supervisedProcessLogger
+			supervisedProcessLogger = nodeDummyChainLogger
+		case "mindreader":
+			appLogger = mindreaderLogger
+			supervisedProcessLogger = mindreaderDummyChainLogger
+		default:
+			panic(fmt.Errorf("unknown node kind %q", kind))
+		}
+
 		sfDataDir := runtime.AbsDataDir
 
 		nodePath := viper.GetString(flagPrefix + "path")
@@ -89,8 +106,8 @@ func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger
 			metricsAndReadinessManager.UpdateHeadBlock,
 			debugDeepMind,
 			logToZap,
-			*appLogger,
-			*nodeLogger,
+			appLogger,
+			supervisedProcessLogger,
 		)
 
 		bootstrapper := &bootstrapper{
@@ -98,7 +115,7 @@ func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger
 		}
 
 		chainOperator, err := operator.New(
-			*appLogger,
+			appLogger,
 			superviser,
 			metricsAndReadinessManager,
 			&operator.Options{
@@ -116,10 +133,10 @@ func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger
 			}, &nodeManagerApp.Modules{
 				Operator:                   chainOperator,
 				MetricsAndReadinessManager: metricsAndReadinessManager,
-			}, *appLogger), nil
+			}, appLogger), nil
 		}
 
-		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(*appLogger))
+		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
 		oneBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-oneblock-store-url"))
 		mergedBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-blocks-store-url"))
 		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("mindreader-node-working-dir"))
@@ -150,7 +167,7 @@ func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger
 			chainOperator.Shutdown,
 			metricsAndReadinessManager,
 			tracker,
-			*appLogger,
+			appLogger,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("new mindreader plugin: %w", err)
@@ -171,7 +188,7 @@ func nodeFactoryFunc(flagPrefix, kind string, appLogger, nodeLogger **zap.Logger
 
 				return nil
 			},
-		}, *appLogger), nil
+		}, appLogger), nil
 	}
 }
 

@@ -16,11 +16,6 @@ package codec
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/golang/protobuf/proto"
-	"github.com/streamingfast/logging"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 	"io"
 	"io/ioutil"
 	"os"
@@ -28,11 +23,12 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-)
 
-func init() {
-	logging.TestingOverride()
-}
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+)
 
 type ObjectReader func() (interface{}, error)
 

@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 )
 
@@ -82,3 +83,5 @@ func MustReplaceDataDir(dataDir, in string) string {
 	in = strings.Replace(in, "{sf-data-dir}", d, -1)
 	return in
 }
+
+var DefaultLevelInfo = logging.LoggerDefaultLevel(zap.InfoLevel)

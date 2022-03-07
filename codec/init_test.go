@@ -3,9 +3,14 @@ package codec
 import (
 	"testing"
 
+	"github.com/streamingfast/logging"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 )
+
+func init() {
+	logging.InstantiateLoggers()
+}
 
 func assertProtoEqual(t *testing.T, expected, actual proto.Message) {
 	t.Helper()
