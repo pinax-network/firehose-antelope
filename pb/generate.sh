@@ -16,8 +16,7 @@
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
 
 # Protobuf definitions
-PROTO=${1:-"$ROOT/../proto"}
-PROTO_ACME=${2:-"$ROOT/../proto-acme"}
+PROTO_ACME=${2:-"$ROOT/proto"}
 
 function main() {
   checks
@@ -26,11 +25,10 @@ function main() {
   trap "cd \"$current_dir\"" EXIT
   pushd "$ROOT/pb" &> /dev/null
 
-  generate "sf/acme/codec/v1/codec.proto"
+  generate "sf/acme/type/v1/type.proto"
 
   echo "generate.sh - `date` - `whoami`" > $ROOT/pb/last_generate.txt
   echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
-  echo "streamingfast/proto-acme revision: `GIT_DIR=$PROTO_ACME/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
 }
 
 # usage:
@@ -43,7 +41,7 @@ function generate() {
     fi
 
     for file in "$@"; do
-      protoc -I$PROTO -I$PROTO_ACME \
+      protoc -I$PROTO_ACME \
         --go_out=. --go_opt=paths=source_relative \
         --go-grpc_out=. --go-grpc_opt=paths=source_relative,require_unimplemented_servers=false \
          $base$file
