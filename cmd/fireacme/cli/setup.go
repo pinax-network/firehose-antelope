@@ -62,7 +62,7 @@ func setupCmd(cmd *cobra.Command) error {
 
 	launcher.SetupLogger(rootLog, &launcher.LoggingOptions{
 		WorkingDir:    viper.GetString("global-data-dir"),
-		Verbosity:     viper.GetInt("global-verbose"),
+		Verbosity:     viper.GetInt("global-log-verbosity"),
 		LogFormat:     viper.GetString("global-log-format"),
 		LogToFile:     isMatchingCommand(cmds, logToFileOn) && viper.GetBool("global-log-to-file"),
 		LogListenAddr: viper.GetString("global-log-level-switcher-listen-addr"),

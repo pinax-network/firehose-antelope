@@ -35,10 +35,10 @@ func init() {
 }
 
 func registerMindreaderNodeFlags(cmd *cobra.Command) error {
-	cmd.Flags().String("mindreader-node-grpc-listen-addr", MindreaderGRPCAddr, "gRPC listening address to use for serving real-time blocks")
-	cmd.Flags().Bool("mindreader-node-merge-and-store-directly", false, "[BATCH] When enabled, do not write oneblock files, sidestep the merger and write the merged 100-blocks logs directly to --common-merged-blocks-store-url")
+	cmd.Flags().String("mindreader-node-grpc-listen-addr", MindreaderGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
+	cmd.Flags().Bool("mindreader-node-merge-and-store-directly", false, "When enabled, do not write one block files, sidestep the merger and write the merged 100-blocks logs directly to --common-merged-blocks-store-url")
 	cmd.Flags().Bool("mindreader-node-discard-after-stop-num", false, "Ignore remaining blocks being processed after stop num (only useful if we discard the mindreader data after reprocessing a chunk of blocks)")
-	cmd.Flags().String("mindreader-node-working-dir", "{sf-data-dir}/mindreader/work", "Path where mindreader will stores its files")
+	cmd.Flags().String("mindreader-node-working-dir", "{data-dir}/mindreader/work", "Path where mindreader will stores its files")
 	cmd.Flags().Uint("mindreader-node-start-block-num", 0, "Blocks that were produced with smaller block number then the given block num are skipped")
 	cmd.Flags().Uint("mindreader-node-stop-block-num", 0, "Shutdown mindreader when we the following 'stop-block-num' has been reached, inclusively.")
 	cmd.Flags().Int("mindreader-node-blocks-chan-capacity", 100, "Capacity of the channel holding blocks read by the mindreader. Process will shutdown superviser/geth if the channel gets over 90% of that capacity to prevent horrible consequences. Raise this number when processing tiny blocks very quickly")

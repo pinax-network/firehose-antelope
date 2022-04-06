@@ -18,9 +18,9 @@ const (
 	FirehoseGRPCServingAddr      string = ":17042"
 
 	// Data storage default locations
-	ATMDirectory         string = "file://{sf-data-dir}/atm"
-	MergedBlocksStoreURL string = "file://{sf-data-dir}/storage/merged-blocks"
-	OneBlockStoreURL     string = "file://{sf-data-dir}/storage/one-blocks"
+	ATMDirectory         string = "file://{data-dir}/atm"
+	MergedBlocksStoreURL string = "file://{data-dir}/storage/merged-blocks"
+	OneBlockStoreURL     string = "file://{data-dir}/storage/one-blocks"
 
 	// Tweak this for your chain
 	FirstStreamableBlock int = 1

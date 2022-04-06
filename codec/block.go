@@ -24,5 +24,6 @@ func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
 		PayloadKind:    pbbstream.Protocol_UNKNOWN,
 		PayloadVersion: 1,
 	}
+
 	return bstream.GetBlockPayloadSetter(block, content)
 }

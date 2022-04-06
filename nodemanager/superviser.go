@@ -1,8 +1,6 @@
 package nodemanager
 
 import (
-	"fmt"
-	"net"
 	"strconv"
 	"strings"
 	"sync"
@@ -19,7 +17,6 @@ import (
 type Superviser struct {
 	*superviser.Superviser
 
-	//backupMutex         sync.Mutex
 	infoMutex           sync.Mutex
 	binary              string
 	arguments           []string
@@ -68,18 +65,6 @@ func NewSuperviser(
 	return supervisor
 }
 
-func (s *Superviser) setServerId(serverId string) error {
-	ipAddr := getIPAddress()
-	if ipAddr == "" {
-		return fmt.Errorf("cannot find local IP address")
-	}
-
-	s.infoMutex.Lock()
-	defer s.infoMutex.Unlock()
-	s.serverId = fmt.Sprintf(`${1}@%s:30303`, ipAddr)
-	return nil
-}
-
 func (s *Superviser) GetCommand() string {
 	return s.binary + " " + strings.Join(s.arguments, " ")
 }
@@ -115,7 +100,6 @@ func (s *Superviser) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 }
 
 func (s *Superviser) lastBlockSeenLogPlugin(line string) {
-	//DMLOG BLOCK_BEGIN <HEIGHT>
 	if !strings.HasPrefix(line, "DMLOG BLOCK_BEGIN") {
 		return
 	}
@@ -132,50 +116,5 @@ func (s *Superviser) lastBlockSeenLogPlugin(line string) {
 		return
 	}
 
-	//metrics.SetHeadBlockNumber(blockNum)
 	s.lastBlockSeen = blockNum
-}
-
-// AddPeer sends a command through IPC socket to connect geth to the given peer
-
-//func (s *Superviser) sendGethCommand(cmd string) (string, error) {
-//	c, err := net.Dial("unix", s.ipcFilePath)
-//	if err != nil {
-//		return "", err
-//	}
-//	defer c.Close()
-//
-//	_, err = c.Write([]byte(cmd))
-//	if err != nil {
-//		return "", err
-//	}
-//
-//	resp, err := readString(c)
-//	return resp, err
-//}
-
-func getIPAddress() string {
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		return ""
-	}
-	for _, i := range ifaces {
-		addrs, err := i.Addrs()
-		if err != nil {
-			continue
-		}
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-			if ip.IsGlobalUnicast() {
-				return ip.String()
-			}
-		}
-	}
-	return ""
 }

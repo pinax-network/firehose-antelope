@@ -28,10 +28,19 @@ var mindreaderLogger, _ = logging.PackageLogger("mindreader", "github.com/stream
 var mindreaderDummyChainLogger, _ = logging.PackageLogger("mindreader.dummy-chain", "github.com/streamingfast/firehose-acme/mindreader/dummy-chain", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
-	cmd.Flags().String(flagPrefix+"path", "dummychain", "Command that will be launched by the node manager")
-	cmd.Flags().String(flagPrefix+"data-dir", "{sf-data-dir}/{node-role}/data", "Directory for node data ({node-role} is either mindreader, peering or dev-miner)")
+	cmd.Flags().String(flagPrefix+"path", "dchain", FlagDescription(`
+		Process that will be invoked mindreader (a.k.a extractor) component, can be a full path or just the binary's name, in which case the binary is
+		searched for paths listed by the PATH environment variable (following operating system rules around PATH handling).
+	`))
+	cmd.Flags().String(flagPrefix+"data-dir", "{data-dir}/{node-role}/data", "Directory for node data ({node-role} is either mindreader, peering or dev-miner)")
 	cmd.Flags().Bool(flagPrefix+"debug-deep-mind", false, "[DEV] Prints deep mind instrumentation logs to standard output, should be use for debugging purposes only")
-	cmd.Flags().Bool(flagPrefix+"log-to-zap", true, "Enable all node logs to transit into node's logger directly, when false, prints node logs directly to stdout")
+	cmd.Flags().Bool(flagPrefix+"log-to-zap", true, FlagDescription(`
+		When sets to 'true', all standard error outpout emitted by the invoked process defined via '%s'
+		is intercepted, split line by line and each line is then transformed and logged through the Firehose stack
+		logging system. The transformation extracts the level and remove the timestamps creating a 'sanitized' version
+		of the logs emitted by the blockchain's managed client process. If this is not desirable, disabled the flag
+		and all the invoked process standard error will be redirect to 'fireacme' standard's output.
+	`, flagPrefix+"path"))
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")
 	cmd.Flags().String(flagPrefix+"arguments", "", "If not empty, overrides the list of default node arguments (computed from node type and role). Start with '+' to append to default args instead of replacing. ")
