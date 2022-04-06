@@ -21,25 +21,45 @@ import (
 )
 
 func init() {
-	launcher.RegisterCommonFlags = func(logger *zap.Logger, cmd *cobra.Command) error {
+	launcher.RegisterCommonFlags = func(_ *zap.Logger, cmd *cobra.Command) error {
 		//Common stores configuration flags
-		cmd.Flags().String("common-blocks-store-url", MergedBlocksStoreURL, "[COMMON] Store URL (with prefix) where to read/write. Used by: relayer, fluxdb, trxdb-loader, blockmeta, search-indexer, search-live, search-forkresolver")
-		cmd.Flags().String("common-oneblock-store-url", OneBlockStoreURL, "[COMMON] Store URL (with prefix) to read/write one-block files. Used by: mindreader, merger")
-		cmd.Flags().String("common-blockstream-addr", RelayerServingAddr, "[COMMON] gRPC endpoint to get real-time blocks. Used by: fluxdb, trxdb-loader, blockmeta, search-indexer, search-live (relayer uses its own --relayer-blockstream-addr)")
+		cmd.Flags().String("common-one-blocks-store-url", OneBlockStoreURL, "[COMMON] Store URL to read/write one-block files, use by mindreader, merger")
+		cmd.Flags().String("common-merged-blocks-store-url", MergedBlocksStoreURL, "[COMMON] Store URL where to read/write merged blocks, used by: mindreader, merger, firehose.")
+		cmd.Flags().String("common-relayer-addr", RelayerServingAddr, "[COMMON] gRPC endpoint to get real-time blocks, used by: firehose")
 
-		cmd.Flags().Bool("common-atm-cache-enabled", false, "[COMMON] enable ATM caching")
-		cmd.Flags().String("common-atm-cache-dir", ATMDirectory, "[COMMON] ATM cache file directory.")
-		cmd.Flags().Int("common-atm-max-recent-entry-bytes", 21474836480, "[COMMON] ATM cache max size in bytes of recent entry heap")
-		cmd.Flags().Int("common-atm-max-entry-by-age-bytes", 21474836480, "[COMMON] ATM cache max size in bytes of age entry heap")
+		cmd.Flags().Bool("common-atm-cache-enabled", false, FlagDescription(`
+			[COMMON] Use a disk cache to store the blocks of the reversible (a.k.a non-final) segment of the chain to disk and instead of keeping it in RAM.
+			A graph of the reversible segment branches is used internally on any stream, be it internal to the stack or through end-user consuming a Firehose
+			stream. By enabling this, reversible block's Protobuf content, in bytes, is kept on file system instead of RAM, increasing the concurrent requests that
+			a single Firehose instance can enable. This is a tradeoff between RAM and Disk, if you are going to serve only a handful of concurrent requests,
+			it's suggested to keep is disabled, if you encounter heavy RAM consumption issue, specially by the firehose component, it's definitely a good idea
+			to enable it and configure it properly through the other 'common-atm-...' flags. The cache is split in two portions, one keeping N total bytes of blocks
+			of the most recently used blocks and the other one keeping the N earliest blocks as requested by the various consumers of the cache.
+		`))
+		cmd.Flags().String("common-atm-cache-dir", ATMDirectory, FlagDescription(`
+			[COMMON] ATM cache directory where all the block's bytes will be cached to disk instead of being kept in RAM.
+			This should be a disk that persists across restarts of the Firehose component to reduce the the strain on the disk
+			when restarting and streams reconnects. The size of disk must at least big (with a 10% buffer) in bytes as the sum of flags'
+			value for  'common-atm-max-recent-entry-bytes' and 'common-atm-max-entry-by-age-bytes'.
+		`))
+		cmd.Flags().Int("common-atm-max-recent-entry-bytes", 21474836480, FlagDescription(`
+			[COMMON] ATM cache max size in bytes of the most recently used blocks, after the limit is reached, blocks are evicted from the cache.
+		`))
+		cmd.Flags().Int("common-atm-max-entry-by-age-bytes", 21474836480, FlagDescription(`
+			[COMMON] ATM cache max size in bytes of the earliest used blocks, after the limit is reached, blocks are evicted from the cache.
+		`))
 
-		cmd.Flags().Int("common-first-streamable-block", FirstStreamableBlock, "[COMMON] first streamable block number")
+		cmd.Flags().Int("common-first-streamable-block", FirstStreamableBlock, "[COMMON] First streamable block of the chain, ")
 
 		// Authentication, metering and rate limiter plugins
 		cmd.Flags().String("common-auth-plugin", "null://", "[COMMON] Auth plugin URI, see dfuse-io/dauth repository")
 		cmd.Flags().String("common-metering-plugin", "null://", "[COMMON] Metering plugin URI, see dfuse-io/dmetering repository")
 
 		// System Behavior
-		cmd.Flags().Duration("common-system-shutdown-signal-delay", 0, "[COMMON] Add a delay between receiving SIGTERM signal and shutting down apps. Apps will respond negatively to /healthz during this period")
+		cmd.Flags().Duration("common-system-shutdown-signal-delay", 0, FlagDescription(`
+			[COMMON] Add a delay between receiving SIGTERM signal and shutting down apps.
+			Apps will respond negatively to /healthz during this period
+		`))
 		return nil
 	}
 }

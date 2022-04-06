@@ -31,11 +31,11 @@ func init() {
 		InitFunc: func(runtime *launcher.Runtime) (err error) {
 			sfDataDir := runtime.AbsDataDir
 
-			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-blocks-store-url"))); err != nil {
+			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url"))); err != nil {
 				return
 			}
 
-			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-oneblock-store-url"))); err != nil {
+			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))); err != nil {
 				return
 			}
 
@@ -48,8 +48,8 @@ func init() {
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
 			return mergerApp.New(&mergerApp.Config{
-				StorageMergedBlocksFilesPath:   mustReplaceDataDir(sfDataDir, viper.GetString("common-blocks-store-url")),
-				StorageOneBlockFilesPath:       mustReplaceDataDir(sfDataDir, viper.GetString("common-oneblock-store-url")),
+				StorageMergedBlocksFilesPath:   mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
+				StorageOneBlockFilesPath:       mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
 				TimeBetweenStoreLookups:        viper.GetDuration("merger-time-between-store-lookups"),
 				GRPCListenAddr:                 viper.GetString("merger-grpc-listen-addr"),
 				WritersLeewayDuration:          viper.GetDuration("merger-writers-leeway"),

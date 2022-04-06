@@ -26,10 +26,10 @@ func init() {
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          "firehose",
 		Title:       "Block Firehose",
-		Description: "Provides on-demand filtered blocks, depends on common-blocks-store-url and common-blockstream-addr",
+		Description: "Provides on-demand filtered blocks, depends on common-merged-blocks-store-url and common-relayer-addr",
 		RegisterFlags: func(cmd *cobra.Command) error {
 			cmd.Flags().String("firehose-grpc-listen-addr", FirehoseGRPCServingAddr, "Address on which the firehose will listen")
-			cmd.Flags().StringSlice("firehose-blocks-store-urls", nil, "If non-empty, overrides common-blocks-store-url with a list of blocks stores")
+			cmd.Flags().StringSlice("firehose-blocks-store-urls", nil, "If non-empty, overrides common-merged-blocks-store-url with a list of blocks stores")
 			cmd.Flags().Duration("firehose-real-time-tolerance", 1*time.Minute, "firehose will became alive if now - block time is smaller then tolerance")
 			return nil
 		},
@@ -37,7 +37,7 @@ func init() {
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
 			tracker := runtime.Tracker.Clone()
-			blockstreamAddr := viper.GetString("common-blockstream-addr")
+			blockstreamAddr := viper.GetString("common-relayer-addr")
 			if blockstreamAddr != "" {
 				tracker.AddGetter(bstream.BlockStreamLIBTarget, bstream.StreamLIBBlockRefGetter(blockstreamAddr))
 			}
@@ -57,7 +57,7 @@ func init() {
 
 			firehoseBlocksStoreURLs := viper.GetStringSlice("firehose-blocks-store-urls")
 			if len(firehoseBlocksStoreURLs) == 0 {
-				firehoseBlocksStoreURLs = []string{viper.GetString("common-blocks-store-url")}
+				firehoseBlocksStoreURLs = []string{viper.GetString("common-merged-blocks-store-url")}
 			} else if len(firehoseBlocksStoreURLs) == 1 && strings.Contains(firehoseBlocksStoreURLs[0], ",") {
 				if viper.GetBool("common-atm-cache-enabled") {
 					panic("cannot use ATM cache with firehose multi blocks store URLs")

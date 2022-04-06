@@ -5,6 +5,8 @@ start:
   - mindreader-node
   - relayer
   flags:
+    # We disable receiving live blocks from the receiver, so Firehose will work on historical blocks only
+    common-relayer-addr:
     # Specifies the path to the dummy chain binary is
     mindreader-node-path: "/Users/julien/codebase/sf/dummy-blockchain/dchain"
     # Indicates to the mindreader-node to skip writing individual one block files and merge the block data into 100-blocks merged files
@@ -15,4 +17,3 @@ start:
     # blocks even if the chain is not live yet.
     firehose-real-time-tolerance: 999999999s
     relayer-max-source-latency: 999999999s
-    common-blockstream-addr:

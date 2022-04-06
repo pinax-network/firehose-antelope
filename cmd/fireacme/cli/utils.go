@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/streamingfast/cli"
 	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 )
@@ -85,3 +86,7 @@ func MustReplaceDataDir(dataDir, in string) string {
 }
 
 var DefaultLevelInfo = logging.LoggerDefaultLevel(zap.InfoLevel)
+
+func FlagDescription(in string) string {
+	return strings.Join(strings.Split(string(cli.Description(in)), "\n"), " ")
+}
