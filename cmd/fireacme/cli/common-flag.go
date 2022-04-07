@@ -28,13 +28,12 @@ func init() {
 		cmd.Flags().String("common-relayer-addr", RelayerServingAddr, "[COMMON] gRPC endpoint to get real-time blocks, used by: firehose")
 
 		cmd.Flags().Bool("common-atm-cache-enabled", false, FlagDescription(`
-			[COMMON] Use a disk cache to store the blocks of the reversible (a.k.a non-final) segment of the chain to disk and instead of keeping it in RAM.
-			A graph of the reversible segment branches is used internally on any stream, be it internal to the stack or through end-user consuming a Firehose
-			stream. By enabling this, reversible block's Protobuf content, in bytes, is kept on file system instead of RAM, increasing the concurrent requests that
-			a single Firehose instance can enable. This is a tradeoff between RAM and Disk, if you are going to serve only a handful of concurrent requests,
-			it's suggested to keep is disabled, if you encounter heavy RAM consumption issue, specially by the firehose component, it's definitely a good idea
-			to enable it and configure it properly through the other 'common-atm-...' flags. The cache is split in two portions, one keeping N total bytes of blocks
-			of the most recently used blocks and the other one keeping the N earliest blocks as requested by the various consumers of the cache.
+			[COMMON] Use a disk cache to store the blocks data to disk and instead of keeping it in RAM. By enabling this, block's Protobuf content, in bytes,
+			is kept on file system instead of RAM. This is done as soon the block is downloaded from storage. This is a tradeoff between RAM and Disk, if you
+			are going to serve only a handful of concurrent requests, it's suggested to keep is disabled, if you encounter heavy RAM consumption issue, specially
+			by the firehose component, it's definitely a good idea to enable it and configure it properly through the other 'common-atm-...' flags. The cache is
+			split in two portions, one keeping N total bytes of blocks of the most recently used blocks and the other one keeping the N earliest blocks as
+			requested by the various consumers of the cache.
 		`))
 		cmd.Flags().String("common-atm-cache-dir", ATMDirectory, FlagDescription(`
 			[COMMON] ATM cache directory where all the block's bytes will be cached to disk instead of being kept in RAM.
