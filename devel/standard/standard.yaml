@@ -8,7 +8,7 @@ start:
     # We disable receiving live blocks from the receiver, so Firehose will work on historical blocks only
     common-relayer-addr:
     # Specifies the path to the binary
-    mindreader-node-path: "dchain"
+    mindreader-node-path: "dummy-blockchain"
     # Indicates to the mindreader-node to skip writing individual one block files and merge the block data into 100-blocks merged files
     mindreader-node-merge-and-store-directly: true
     # Flags that will be added to the dummy chain process command

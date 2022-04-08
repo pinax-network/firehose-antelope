@@ -35,7 +35,7 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	cmd.Flags().String(flagPrefix+"data-dir", "{data-dir}/{node-role}/data", "Directory for node data ({node-role} is either mindreader, peering or dev-miner)")
 	cmd.Flags().Bool(flagPrefix+"debug-deep-mind", false, "[DEV] Prints deep mind instrumentation logs to standard output, should be use for debugging purposes only")
 	cmd.Flags().Bool(flagPrefix+"log-to-zap", true, FlagDescription(`
-		When sets to 'true', all standard error outpout emitted by the invoked process defined via '%s'
+		When sets to 'true', all standard error output emitted by the invoked process defined via '%s'
 		is intercepted, split line by line and each line is then transformed and logged through the Firehose stack
 		logging system. The transformation extracts the level and remove the timestamps creating a 'sanitized' version
 		of the logs emitted by the blockchain's managed client process. If this is not desirable, disabled the flag
@@ -155,7 +155,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		batchStartBlockNum := viper.GetUint64("mindreader-node-start-block-num")
 		batchStopBlockNum := viper.GetUint64("mindreader-node-stop-block-num")
 		waitTimeForUploadOnShutdown := viper.GetDuration("mindreader-node-wait-upload-complete-on-shutdown")
-		oneBlockFileSuffix := viper.GetString("mindreader-node-oneblock-suffix")
+		oneBlockFileSuffix := viper.GetString("mindreader-node-one-block-suffix")
 		blocksChanCapacity := viper.GetInt("mindreader-node-blocks-chan-capacity")
 
 		tracker := runtime.Tracker.Clone()
