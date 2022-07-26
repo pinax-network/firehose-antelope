@@ -149,7 +149,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
-		mergedBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url"))
+		oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))
 		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("extractor-node-working-dir"))
 		gprcListenAdrr := viper.GetString("extractor-node-grpc-listen-addr")
 		batchStartBlockNum := viper.GetUint64("extractor-node-start-block-num")
@@ -159,7 +159,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 
 		mindreaderPlugin, err := getMindreaderLogPlugin(
 			blockStreamServer,
-			mergedBlockStoreURL,
+			oneBlocksStoreURL,
 			workingDir,
 			batchStartBlockNum,
 			batchStopBlockNum,

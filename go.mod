@@ -22,7 +22,7 @@ require (
 	github.com/streamingfast/firehose v0.1.1-0.20220714133629-d73d5125aad5
 	github.com/streamingfast/logging v0.0.0-20220304214715-bc750a74b424
 	github.com/streamingfast/merger v0.0.3-0.20220722205853-35cb87d9e6f5
-	github.com/streamingfast/node-manager v0.0.2-0.20220718140702-83be8620bf26
+	github.com/streamingfast/node-manager v0.0.2-0.20220726150849-93bd6c899c04
 	github.com/streamingfast/pbgo v0.0.6-0.20220630154121-2e8bba36234e
 	github.com/streamingfast/relayer v0.0.2-0.20220718181058-0fb6aa6b335d
 	github.com/streamingfast/sf-tools v0.0.0-20220719204131-712c531f00bc

@@ -32,6 +32,8 @@ func init() {
 		},
 
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
+			sfDataDir := runtime.AbsDataDir
+
 			authenticator, err := dauthAuthenticator.New(viper.GetString("common-auth-plugin"))
 			if err != nil {
 				return nil, fmt.Errorf("unable to initialize dauth: %w", err)
@@ -44,7 +46,8 @@ func init() {
 			dmetering.SetDefaultMeter(metering)
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
-				MergedBlocksStoreURL:    viper.GetString("common-merged-blocks-store-url"),
+				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
+				MergedBlocksStoreURL:    MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
 				BlockStreamAddr:         viper.GetString("common-relayer-addr"),
 				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
 				GRPCShutdownGracePeriod: 1 * time.Second,

@@ -39,6 +39,7 @@ func init() {
 		},
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
+
 			return mergerApp.New(&mergerApp.Config{
 				StorageOneBlockFilesPath:     MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
 				StorageMergedBlocksFilesPath: MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),

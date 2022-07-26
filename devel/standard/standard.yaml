@@ -5,8 +5,6 @@ start:
   - extractor-node
   - relayer
   flags:
-    # We disable receiving live blocks from the receiver, so Firehose will work on historical blocks only
-    common-relayer-addr:
     # Specifies the path to the binary
     extractor-node-path: "dummy-blockchain"
     # Flags that will be added to the dummy chain process command

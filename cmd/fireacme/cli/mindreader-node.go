@@ -46,7 +46,7 @@ func registerExtractorNodeFlags(cmd *cobra.Command) error {
 
 func getMindreaderLogPlugin(
 	blockStreamServer *blockstream.Server,
-	mergedBlockStoreURL string,
+	oneBlocksStoreURL string,
 	workingDir string,
 	batchStartBlockNum uint64,
 	batchStopBlockNum uint64,
@@ -62,7 +62,7 @@ func getMindreaderLogPlugin(
 	}
 
 	return mindreader.NewMindReaderPlugin(
-		mergedBlockStoreURL,
+		oneBlocksStoreURL,
 		workingDir,
 		consoleReaderFactory,
 		batchStartBlockNum,
