@@ -21,11 +21,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-var nodeLogger, _ = logging.PackageLogger("node", "github.com/streamingfast/firehose-acme/node")
-var nodeDummyChainLogger, _ = logging.PackageLogger("node.dummy-chain", "github.com/streamingfast/firehose-acme/node/dummy-chain", DefaultLevelInfo)
+var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/streamingfast/firehose-acme/node")
+var nodeAcmeChainLogger, _ = logging.PackageLogger("node.acme", "github.com/streamingfast/firehose-acme/node/acme", DefaultLevelInfo)
 
-var mindreaderLogger, _ = logging.PackageLogger("mindreader", "github.com/streamingfast/firehose-acme/mindreader")
-var mindreaderDummyChainLogger, _ = logging.PackageLogger("mindreader.dummy-chain", "github.com/streamingfast/firehose-acme/mindreader/dummy-chain", DefaultLevelInfo)
+var mindreaderLogger, mindreaderTracer = logging.PackageLogger("mindreader", "github.com/streamingfast/firehose-acme/mindreader")
+var mindreaderAcmeChainLogger, _ = logging.PackageLogger("mindreader.acme", "github.com/streamingfast/firehose-acme/mindreader/acme", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
 	cmd.Flags().String(flagPrefix+"path", "dchain", FlagDescription(`
@@ -73,15 +73,18 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.App, error) {
 	return func(runtime *launcher.Runtime) (launcher.App, error) {
 		var appLogger *zap.Logger
+		var appTracer logging.Tracer
 		var supervisedProcessLogger *zap.Logger
 
 		switch kind {
 		case "node":
-			appLogger = supervisedProcessLogger
-			supervisedProcessLogger = nodeDummyChainLogger
+			appLogger = nodeLogger
+			appTracer = nodeTracer
+			supervisedProcessLogger = nodeAcmeChainLogger
 		case "mindreader":
 			appLogger = mindreaderLogger
-			supervisedProcessLogger = mindreaderDummyChainLogger
+			appTracer = mindreaderTracer
+			supervisedProcessLogger = mindreaderAcmeChainLogger
 		default:
 			panic(fmt.Errorf("unknown node kind %q", kind))
 		}
@@ -146,37 +149,26 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
-		oneBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))
 		mergedBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url"))
 		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("mindreader-node-working-dir"))
 		gprcListenAdrr := viper.GetString("mindreader-node-grpc-listen-addr")
-		mergeAndStoreDirectly := viper.GetBool("mindreader-node-merge-and-store-directly")
-		mergeThresholdBlockAge := viper.GetDuration("mindreader-node-merge-threshold-block-age")
 		batchStartBlockNum := viper.GetUint64("mindreader-node-start-block-num")
 		batchStopBlockNum := viper.GetUint64("mindreader-node-stop-block-num")
-		waitTimeForUploadOnShutdown := viper.GetDuration("mindreader-node-wait-upload-complete-on-shutdown")
 		oneBlockFileSuffix := viper.GetString("mindreader-node-one-block-suffix")
 		blocksChanCapacity := viper.GetInt("mindreader-node-blocks-chan-capacity")
 
-		tracker := runtime.Tracker.Clone()
-
 		mindreaderPlugin, err := getMindreaderLogPlugin(
 			blockStreamServer,
-			oneBlockStoreURL,
 			mergedBlockStoreURL,
-			mergeAndStoreDirectly,
-			mergeThresholdBlockAge,
 			workingDir,
 			batchStartBlockNum,
 			batchStopBlockNum,
 			blocksChanCapacity,
-			false,
-			waitTimeForUploadOnShutdown,
 			oneBlockFileSuffix,
 			chainOperator.Shutdown,
 			metricsAndReadinessManager,
-			tracker,
 			appLogger,
+			appTracer,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("new mindreader plugin: %w", err)

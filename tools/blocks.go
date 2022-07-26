@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dstore"
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 
@@ -115,7 +115,7 @@ func printBlocksE(cmd *cobra.Command, args []string) error {
 
 		seenBlockCount++
 
-		acmeBlock := block.ToProtocol().(*pbcodec.Block)
+		acmeBlock := block.ToProtocol().(*pbacme.Block)
 
 		fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
 			block.Num(),
@@ -190,7 +190,7 @@ func printBlockE(cmd *cobra.Command, args []string) error {
 			)
 			continue
 		}
-		acmeBlock := block.ToProtocol().(*pbcodec.Block)
+		acmeBlock := block.ToProtocol().(*pbacme.Block)
 
 		fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
 			block.Num(),
@@ -225,7 +225,7 @@ func printOneBlockE(cmd *cobra.Command, args []string) error {
 
 	var files []string
 	filePrefix := fmt.Sprintf("%010d", blockNum)
-	err = store.Walk(ctx, filePrefix, "", func(filename string) (err error) {
+	err = store.Walk(ctx, filePrefix, func(filename string) (err error) {
 		files = append(files, filename)
 		return nil
 	})
@@ -266,7 +266,7 @@ func printOneBlockE(cmd *cobra.Command, args []string) error {
 }
 
 func printBlock(block *bstream.Block) error {
-	nativeBlock := block.ToProtocol().(*pbcodec.Block)
+	nativeBlock := block.ToProtocol().(*pbacme.Block)
 
 	data, err := json.MarshalIndent(nativeBlock, "", "  ")
 	if err != nil {

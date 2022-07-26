@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package codec
+package types
 
 import (
 	"fmt"
-	"google.golang.org/protobuf/proto"
 
 	"github.com/streamingfast/bstream"
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 func BlockDecoder(blk *bstream.Block) (interface{}, error) {
@@ -32,7 +32,7 @@ func BlockDecoder(blk *bstream.Block) (interface{}, error) {
 		return nil, fmt.Errorf("this decoder only knows about version 1, got %d", blk.Version())
 	}
 
-	block := new(pbcodec.Block)
+	block := new(pbacme.Block)
 	payload, err := blk.Payload.Get()
 	if err != nil {
 		return nil, fmt.Errorf("getting payload: %w", err)

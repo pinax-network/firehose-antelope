@@ -13,22 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../.. && pwd )"
 
 # Protobuf definitions
+PROTO=${1:-"$ROOT/../proto"}
 PROTO_ACME=${2:-"$ROOT/proto"}
 
 function main() {
   checks
 
-  current_dir="`pwd`"
-  trap "cd \"$current_dir\"" EXIT
-  pushd "$ROOT/pb" &> /dev/null
+  set -e
+  cd "$ROOT/types/pb" &> /dev/null
 
   generate "sf/acme/type/v1/type.proto"
 
-  echo "generate.sh - `date` - `whoami`" > $ROOT/pb/last_generate.txt
-  echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> $ROOT/pb/last_generate.txt
+  echo "generate.sh - `date` - `whoami`" > ./last_generate.txt
+  echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> ./last_generate.txt
+  echo "streamingfast/firehose-acme/proto revision: `GIT_DIR=$ROOT/.git git log -n 1 --pretty=format:%h -- proto`" >> ./last_generate.txt
 }
 
 # usage:
@@ -41,7 +42,7 @@ function generate() {
     fi
 
     for file in "$@"; do
-      protoc -I$PROTO_ACME \
+      protoc -I$PROTO -I$PROTO_ACME \
         --go_out=. --go_opt=paths=source_relative \
         --go-grpc_out=. --go-grpc_opt=paths=source_relative,require_unimplemented_servers=false \
          $base$file
@@ -50,38 +51,23 @@ function generate() {
 
 function checks() {
   # The old `protoc-gen-go` did not accept any flags. Just using `protoc-gen-go --version` in this
-  # version waits forever. So we pipe some wrong input to make it exit fast. This, in the new version
+  # version waits forever. So we pipe some wrong input to make it exit fast. This in the new version
   # which supports `--version` correctly print the version anyway and discard the standard input
   # so it's good with both version.
-  result=`printf "" | protoc-gen-go --version 2>&1 | grep -Eo "v1\.(27)\.[0-9]+"`
+  result=`printf "" | protoc-gen-go --version 2>&1 | grep -Eo v[0-9\.]+`
   if [[ "$result" == "" ]]; then
     echo "Your version of 'protoc-gen-go' (at `which protoc-gen-go`) is not recent enough."
     echo ""
-    echo "To fix your problem, perform this command (assumes you have Golang 1.17+):"
+    echo "To fix your problem, perform those commands:"
     echo ""
-    echo "  go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.27.1"
+    echo "  go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0"
+    echo "  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0"
     echo ""
-    echo "If everything is working as expected, the command:"
+    echo "If everything is working as expetcted, the command:"
     echo ""
     echo "  protoc-gen-go --version"
     echo ""
-    echo "Should print 'protoc-gen-go v1.27.1' (or another more recent version)"
-    exit 1
-  fi
-
-  result=`printf "" | protoc-gen-go-grpc --version 2>&1 | grep -Eo "1\.2\.[0-9]+"`
-  if [[ "$result" == "" ]]; then
-    echo "Your version of 'protoc-gen-go-grpc' (at `which protoc-gen-go-grpc`) is not recent enough."
-    echo ""
-    echo "To fix your problem, perform this command (assumes you have Golang 1.17+):"
-    echo ""
-    echo "  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2.0"
-    echo ""
-    echo "If everything is working as expected, the command:"
-    echo ""
-    echo "  protoc-gen-go-grpc --version"
-    echo ""
-    echo "Should print 'protoc-gen-go-grpc 1.2.0' (or another more recent version)"
+    echo "Should print 'protoc-gen-go v1.25.0' (if it just hangs, you don't have the correct version)"
     exit 1
   fi
 }

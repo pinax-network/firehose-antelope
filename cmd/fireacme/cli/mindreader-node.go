@@ -15,16 +15,10 @@
 package cli
 
 import (
-	"context"
-	"fmt"
-	"math"
-	"time"
-
 	"github.com/spf13/cobra"
-	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/bstream/blockstream"
-	"github.com/streamingfast/firehose-acme/codec"
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	"github.com/streamingfast/firehose-acme/nodemanager/codec"
+	"github.com/streamingfast/logging"
 	nodeManager "github.com/streamingfast/node-manager"
 	"github.com/streamingfast/node-manager/mindreader"
 	"go.uber.org/zap"
@@ -36,7 +30,6 @@ func init() {
 
 func registerMindreaderNodeFlags(cmd *cobra.Command) error {
 	cmd.Flags().String("mindreader-node-grpc-listen-addr", MindreaderGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
-	cmd.Flags().Bool("mindreader-node-merge-and-store-directly", false, "When enabled, do not write one block files, sidestep the merger and write the merged 100-blocks logs directly to --common-merged-blocks-store-url")
 	cmd.Flags().Bool("mindreader-node-discard-after-stop-num", false, "Ignore remaining blocks being processed after stop num (only useful if we discard the mindreader data after reprocessing a chunk of blocks)")
 	cmd.Flags().String("mindreader-node-working-dir", "{data-dir}/mindreader/work", "Path where mindreader will stores its files")
 	cmd.Flags().Uint("mindreader-node-start-block-num", 0, "Blocks that were produced with smaller block number then the given block num are skipped")
@@ -47,59 +40,31 @@ func registerMindreaderNodeFlags(cmd *cobra.Command) error {
 		for writes. You should set this flag if you have multiple mindreader running, each one should get a unique identifier, the
 		hostname value is a good value to use.
 	`))
-	cmd.Flags().Duration("mindreader-node-wait-upload-complete-on-shutdown", 30*time.Second, "When the mindreader is shutting down, it will wait up to that amount of time for the archiver to finish uploading the blocks before leaving anyway")
-	cmd.Flags().Duration("mindreader-node-merge-threshold-block-age", time.Duration(math.MaxInt64), "When processing blocks with a blocktime older than this threshold, they will be automatically merged")
 
 	return nil
 }
 
 func getMindreaderLogPlugin(
 	blockStreamServer *blockstream.Server,
-	oneBlockStoreURL string,
 	mergedBlockStoreURL string,
-	mergeAndStoreDirectly bool,
-	mergeThresholdBlockAge time.Duration,
 	workingDir string,
 	batchStartBlockNum uint64,
 	batchStopBlockNum uint64,
 	blocksChanCapacity int,
-	failOnNonContiguousBlock bool,
-	waitTimeForUploadOnShutdown time.Duration,
 	oneBlockFileSuffix string,
 	operatorShutdownFunc func(error),
 	metricsAndReadinessManager *nodeManager.MetricsAndReadinessManager,
-	tracker *bstream.Tracker,
 	appLogger *zap.Logger,
+	appTracer logging.Tracer,
 ) (*mindreader.MindReaderPlugin, error) {
-	// blockmetaAddr := viper.GetString("common-blockmeta-addr")
-	tracker.AddGetter(bstream.NetworkLIBTarget, func(ctx context.Context) (bstream.BlockRef, error) {
-		// FIXME: Need to re-enable the tracker through blockmeta later on (see commented code below), might need to tweak some stuff to make mindreader work...
-		return bstream.BlockRefEmpty, nil
-	})
-	// tracker.AddGetter(bstream.NetworkLIBTarget, bstream.NetworkLIBBlockRefGetter(blockmetaAddr))
-
 	consoleReaderFactory := func(lines chan string) (mindreader.ConsolerReader, error) {
-		return codec.NewConsoleReader(lines, NodeRPCAddr)
-	}
-
-	consoleReaderTransformer := func(obj interface{}) (*bstream.Block, error) {
-		blk, ok := obj.(*pbcodec.Block)
-		if !ok {
-			return nil, fmt.Errorf("expected *pbcodec.Block, got %T", obj)
-		}
-
-		return codec.BlockFromProto(blk)
+		return codec.NewConsoleReader(appLogger, lines)
 	}
 
 	return mindreader.NewMindReaderPlugin(
-		oneBlockStoreURL,
 		mergedBlockStoreURL,
-		mergeAndStoreDirectly,
-		mergeThresholdBlockAge,
 		workingDir,
 		consoleReaderFactory,
-		consoleReaderTransformer,
-		tracker,
 		batchStartBlockNum,
 		batchStopBlockNum,
 		blocksChanCapacity,
@@ -107,10 +72,9 @@ func getMindreaderLogPlugin(
 		func(error) {
 			operatorShutdownFunc(nil)
 		},
-		failOnNonContiguousBlock,
-		waitTimeForUploadOnShutdown,
 		oneBlockFileSuffix,
 		blockStreamServer,
 		appLogger,
+		appTracer,
 	)
 }

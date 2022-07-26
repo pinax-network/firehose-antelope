@@ -9,7 +9,9 @@ import (
 	"strings"
 	"time"
 
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	"github.com/streamingfast/bstream"
+	"github.com/streamingfast/firehose-acme/types"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 
@@ -21,13 +23,16 @@ type ConsoleReader struct {
 
 	ctx  *parseCtx
 	done chan interface{}
+
+	logger *zap.Logger
 }
 
-func NewConsoleReader(lines chan string, rpcUrl string) (*ConsoleReader, error) {
+func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, error) {
 	l := &ConsoleReader{
-		lines: lines,
-		close: func() {},
-		done:  make(chan interface{}),
+		lines:  lines,
+		close:  func() {},
+		done:   make(chan interface{}),
+		logger: logger,
 	}
 	return l, nil
 }
@@ -45,18 +50,20 @@ type parsingStats struct {
 	startAt  time.Time
 	blockNum uint64
 	data     map[string]int
+	logger   *zap.Logger
 }
 
-func newParsingStats(block uint64) *parsingStats {
+func newParsingStats(logger *zap.Logger, block uint64) *parsingStats {
 	return &parsingStats{
 		startAt:  time.Now(),
 		blockNum: block,
 		data:     map[string]int{},
+		logger:   logger,
 	}
 }
 
 func (s *parsingStats) log() {
-	zlog.Info("mindreader block stats",
+	s.logger.Info("mindreader block stats",
 		zap.Uint64("block_num", s.blockNum),
 		zap.Int64("duration", int64(time.Since(s.startAt))),
 		zap.Reflect("stats", s.data),
@@ -74,71 +81,86 @@ func (s *parsingStats) inc(key string) {
 }
 
 type parseCtx struct {
-	currentBlock *pbcodec.Block
+	currentBlock *pbacme.Block
+	stats        *parsingStats
 
-	stats *parsingStats
+	logger *zap.Logger
 }
 
-func newContext(height uint64) *parseCtx {
+func newContext(logger *zap.Logger, height uint64) *parseCtx {
 	return &parseCtx{
-		currentBlock: &pbcodec.Block{
+		currentBlock: &pbacme.Block{
 			Height:       height,
-			Transactions: []*pbcodec.Transaction{},
+			Transactions: []*pbacme.Transaction{},
 		},
+		stats: newParsingStats(logger, height),
+
+		logger: logger,
+	}
+}
+
+func (r *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
+	block, err := r.next()
+	if err != nil {
+		return nil, err
 	}
 
-}
-
-func (r *ConsoleReader) Read() (out interface{}, err error) {
-	return r.next()
+	return types.BlockFromProto(block)
 }
 
 const (
 	LogPrefix     = "DMLOG"
 	LogBeginBlock = "BLOCK_BEGIN"
-	LogBeingTrx   = "BEGIN_TRX"
+	LogBeginTrx   = "BEGIN_TRX"
 	LogBeginEvent = "TRX_BEGIN_EVENT"
 	LogEventAttr  = "TRX_EVENT_ATTR"
 	LogEndTrx     = "END_TRX"
 	LogEndBlock   = "BLOCK_END"
 )
 
-func (r *ConsoleReader) next() (out interface{}, err error) {
+func (r *ConsoleReader) next() (out *pbacme.Block, err error) {
 	for line := range r.lines {
 		if !strings.HasPrefix(line, LogPrefix) {
 			continue
 		}
 
+		// This code assumes that distinct element do not contains space. This can happen
+		// for example when exchanging JSON object (although we strongly discourage usage of
+		// JSON, use serialized Protobuf object). If you happen to have spaces in the last element,
+		// refactor the code here to avoid the split and perform the split in the line handler directly
+		// instead.
 		tokens := strings.Split(line[len(LogPrefix)+1:], " ")
 		if len(tokens) < 2 {
-			return nil, fmt.Errorf("invalid log line format: %s", line)
+			return nil, fmt.Errorf("invalid log line %q, expecting at least two tokens", line)
 		}
 
+		// Order the case from most occurring line prefix to least occurring
 		switch tokens[0] {
-		case LogBeginBlock:
-			err = r.blockBegin(tokens[1:])
-		case LogBeingTrx:
-			err = r.ctx.trxBegin(tokens[1:])
 		case LogBeginEvent:
 			err = r.ctx.eventBegin(tokens[1:])
 		case LogEventAttr:
 			err = r.ctx.eventAttr(tokens[1:])
+		case LogBeginTrx:
+			err = r.ctx.trxBegin(tokens[1:])
+		case LogBeginBlock:
+			err = r.blockBegin(tokens[1:])
 		case LogEndBlock:
+			// This end the execution of the reading loop as we have a full block here
 			return r.ctx.readBlockEnd(tokens[1:])
 		default:
-			if tracer.Enabled() {
-				zlog.Debug("skipping unknown deep mind log line", zap.String("line", line))
+			if r.logger.Core().Enabled(zap.DebugLevel) {
+				r.logger.Debug("skipping unknown deep mind log line", zap.String("line", line))
 			}
 			continue
 		}
 
 		if err != nil {
 			chunks := strings.SplitN(line, " ", 2)
-			return nil, fmt.Errorf("%s: %s (line %q)", chunks[0], err, line)
+			return nil, fmt.Errorf("%s: %w (line %q)", chunks[0], err, line)
 		}
 	}
 
-	zlog.Info("lines channel has been closed")
+	r.logger.Info("lines channel has been closed")
 	return nil, io.EOF
 }
 
@@ -178,7 +200,7 @@ func (r *ConsoleReader) blockBegin(params []string) error {
 	}
 
 	//Push new block meta
-	r.ctx = newContext(blockHeight)
+	r.ctx = newContext(r.logger, blockHeight)
 	return nil
 }
 
@@ -192,26 +214,26 @@ func (ctx *parseCtx) trxBegin(params []string) error {
 		return fmt.Errorf("did not process a BLOCK_BEGIN")
 	}
 
-	trx := &pbcodec.Transaction{
+	trx := &pbacme.Transaction{
 		Type:     params[1],
 		Hash:     params[0],
 		Sender:   params[2],
 		Receiver: params[3],
 		Success:  params[6] == "true",
-		Events:   []*pbcodec.Event{},
+		Events:   []*pbacme.Event{},
 	}
 
 	v, ok := new(big.Int).SetString(params[4], 16)
 	if !ok {
 		return fmt.Errorf("unable to parse trx amount %s", params[4])
 	}
-	trx.Amount = &pbcodec.BigInt{Bytes: v.Bytes()}
+	trx.Amount = &pbacme.BigInt{Bytes: v.Bytes()}
 
 	v, ok = new(big.Int).SetString(params[5], 16)
 	if !ok {
 		return fmt.Errorf("unable to parse trx amount %s", params[4])
 	}
-	trx.Fee = &pbcodec.BigInt{Bytes: v.Bytes()}
+	trx.Fee = &pbacme.BigInt{Bytes: v.Bytes()}
 
 	ctx.currentBlock.Transactions = append(ctx.currentBlock.Transactions, trx)
 	return nil
@@ -236,9 +258,9 @@ func (ctx *parseCtx) eventBegin(params []string) error {
 		return fmt.Errorf("last transaction hash %q does not match the event trx hash %q", trx.Hash, params[0])
 	}
 
-	trx.Events = append(trx.Events, &pbcodec.Event{
+	trx.Events = append(trx.Events, &pbacme.Event{
 		Type:       params[1],
-		Attributes: []*pbcodec.Attribute{},
+		Attributes: []*pbacme.Attribute{},
 	})
 
 	ctx.currentBlock.Transactions[len(ctx.currentBlock.Transactions)-1] = trx
@@ -272,7 +294,7 @@ func (ctx *parseCtx) eventAttr(params []string) error {
 		return fmt.Errorf("length of events array does not match event index: %d", eventIndex)
 	}
 	event := trx.Events[eventIndex]
-	event.Attributes = append(event.Attributes, &pbcodec.Attribute{
+	event.Attributes = append(event.Attributes, &pbacme.Attribute{
 		Key:   params[2],
 		Value: params[3],
 	})
@@ -283,7 +305,7 @@ func (ctx *parseCtx) eventAttr(params []string) error {
 
 // Format:
 // DMLOG BLOCK_END <HEIGHT> <HASH> <PREV_HASH> <TIMESTAMP> <TRX-COUNT>
-func (ctx *parseCtx) readBlockEnd(params []string) (*pbcodec.Block, error) {
+func (ctx *parseCtx) readBlockEnd(params []string) (*pbacme.Block, error) {
 	if err := validateChunk(params, 5); err != nil {
 		return nil, fmt.Errorf("invalid log line length: %w", err)
 	}
@@ -294,7 +316,7 @@ func (ctx *parseCtx) readBlockEnd(params []string) (*pbcodec.Block, error) {
 
 	blockHeight, err := strconv.ParseUint(params[0], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse blockNum: %s", err)
+		return nil, fmt.Errorf("failed to parse blockNum: %w", err)
 	}
 	if blockHeight != ctx.currentBlock.Height {
 		return nil, fmt.Errorf("end block height does not match active block height, got block height %d but current is block height %d", blockHeight, ctx.currentBlock.Height)
@@ -302,28 +324,29 @@ func (ctx *parseCtx) readBlockEnd(params []string) (*pbcodec.Block, error) {
 
 	trxCount, err := strconv.ParseUint(params[4], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse blockNum: %s", err)
+		return nil, fmt.Errorf("failed to parse blockNum: %w", err)
 	}
 
 	if len(ctx.currentBlock.Transactions) != int(trxCount) {
-		return nil, fmt.Errorf("failed expected %d transaction count (had %d) : %s", trxCount, len(ctx.currentBlock.Transactions), err)
+		return nil, fmt.Errorf("failed expected %d transaction count (had %d): %w", trxCount, len(ctx.currentBlock.Transactions), err)
 	}
 
 	timestamp, err := strconv.ParseUint(params[3], 10, 64)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse blockNum: %s", err)
+		return nil, fmt.Errorf("failed to parse block timestamp: %w", err)
 	}
 
 	ctx.currentBlock.Hash = params[1]
 	ctx.currentBlock.PrevHash = params[2]
 	ctx.currentBlock.Timestamp = timestamp
 
-	zlog.Debug("console reader read block",
+	ctx.logger.Debug("console reader read block",
 		zap.Uint64("height", ctx.currentBlock.Height),
 		zap.String("hash", ctx.currentBlock.Hash),
 		zap.String("prev_hash", ctx.currentBlock.PrevHash),
 		zap.Int("trx_count", len(ctx.currentBlock.Transactions)),
 	)
+
 	return ctx.currentBlock, nil
 }
 

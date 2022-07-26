@@ -1,15 +1,15 @@
-package codec
+package types
 
 import (
 	"fmt"
 
 	"github.com/streamingfast/bstream"
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"google.golang.org/protobuf/proto"
 )
 
-func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
+func BlockFromProto(b *pbacme.Block) (*bstream.Block, error) {
 	content, err := proto.Marshal(b)
 	if err != nil {
 		return nil, fmt.Errorf("unable to marshal to binary form: %s", err)

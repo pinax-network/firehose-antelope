@@ -20,7 +20,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
-	pbcodec "github.com/streamingfast/firehose-acme/pb/sf/acme/codec/v1"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	sftools "github.com/streamingfast/sf-tools"
 )
 
@@ -75,7 +75,7 @@ func checkMergedBlocksE(cmd *cobra.Command, args []string) error {
 }
 
 func blockPrinter(block *bstream.Block) {
-	dummBlock := block.ToProtocol().(*pbcodec.Block)
+	dummBlock := block.ToProtocol().(*pbacme.Block)
 	fmt.Printf("Block %s, Prev: %s: %d timestamp\n",
 		block.AsRef(),
 		block.PreviousRef(),

@@ -1,3 +1,0 @@
-generate.sh - Wed Mar  2 10:25:12 EST 2022 - maoueh
-streamingfast/proto revision: 31d6ec46cfaefce2ec6d84eddd6676b540a1bb63
-streamingfast/proto-acme revision: 32ee432a9bf4171718f4f576cc4a00c80677f57e

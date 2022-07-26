@@ -15,14 +15,10 @@ func init() {
 		Title:       "Merger",
 		Description: "Produces merged block files from single-block files",
 		RegisterFlags: func(cmd *cobra.Command) error {
-			cmd.Flags().Duration("merger-time-between-store-lookups", 5*time.Second, "Delay between source store polling (should be higher for remote storage)")
-			cmd.Flags().String("merger-state-file", "{data-dir}/merger/merger.seen.gob", "Path to file containing last written block number, as well as a map of all 'seen blocks' in the 'max-fixable-fork' range")
+			cmd.Flags().Duration("merger-time-between-store-lookups", 1*time.Second, "Delay between source store polling (should be higher for remote storage)")
+			cmd.Flags().Duration("merger-time-between-store-pruning", time.Minute, "Delay between source store pruning loops")
+			cmd.Flags().Uint64("merger-prune-forked-blocks-after", 50000, "Number of blocks that must pass before we delete old forks (one-block-files lingering)")
 			cmd.Flags().String("merger-grpc-listen-addr", MergerServingAddr, "Address to listen for incoming gRPC requests")
-			cmd.Flags().Duration("merger-writers-leeway", 10*time.Second, "How long we wait after seeing the upper boundary, to ensure that we get as many blocks as possible in a bundle")
-			cmd.Flags().Int("merger-one-block-deletion-threads", 10, "Number of parallel threads used to delete one-block-files (more means more stress on your storage backend)")
-			cmd.Flags().Int("merger-max-one-block-operations-batch-size", 2000, "Max number of 'good' (mergeable) files to look up from storage in one polling operation")
-			cmd.Flags().Int("merger-next-exclusive-highest-block-limit", 0, "For next bundle boundary")
-
 			return nil
 		},
 		// FIXME: Lots of config value construction is duplicated across InitFunc and FactoryFunc, how to streamline that
@@ -39,24 +35,17 @@ func init() {
 				return
 			}
 
-			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("merger-state-file"))); err != nil {
-				return
-			}
-
 			return nil
 		},
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
 			return mergerApp.New(&mergerApp.Config{
-				StorageMergedBlocksFilesPath:   mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
-				StorageOneBlockFilesPath:       mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
-				TimeBetweenStoreLookups:        viper.GetDuration("merger-time-between-store-lookups"),
-				GRPCListenAddr:                 viper.GetString("merger-grpc-listen-addr"),
-				WritersLeewayDuration:          viper.GetDuration("merger-writers-leeway"),
-				StateFile:                      mustReplaceDataDir(sfDataDir, viper.GetString("merger-state-file")),
-				MaxOneBlockOperationsBatchSize: viper.GetInt("merger-max-one-block-operations-batch-size"),
-				OneBlockDeletionThreads:        viper.GetInt("merger-one-block-deletion-threads"),
-				NextExclusiveHighestBlockLimit: viper.GetUint64("merger-next-exclusive-highest-block-limit"),
+				StorageOneBlockFilesPath:     MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
+				StorageMergedBlocksFilesPath: MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
+				GRPCListenAddr:               viper.GetString("merger-grpc-listen-addr"),
+				PruneForkedBlocksAfter:       viper.GetUint64("merger-prune-forked-blocks-after"),
+				TimeBetweenPruning:           viper.GetDuration("merger-time-between-store-pruning"),
+				TimeBetweenPolling:           viper.GetDuration("merger-time-between-store-lookups"),
 			}), nil
 		},
 	})

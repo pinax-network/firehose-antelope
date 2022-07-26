@@ -24,16 +24,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
+	"github.com/streamingfast/firehose-acme/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 )
 
-type ObjectReader func() (interface{}, error)
-
 func TestParseFromFile(t *testing.T) {
-	zlog, _ = zap.NewDevelopment()
 	tests := []struct {
 		deepMindFile     string
 		expectedPanicErr error
@@ -54,36 +50,36 @@ func TestParseFromFile(t *testing.T) {
 			buf.Write([]byte("["))
 
 			for first := true; true; first = false {
-				var reader ObjectReader = cr.Read
-				out, err := reader()
+				out, err := cr.ReadBlock()
 				if err == io.EOF {
 					break
 				}
 				require.NoError(t, err)
 
-				if v, ok := out.(proto.Message); ok && !isNil(v) {
-					if !first {
-						buf.Write([]byte(","))
-					}
+				block, err := types.BlockDecoder(out)
+				require.NoError(t, err)
 
-					// FIXMME: jsonpb needs to be updated to latest version of used gRPC
-					//         elements. We are disaligned and using that breaks now.
-					//         Needs to check what is the latest way to properly serialize
-					//         Proto generated struct to JSON.
-					// value, err := jsonpb.MarshalIndentToString(v, "  ")
-					// require.NoError(t, err)
-
-					value, err := json.MarshalIndent(v, "", "  ")
-					require.NoError(t, err)
-
-					buf.Write(value)
+				if !first {
+					buf.Write([]byte(","))
 				}
 
-				if len(buf.Bytes()) != 0 {
-					buf.Write([]byte("\n"))
-				}
+				// FIXMME: jsonpb needs to be updated to latest version of used gRPC
+				//         elements. We are disaligned and using that breaks now.
+				//         Needs to check what is the latest way to properly serialize
+				//         Proto generated struct to JSON.
+				// value, err := jsonpb.MarshalIndentToString(v, "  ")
+				// require.NoError(t, err)
 
+				value, err := json.MarshalIndent(block, "", "  ")
+				require.NoError(t, err)
+
+				buf.Write(value)
 			}
+
+			if len(buf.Bytes()) != 0 {
+				buf.Write([]byte("\n"))
+			}
+
 			buf.Write([]byte("]"))
 
 			goldenFile := test.deepMindFile + ".golden.json"
@@ -127,8 +123,9 @@ func testReaderConsoleReader(t *testing.T, lines chan string, closer func()) *Co
 	t.Helper()
 
 	l := &ConsoleReader{
-		lines: lines,
-		close: closer,
+		lines:  lines,
+		close:  closer,
+		logger: zlog,
 	}
 
 	return l

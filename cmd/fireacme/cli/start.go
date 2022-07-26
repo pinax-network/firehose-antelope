@@ -63,23 +63,21 @@ func Start(dataDir string, args []string) (err error) {
 		return err
 	}
 
-	tracker := bstream.NewTracker(50)
-
-	tracker.AddResolver(bstream.OffsetStartBlockResolver(200))
+	tracker := bstream.NewTracker(BlockDifferenceThresholdConsideredNear)
 
 	modules := &launcher.Runtime{
 		AbsDataDir: dataDirAbs,
 		Tracker:    tracker,
 	}
 
-	atmCacheEnabled := viper.GetBool("common-atm-cache-enabled")
-	if atmCacheEnabled {
+	blocksCacheEnabled := viper.GetBool("common-blocks-cache-enabled")
+	if blocksCacheEnabled {
 		bstream.GetBlockPayloadSetter = bstream.ATMCachedPayloadSetter
 
-		cacheDir := MustReplaceDataDir(modules.AbsDataDir, viper.GetString("common-atm-cache-dir"))
+		cacheDir := MustReplaceDataDir(modules.AbsDataDir, viper.GetString("common-blocks-cache-dir"))
 		storeUrl := MustReplaceDataDir(modules.AbsDataDir, viper.GetString("common-merged-blocks-store-url"))
-		maxRecentEntryBytes := viper.GetInt("common-atm-max-recent-entry-bytes")
-		maxEntryByAgeBytes := viper.GetInt("common-atm-max-entry-by-age-bytes")
+		maxRecentEntryBytes := viper.GetInt("common-blocks-cache-max-recent-entry-bytes")
+		maxEntryByAgeBytes := viper.GetInt("common-blocks-cache-entry-by-age-bytes")
 		bstream.InitCache(storeUrl, cacheDir, maxRecentEntryBytes, maxEntryByAgeBytes)
 	}
 

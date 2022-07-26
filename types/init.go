@@ -12,21 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package codec
+package types
 
 import (
+	"fmt"
+	"io"
 	"time"
 
 	"github.com/streamingfast/bstream"
+	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 )
 
 func init() {
 	bstream.GetBlockWriterFactory = bstream.BlockWriterFactoryFunc(blockWriterFactory)
 	bstream.GetBlockReaderFactory = bstream.BlockReaderFactoryFunc(blockReaderFactory)
 	bstream.GetBlockDecoder = bstream.BlockDecoderFunc(BlockDecoder)
-	// WARNING: We do not set this value anymore here. It is set in the `FirstStreamableBlock` constant located `cmd/fireacme/cli/constants.go:26`
-	//bstream.GetProtocolFirstStreamableBlock = 1
 	bstream.GetBlockWriterHeaderLen = 10
 	bstream.GetBlockPayloadSetter = bstream.MemoryBlockPayloadSetter
-	bstream.GetMemoizeMaxAge = 200 * 15 * time.Second
+	bstream.GetMemoizeMaxAge = 20 * time.Second
+}
+
+func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
+	return bstream.NewDBinBlockReader(reader, func(contentType string, version int32) error {
+		protocol := pbbstream.Protocol(pbbstream.Protocol_value[contentType])
+		if protocol != pbbstream.Protocol_ETH && version != 1 {
+			return fmt.Errorf("reader only knows about %s block kind at version 1, got %s at version %d", protocol, contentType, version)
+		}
+
+		return nil
+	})
+}
+
+func blockWriterFactory(writer io.Writer) (bstream.BlockWriter, error) {
+	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_ETH.String(), 1)
 }
