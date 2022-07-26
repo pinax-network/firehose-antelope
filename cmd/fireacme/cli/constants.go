@@ -24,15 +24,21 @@ const (
 	// Those should be the port the native node is using for P2P and RPC respectively
 	// and importantly, they should be different than the `node` ones below. Each chain
 	// usually have at least P2P and RPC ports. We suggest to use the standard port on the
-	// `node` values below and increment the `mindreader` ones by 1.
-	MindreaderNodeP2PPort string = "30304"
-	MindreaderNodeRPCPort string = "8546"
+	// `node` values below and increment the `extractor` ones by 1.
+	ExtractorNodeP2PPort string = "30304"
+	ExtractorNodeRPCPort string = "8546"
 
 	// Those should be the port the native node is using for P2P and RPC respectively
-	// and importantly, they should be different than the `mindreader` ones above. We suggest
+	// and importantly, they should be different than the `extractor` ones above. We suggest
 	// to use the standard port on the `node` values here directly.
 	NodeP2PPort string = "30303"
 	NodeRPCPort string = "8545"
+
+	// This should be the standard name of the executable that is usually used to
+	// sync the chain with the blockchain network. For example on Ethereum where
+	// our standard instrumentation if using the Geth client, value is `geth`, on EOSIO
+	// chain, it's `nodeos`.
+	ChainExecutableName = "dchain"
 
 	//
 	/// Standard Values
@@ -47,12 +53,12 @@ const (
 	// The current prefix is the one you should use for your chain. Once you have copied
 	// this whole repository, you should open a PR on firehose-acme to bump it again
 	// so the next team supporting Firehose will use 18XXX and so forth.
-	MindreaderGRPCAddr           string = ":18010"
-	NodeManagerAPIAddr           string = ":18041"
-	MindreaderNodeManagerAPIAddr string = ":18009"
-	MergerServingAddr            string = ":18012"
-	RelayerServingAddr           string = ":18011"
-	FirehoseGRPCServingAddr      string = ":18042"
+	ExtractorNodeGRPCAddr       string = ":18010"
+	ExtractorNodeManagerAPIAddr string = ":18011"
+	MergerServingAddr           string = ":18012"
+	NodeManagerAPIAddr          string = ":18013"
+	RelayerServingAddr          string = ":18014"
+	FirehoseGRPCServingAddr     string = ":18015"
 
 	// Data storage default locations
 	BlocksCacheDirectory string = "file://{data-dir}/storage/blocks-cache"

@@ -63,7 +63,7 @@ func newParsingStats(logger *zap.Logger, block uint64) *parsingStats {
 }
 
 func (s *parsingStats) log() {
-	s.logger.Info("mindreader block stats",
+	s.logger.Info("extractor block stats",
 		zap.Uint64("block_num", s.blockNum),
 		zap.Int64("duration", int64(time.Since(s.startAt))),
 		zap.Reflect("stats", s.data),

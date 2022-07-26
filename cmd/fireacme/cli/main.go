@@ -81,7 +81,7 @@ func Main() {
 	derr.Check("acme-blockchain", RootCmd.Execute())
 }
 
-var startCmdExample = `fireacme start mindreader`
+var startCmdExample = `fireacme start extractor`
 var startCmdHelpTemplate = `Usage:{{if .Runnable}}
   {{.UseLine}}{{end}} [all|command1 [command2...]]{{if gt (len .Aliases) 0}}
 

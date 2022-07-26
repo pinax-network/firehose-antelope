@@ -25,19 +25,19 @@ import (
 )
 
 func init() {
-	registerNode("mindreader", registerMindreaderNodeFlags, MindreaderNodeManagerAPIAddr)
+	registerNode("extractor", registerExtractorNodeFlags, ExtractorNodeManagerAPIAddr)
 }
 
-func registerMindreaderNodeFlags(cmd *cobra.Command) error {
-	cmd.Flags().String("mindreader-node-grpc-listen-addr", MindreaderGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
-	cmd.Flags().Bool("mindreader-node-discard-after-stop-num", false, "Ignore remaining blocks being processed after stop num (only useful if we discard the mindreader data after reprocessing a chunk of blocks)")
-	cmd.Flags().String("mindreader-node-working-dir", "{data-dir}/mindreader/work", "Path where mindreader will stores its files")
-	cmd.Flags().Uint("mindreader-node-start-block-num", 0, "Blocks that were produced with smaller block number then the given block num are skipped")
-	cmd.Flags().Uint("mindreader-node-stop-block-num", 0, "Shutdown mindreader when we the following 'stop-block-num' has been reached, inclusively.")
-	cmd.Flags().Int("mindreader-node-blocks-chan-capacity", 100, "Capacity of the channel holding blocks read by the mindreader. Process will shutdown superviser/geth if the channel gets over 90% of that capacity to prevent horrible consequences. Raise this number when processing tiny blocks very quickly")
-	cmd.Flags().String("mindreader-node-one-block-suffix", "default", FlagDescription(`
-		Unique identifier for Mindreader, so that it can produce 'oneblock files' in the same store as another instance without competing
-		for writes. You should set this flag if you have multiple mindreader running, each one should get a unique identifier, the
+func registerExtractorNodeFlags(cmd *cobra.Command) error {
+	cmd.Flags().String("extractor-node-grpc-listen-addr", ExtractorNodeGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
+	cmd.Flags().Bool("extractor-node-discard-after-stop-num", false, "Ignore remaining blocks being processed after stop num (only useful if we discard the extractor data after reprocessing a chunk of blocks)")
+	cmd.Flags().String("extractor-node-working-dir", "{data-dir}/extractor/work", "Path where extractor will stores its files")
+	cmd.Flags().Uint("extractor-node-start-block-num", 0, "Blocks that were produced with smaller block number then the given block num are skipped")
+	cmd.Flags().Uint("extractor-node-stop-block-num", 0, "Shutdown extractor when we the following 'stop-block-num' has been reached, inclusively.")
+	cmd.Flags().Int("extractor-node-blocks-chan-capacity", 100, "Capacity of the channel holding blocks read by the extractor. Process will shutdown superviser/geth if the channel gets over 90% of that capacity to prevent horrible consequences. Raise this number when processing tiny blocks very quickly")
+	cmd.Flags().String("extractor-node-one-block-suffix", "default", FlagDescription(`
+		Unique identifier for extractor, so that it can produce 'oneblock files' in the same store as another instance without competing
+		for writes. You should set this flag if you have multiple extractor running, each one should get a unique identifier, the
 		hostname value is a good value to use.
 	`))
 

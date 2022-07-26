@@ -24,15 +24,15 @@ import (
 var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/streamingfast/firehose-acme/node")
 var nodeAcmeChainLogger, _ = logging.PackageLogger("node.acme", "github.com/streamingfast/firehose-acme/node/acme", DefaultLevelInfo)
 
-var mindreaderLogger, mindreaderTracer = logging.PackageLogger("mindreader", "github.com/streamingfast/firehose-acme/mindreader")
-var mindreaderAcmeChainLogger, _ = logging.PackageLogger("mindreader.acme", "github.com/streamingfast/firehose-acme/mindreader/acme", DefaultLevelInfo)
+var extractorLogger, extractorTracer = logging.PackageLogger("extractor", "github.com/streamingfast/firehose-acme/extractor")
+var extractorAcmeChainLogger, _ = logging.PackageLogger("extractor.acme", "github.com/streamingfast/firehose-acme/extractor/acme", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
-	cmd.Flags().String(flagPrefix+"path", "dchain", FlagDescription(`
-		Process that will be invoked mindreader (a.k.a extractor) component, can be a full path or just the binary's name, in which case the binary is
+	cmd.Flags().String(flagPrefix+"path", ChainExecutableName, FlagDescription(`
+		Process that will be invoked to sync the chain, can be a full path or just the binary's name, in which case the binary is
 		searched for paths listed by the PATH environment variable (following operating system rules around PATH handling).
 	`))
-	cmd.Flags().String(flagPrefix+"data-dir", "{data-dir}/{node-role}/data", "Directory for node data ({node-role} is either mindreader, peering or dev-miner)")
+	cmd.Flags().String(flagPrefix+"data-dir", "{data-dir}/{node-role}/data", "Directory for node data ({node-role} is either extractor, peering or dev-miner)")
 	cmd.Flags().Bool(flagPrefix+"debug-deep-mind", false, "[DEV] Prints deep mind instrumentation logs to standard output, should be use for debugging purposes only")
 	cmd.Flags().Bool(flagPrefix+"log-to-zap", true, FlagDescription(`
 		When sets to 'true', all standard error output emitted by the invoked process defined via '%s'
@@ -47,8 +47,8 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 }
 
 func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) error, managerAPIaddr string) {
-	if kind != "mindreader" {
-		panic(fmt.Errorf("invalid kind value, must be either 'mindreader', got %q", kind))
+	if kind != "extractor" {
+		panic(fmt.Errorf("invalid kind value, must be either 'extractor', got %q", kind))
 	}
 
 	app := fmt.Sprintf("%s-node", kind)
@@ -81,10 +81,10 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			appLogger = nodeLogger
 			appTracer = nodeTracer
 			supervisedProcessLogger = nodeAcmeChainLogger
-		case "mindreader":
-			appLogger = mindreaderLogger
-			appTracer = mindreaderTracer
-			supervisedProcessLogger = mindreaderAcmeChainLogger
+		case "extractor":
+			appLogger = extractorLogger
+			appTracer = extractorTracer
+			supervisedProcessLogger = extractorAcmeChainLogger
 		default:
 			panic(fmt.Errorf("unknown node kind %q", kind))
 		}
@@ -139,7 +139,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("unable to create chain operator: %w", err)
 		}
 
-		if kind != "mindreader" {
+		if kind != "extractor" {
 			return nodeManagerApp.New(&nodeManagerApp.Config{
 				HTTPAddr: httpAddr,
 			}, &nodeManagerApp.Modules{
@@ -150,12 +150,12 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
 		mergedBlockStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url"))
-		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("mindreader-node-working-dir"))
-		gprcListenAdrr := viper.GetString("mindreader-node-grpc-listen-addr")
-		batchStartBlockNum := viper.GetUint64("mindreader-node-start-block-num")
-		batchStopBlockNum := viper.GetUint64("mindreader-node-stop-block-num")
-		oneBlockFileSuffix := viper.GetString("mindreader-node-one-block-suffix")
-		blocksChanCapacity := viper.GetInt("mindreader-node-blocks-chan-capacity")
+		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("extractor-node-working-dir"))
+		gprcListenAdrr := viper.GetString("extractor-node-grpc-listen-addr")
+		batchStartBlockNum := viper.GetUint64("extractor-node-start-block-num")
+		batchStopBlockNum := viper.GetUint64("extractor-node-stop-block-num")
+		oneBlockFileSuffix := viper.GetString("extractor-node-one-block-suffix")
+		blocksChanCapacity := viper.GetInt("extractor-node-blocks-chan-capacity")
 
 		mindreaderPlugin, err := getMindreaderLogPlugin(
 			blockStreamServer,
@@ -206,7 +206,7 @@ type nodeArgsByRole map[string]string
 
 func buildNodeArguments(nodeDataDir, nodeRole string, args string) ([]string, error) {
 	typeRoles := nodeArgsByRole{
-		"mindreader": "start --store-dir={node-data-dir} {extra-arg}",
+		"extractor": "start --store-dir={node-data-dir} {extra-arg}",
 	}
 
 	argsString, ok := typeRoles[nodeRole]
