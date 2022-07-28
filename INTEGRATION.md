@@ -114,16 +114,109 @@ go install ../../cmd/fireacme && fireacme tools print blocks --store ./firehose-
 ```
 
 At this point we have `extractor-node` process running as well a `relayer` & `firehose` process. Both of these processes work together to provide the Firehose data stream.
-Once the firehose process is running, it will be listening on port 13042. At it’s core the firehose is a gRPC stream. We can list the available gRPC service
+Once the firehose process is running, it will be listening on port 18015. At it’s core the firehose is a gRPC stream. We can list the available gRPC service
 
 ```bash
-grpcurl -plaintext localhost:17042 list
+grpcurl -plaintext localhost:18015 list
 ```
 
-We can start streaming blocks with `sf.firehose.v1.Stream` Service:
+We can start streaming blocks with `sf.firehose.v2.Stream` Service:
 
 ```bash
-grpcurl -plaintext -d '{"start_block_num": 10}' -import-path ./proto -proto sf/acme/type/v1/type.proto localhost:17042 sf.firehose.v1.Stream.Blocks
+grpcurl -plaintext -d '{"start_block_num": 10}' -import-path ./proto -proto sf/acme/type/v1/type.proto localhost:18015 sf.firehose.v2.Stream.Blocks
+```
+
+# Using `firehose-acme` as a template
+
+One of the main reason we provide a `firehose-acme` repository is to act as a template element that integrators can use to bootstrap
+creating the required Firehose chain specific code.
+
+We purposely used `Acme` (and also `acme` and `ACME`) throughout this repository so that integrators can simply copy everything and perform
+a global search/replace of this word and use their chain name instead.
+
+As well as this, there is a few files that requires a renaming. Would will find below the instructions to properly make the search/replace
+as well as the list of files that should be renamed.
+
+## Cloning
+
+First step is to clone again `firehose-acme` this time to a dedicated repository that will be the one of your chain:
+
+```
+git clone git@github.com:streamingfast/firehose-acme.git firehose-<chain>
+```
+
+> Don't forget to change `<chain>` by the name of your exact chain like `aptos` so it would became `firehose-aptos`
+
+Then we are going to remove the `.git` folder to start fresh:
+
+```
+cd firehose-<chain>
+rm -rf .git
+git init
+```
+
+While not required, I suggest to create an initial commit so it's easier to revert back if you make a mistake
+or delete a wrong file:
+
+```
+cd firehose-<chain>
+git add -A .
+git commit -m "Initial commit"
+```
+
+## Renaming
+
+Perform a **case-sensitive** search/replace for the following terms:
+
+- `acme` -> `<chain>`
+- `Acme` -> `<Chain>`
+- `ACME` -> `<CHAIN>`
+
+> Don't forget to change `<chain>` (and their variants) by the name of your exact chain like `aptos` so it would became `aptos`, `Aptos` and `APTOS` respectively.
+
+### Files
+
+```
+git mv ./devel/fireacme ./devel/fireaptos
+git mv ./cmd/fireacme ./cmd/fireaptos
+git mv ./tools/fireacme/scripts/acme-is-running ./tools/fireacme/scripts/aptos-is-running
+git mv ./tools/fireacme/scripts/acme-rpc-head-block ./tools/fireacme/scripts/aptos-rpc-head-block
+git mv ./tools/fireacme/scripts/acme-resume ./tools/fireacme/scripts/aptos-resume
+git mv ./tools/fireacme/scripts/acme-command ./tools/fireacme/scripts/aptos-command
+git mv ./tools/fireacme/scripts/acme-debug-deep-mind-30s ./tools/fireacme/scripts/aptos-debug-deep-mind-30s
+git mv ./tools/fireacme/scripts/acme-maintenance ./tools/fireacme/scripts/aptos-maintenance
+git mv ./tools/fireacme ./tools/fireaptos
+git mv ./types/pb/sf/acme ./types/pb/sf/aptos
+```
+
+### Re-generate Protobuf
+
+Once you have performed the renamed of all 3 terms above and file renames, you should re-generate the Protobuf code:
+
+```
+cd firehose-<chain>
+./types/pb/generate.sh
+```
+
+> You will require `protoc`, `protoc-gen-go` and `protoc-gen-go-grpc`. The former can be installed following https://grpc.io/docs/protoc-installation/, the last two can be installed respectively with `go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.25.0` and `go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.1.0`.
+
+### Testing
+
+Once everything is done, normally tests should be all good and everything should compile properly:
+
+```
+go test ./...
+```
+
+### Commit
+
+If everything is fine at that point, you are ready to commit everything and push
+
+```
+git add -A .
+git commit -m "Renamed Acme to <Chain>"
+git add remote origin <url>
+git push
 ```
 
 ## License

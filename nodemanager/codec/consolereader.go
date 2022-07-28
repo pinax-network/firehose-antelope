@@ -328,7 +328,7 @@ func (ctx *parseCtx) readBlockEnd(params []string) (*pbacme.Block, error) {
 	}
 
 	if len(ctx.currentBlock.Transactions) != int(trxCount) {
-		return nil, fmt.Errorf("failed expected %d transaction count (had %d): %w", trxCount, len(ctx.currentBlock.Transactions), err)
+		return nil, fmt.Errorf("expected %d transaction count, got %d", trxCount, len(ctx.currentBlock.Transactions))
 	}
 
 	timestamp, err := strconv.ParseUint(params[3], 10, 64)
