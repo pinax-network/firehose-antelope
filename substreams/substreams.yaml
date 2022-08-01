@@ -1,0 +1,15 @@
+specVersion: v0.1.0
+package:
+  name: acme
+  version: v0.0.1
+  url: https://github.com/streamingfast/firehose-acme
+  doc: |
+    Protobuf definitions for Substreams modules on Acme.
+
+    This package does not include any modules.
+
+protobuf:
+  files:
+    - sf/acme/type/v1/type.proto
+  importPaths:
+    - ../proto

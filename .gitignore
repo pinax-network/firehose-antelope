@@ -16,9 +16,9 @@
 # resulting just compiled binary, meaning you are "always" freshly compiled, it's more or less
 # equivalent to doing directly `go run ./cmd/fireacme start --help` (which is totally fine).
 .envrc*
-
-sf-data
+*.spkg
 
 /fireacme
 /dist
+
 firehose-data
