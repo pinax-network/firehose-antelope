@@ -39,12 +39,12 @@ func init() {
 			[COMMON] Blocks cache directory where all the block's bytes will be cached to disk instead of being kept in RAM.
 			This should be a disk that persists across restarts of the Firehose component to reduce the the strain on the disk
 			when restarting and streams reconnects. The size of disk must at least big (with a 10% buffer) in bytes as the sum of flags'
-			value for  'common-blocks-cache-max-recent-entry-bytes' and 'common-blocks-cache-entry-by-age-bytes'.
+			value for  'common-blocks-cache-max-recent-entry-bytes' and 'common-blocks-cache-max-entry-by-age-bytes'.
 		`))
 		cmd.Flags().Int("common-blocks-cache-max-recent-entry-bytes", 21474836480, FlagDescription(`
 			[COMMON] Blocks cache max size in bytes of the most recently used blocks, after the limit is reached, blocks are evicted from the cache.
 		`))
-		cmd.Flags().Int("common-blocks-cache-entry-by-age-bytes", 21474836480, FlagDescription(`
+		cmd.Flags().Int("common-blocks-cache-max-entry-by-age-bytes", 21474836480, FlagDescription(`
 			[COMMON] Blocks cache max size in bytes of the earliest used blocks, after the limit is reached, blocks are evicted from the cache.
 		`))
 
