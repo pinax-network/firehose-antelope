@@ -31,7 +31,7 @@ import (
 
 func TestParseFromFile(t *testing.T) {
 	tests := []struct {
-		firehoseFile     string
+		firehoseLogsFile     string
 		expectedPanicErr error
 	}{
 		{"testdata/deep-mind.dmlog", nil},
