@@ -31,21 +31,21 @@ import (
 
 func TestParseFromFile(t *testing.T) {
 	tests := []struct {
-		firehoseFile     string
+		firehoseLogsFile string
 		expectedPanicErr error
 	}{
 		{"testdata/deep-mind.dmlog", nil},
 	}
 
 	for _, test := range tests {
-		t.Run(strings.Replace(test.firehoseFile, "testdata/", "", 1), func(t *testing.T) {
+		t.Run(strings.Replace(test.firehoseLogsFile, "testdata/", "", 1), func(t *testing.T) {
 			defer func() {
 				if r := recover(); r != nil {
 					require.Equal(t, test.expectedPanicErr, r)
 				}
 			}()
 
-			cr := testFileConsoleReader(t, test.firehoseFile)
+			cr := testFileConsoleReader(t, test.firehoseLogsFile)
 			buf := &bytes.Buffer{}
 			buf.Write([]byte("["))
 
@@ -82,7 +82,7 @@ func TestParseFromFile(t *testing.T) {
 
 			buf.Write([]byte("]"))
 
-			goldenFile := test.firehoseFile + ".golden.json"
+			goldenFile := test.firehoseLogsFile + ".golden.json"
 			if os.Getenv("GOLDEN_UPDATE") == "true" {
 				ioutil.WriteFile(goldenFile, buf.Bytes(), os.ModePerm)
 			}
