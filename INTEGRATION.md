@@ -183,7 +183,7 @@ git mv ./tools/fireacme/scripts/acme-is-running ./tools/fireacme/scripts/aptos-i
 git mv ./tools/fireacme/scripts/acme-rpc-head-block ./tools/fireacme/scripts/aptos-rpc-head-block
 git mv ./tools/fireacme/scripts/acme-resume ./tools/fireacme/scripts/aptos-resume
 git mv ./tools/fireacme/scripts/acme-command ./tools/fireacme/scripts/aptos-command
-git mv ./tools/fireacme/scripts/acme-debug-deep-mind-30s ./tools/fireacme/scripts/aptos-debug-deep-mind-30s
+git mv ./tools/fireacme/scripts/acme-debug-firehose-logs-30s ./tools/fireacme/scripts/aptos-debug-deep-mind-30s
 git mv ./tools/fireacme/scripts/acme-maintenance ./tools/fireacme/scripts/aptos-maintenance
 git mv ./tools/fireacme ./tools/fireaptos
 git mv ./types/pb/sf/acme ./types/pb/sf/aptos

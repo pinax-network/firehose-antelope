@@ -9,7 +9,7 @@ Welcome to this node manager pod, common commands:
 Node manager commands (acme-... <tab> to show all):
  - Check if running                   acme-is-running
 
- - Debug Deep Mind logs for 30s       acme-debug-deep-mind-30s
+ - Debug Deep Mind logs for 30s       acme-debug-firehose-logs-30s
  - Stop instance                      acme-maintenance
  - Start or restart instance          acme-resume
 
