@@ -6,7 +6,7 @@ export PATH=$PATH:/app
 
 # If we are in a "node-manager" image, display special scripts motd#
 #
-# *Note* Our (i.e. firehose-acme) extractor data directory is at the root
+# *Note* Our (i.e. firehose-acme) reader data directory is at the root
 #        `/data` mount point. Inside it, the `dummmy-blockchain` binary
 #        itself creates a `data` subfolder. This is why we have `/data/data`
 #        here as the path to check if we are inside a Node Manager instance

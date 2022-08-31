@@ -47,7 +47,7 @@ func firehoseCmdStartE(cmd *cobra.Command, args []string) (err error) {
 		return fmt.Errorf("unable to launch: %w", err)
 	}
 
-	// If an error occurred, saying Goodbye is not greate
+	// If an error occurred, saying Goodbye is not great
 	rootLog.Info("goodbye")
 	return
 }

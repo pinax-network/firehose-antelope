@@ -36,7 +36,7 @@ func NewSuperviser(
 	arguments []string,
 	dataDir string,
 	headBlockUpdateFunc nodeManager.HeadBlockUpdater,
-	debugDeepMind bool,
+	debugFirehose bool,
 	logToZap bool,
 	appLogger *zap.Logger,
 	nodelogger *zap.Logger,
@@ -56,9 +56,9 @@ func NewSuperviser(
 	supervisor.RegisterLogPlugin(logplugin.LogPluginFunc(supervisor.lastBlockSeenLogPlugin))
 
 	if logToZap {
-		supervisor.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, nodelogger))
+		supervisor.RegisterLogPlugin(newToZapLogPlugin(debugFirehose, nodelogger))
 	} else {
-		supervisor.RegisterLogPlugin(logplugin.NewToConsoleLogPlugin(debugDeepMind))
+		supervisor.RegisterLogPlugin(logplugin.NewToConsoleLogPlugin(debugFirehose))
 	}
 
 	appLogger.Info("created acme superviser", zap.Object("superviser", supervisor))
@@ -100,7 +100,7 @@ func (s *Superviser) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 }
 
 func (s *Superviser) lastBlockSeenLogPlugin(line string) {
-	if !strings.HasPrefix(line, "DMLOG BLOCK_BEGIN") {
+	if !strings.HasPrefix(line, "FIRE BLOCK_BEGIN") {
 		return
 	}
 

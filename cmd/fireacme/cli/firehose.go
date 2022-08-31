@@ -1,7 +1,6 @@
 package cli
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"time"
@@ -16,9 +15,7 @@ import (
 	firehoseApp "github.com/streamingfast/firehose/app/firehose"
 	"github.com/streamingfast/logging"
 	substreamsClient "github.com/streamingfast/substreams/client"
-	pbsubstreams "github.com/streamingfast/substreams/pb/sf/substreams/v1"
 	substreamsService "github.com/streamingfast/substreams/service"
-	"google.golang.org/grpc"
 )
 
 var metricset = dmetrics.NewSet()
@@ -81,26 +78,24 @@ func init() {
 					opts = append(opts, substreamsService.WithPartialMode())
 				}
 
-				ssClientFactory := func(ctx context.Context) (cli pbsubstreams.StreamClient, closeFunc func() error, callOpts []grpc.CallOption, err error) {
-					endpoint := viper.GetString("substreams-client-endpoint")
-					if endpoint == "" {
-						endpoint = viper.GetString("firehose-grpc-listen-addr")
-					}
-
-					return substreamsClient.NewSubstreamsClient(
-						endpoint,
-						os.ExpandEnv(viper.GetString("substreams-client-jwt")),
-						viper.GetBool("substreams-client-insecure"),
-						viper.GetBool("substreams-client-plaintext"),
-					)
+				clientEndpoint := viper.GetString("substreams-client-endpoint")
+				if clientEndpoint == "" {
+					clientEndpoint = viper.GetString("firehose-grpc-listen-addr")
 				}
+
+				clientConfig := substreamsClient.NewSubstreamsClientConfig(
+					clientEndpoint,
+					os.ExpandEnv(viper.GetString("substreams-client-jwt")),
+					viper.GetBool("substreams-client-insecure"),
+					viper.GetBool("substreams-client-plaintext"),
+				)
 
 				sss := substreamsService.New(
 					stateStore,
 					"sf.aptos.type.v1.Block",
-					ssClientFactory,
 					viper.GetInt("substreams-sub-request-parallel-jobs"),
 					viper.GetInt("substreams-sub-request-block-range-size"),
+					clientConfig,
 					opts...,
 				)
 

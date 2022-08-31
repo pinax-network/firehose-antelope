@@ -63,7 +63,7 @@ func newParsingStats(logger *zap.Logger, block uint64) *parsingStats {
 }
 
 func (s *parsingStats) log() {
-	s.logger.Info("extractor block stats",
+	s.logger.Info("reader block stats",
 		zap.Uint64("block_num", s.blockNum),
 		zap.Int64("duration", int64(time.Since(s.startAt))),
 		zap.Reflect("stats", s.data),
@@ -109,7 +109,7 @@ func (r *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
 }
 
 const (
-	LogPrefix     = "DMLOG"
+	LogPrefix     = "FIRE"
 	LogBeginBlock = "BLOCK_BEGIN"
 	LogBeginTrx   = "BEGIN_TRX"
 	LogBeginEvent = "TRX_BEGIN_EVENT"
@@ -188,7 +188,7 @@ func (r *ConsoleReader) buildScanner(reader io.Reader) *bufio.Scanner {
 }
 
 // Format:
-// DMLOG BLOCK_BEGIN <NUM>
+// FIRE BLOCK_BEGIN <NUM>
 func (r *ConsoleReader) blockBegin(params []string) error {
 	if err := validateChunk(params, 1); err != nil {
 		return fmt.Errorf("invalid log line length: %w", err)
@@ -205,7 +205,7 @@ func (r *ConsoleReader) blockBegin(params []string) error {
 }
 
 // Format:
-// DMLOG BLOCK_BEGIN <HASH> <TYPE> <FROM> <TO> <AMOUNT> <FEE> <SUCCESS>
+// FIRE BLOCK_BEGIN <HASH> <TYPE> <FROM> <TO> <AMOUNT> <FEE> <SUCCESS>
 func (ctx *parseCtx) trxBegin(params []string) error {
 	if err := validateChunk(params, 7); err != nil {
 		return fmt.Errorf("invalid log line length: %w", err)
@@ -240,7 +240,7 @@ func (ctx *parseCtx) trxBegin(params []string) error {
 }
 
 // Format:
-// DMLOG TRX_BEGIN_EVENT <TRX_HASH> <TYPE>
+// FIRE TRX_BEGIN_EVENT <TRX_HASH> <TYPE>
 
 func (ctx *parseCtx) eventBegin(params []string) error {
 	if err := validateChunk(params, 2); err != nil {
@@ -268,7 +268,7 @@ func (ctx *parseCtx) eventBegin(params []string) error {
 }
 
 // Format:
-// DMLOG TRX_EVENT_ATTR <TRX_HASH> <EVENT_INDEX> <KEY> <VALUE>
+// FIRE TRX_EVENT_ATTR <TRX_HASH> <EVENT_INDEX> <KEY> <VALUE>
 func (ctx *parseCtx) eventAttr(params []string) error {
 	if err := validateChunk(params, 4); err != nil {
 		return fmt.Errorf("invalid log line length: %w", err)
@@ -304,7 +304,7 @@ func (ctx *parseCtx) eventAttr(params []string) error {
 }
 
 // Format:
-// DMLOG BLOCK_END <HEIGHT> <HASH> <PREV_HASH> <TIMESTAMP> <TRX-COUNT>
+// FIRE BLOCK_END <HEIGHT> <HASH> <PREV_HASH> <TIMESTAMP> <TRX-COUNT>
 func (ctx *parseCtx) readBlockEnd(params []string) (*pbacme.Block, error) {
 	if err := validateChunk(params, 5); err != nil {
 		return nil, fmt.Errorf("invalid log line length: %w", err)
