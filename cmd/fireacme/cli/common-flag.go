@@ -25,7 +25,7 @@ func init() {
 		//Common stores configuration flags
 		cmd.Flags().String("common-one-block-store-url", OneBlockStoreURL, "[COMMON] Store URL to read/write one-block files, use by reader, merger")
 		cmd.Flags().String("common-merged-blocks-store-url", MergedBlocksStoreURL, "[COMMON] Store URL where to read/write merged blocks, used by: reader, merger, firehose.")
-		cmd.Flags().String("common-relayer-addr", RelayerServingAddr, "[COMMON] gRPC endpoint to get real-time blocks, used by: firehose")
+		cmd.Flags().String("common-live-blocks-addr", RelayerServingAddr, "[COMMON] gRPC endpoint to get real-time blocks.")
 
 		cmd.Flags().Bool("common-blocks-cache-enabled", false, FlagDescription(`
 			[COMMON] Use a disk cache to store the blocks data to disk and instead of keeping it in RAM. By enabling this, block's Protobuf content, in bytes,

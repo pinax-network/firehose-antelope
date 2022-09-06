@@ -28,7 +28,7 @@ func init() {
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          "firehose",
 		Title:       "Block Firehose",
-		Description: "Provides on-demand filtered blocks, depends on common-merged-blocks-store-url and common-relayer-addr",
+		Description: "Provides on-demand filtered blocks, depends on common-merged-blocks-store-url and common-live-blocks-addr",
 		RegisterFlags: func(cmd *cobra.Command) error {
 			cmd.Flags().String("firehose-grpc-listen-addr", FirehoseGRPCServingAddr, "Address on which the firehose will listen")
 			cmd.Flags().Duration("firehose-real-time-tolerance", 1*time.Minute, "firehose will became alive if now - block time is smaller then tolerance")
@@ -105,7 +105,7 @@ func init() {
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
 				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
 				MergedBlocksStoreURL:    MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
-				BlockStreamAddr:         viper.GetString("common-relayer-addr"),
+				BlockStreamAddr:         viper.GetString("common-live-blocks-addr"),
 				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
 				GRPCShutdownGracePeriod: 1 * time.Second,
 			}, &firehoseApp.Modules{
