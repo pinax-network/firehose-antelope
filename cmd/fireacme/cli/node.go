@@ -9,11 +9,13 @@ import (
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream/blockstream"
 	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/firehose-acme/codec"
 	"github.com/streamingfast/firehose-acme/nodemanager"
 	"github.com/streamingfast/logging"
 	nodeManager "github.com/streamingfast/node-manager"
 	nodeManagerApp "github.com/streamingfast/node-manager/app/node_manager2"
 	"github.com/streamingfast/node-manager/metrics"
+	reader "github.com/streamingfast/node-manager/mindreader"
 	"github.com/streamingfast/node-manager/operator"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	pbheadinfo "github.com/streamingfast/pbgo/sf/headinfo/v1"
@@ -151,22 +153,27 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
 		oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))
 		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir"))
-		gprcListenAdrr := viper.GetString("reader-node-grpc-listen-addr")
+		gprcListenAddr := viper.GetString("reader-node-grpc-listen-addr")
 		batchStartBlockNum := viper.GetUint64("reader-node-start-block-num")
 		batchStopBlockNum := viper.GetUint64("reader-node-stop-block-num")
 		oneBlockFileSuffix := viper.GetString("reader-node-one-block-suffix")
 		blocksChanCapacity := viper.GetInt("reader-node-blocks-chan-capacity")
 
-		ReaderPlugin, err := getReaderLogPlugin(
-			blockStreamServer,
+		readerPlugin, err := reader.NewMindReaderPlugin(
 			oneBlocksStoreURL,
 			workingDir,
+			func(lines chan string) (reader.ConsolerReader, error) {
+				return codec.NewConsoleReader(appLogger, lines)
+			},
 			batchStartBlockNum,
 			batchStopBlockNum,
 			blocksChanCapacity,
+			metricsAndReadinessManager.UpdateHeadBlock,
+			func(error) {
+				chainOperator.Shutdown(nil)
+			},
 			oneBlockFileSuffix,
-			chainOperator.Shutdown,
-			metricsAndReadinessManager,
+			blockStreamServer,
 			appLogger,
 			appTracer,
 		)
@@ -174,14 +181,14 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("new reader plugin: %w", err)
 		}
 
-		superviser.RegisterLogPlugin(ReaderPlugin)
+		superviser.RegisterLogPlugin(readerPlugin)
 
 		return nodeManagerApp.New(&nodeManagerApp.Config{
 			HTTPAddr: httpAddr,
-			GRPCAddr: gprcListenAdrr,
+			GRPCAddr: gprcListenAddr,
 		}, &nodeManagerApp.Modules{
 			Operator:                   chainOperator,
-			MindreaderPlugin:           ReaderPlugin,
+			MindreaderPlugin:           readerPlugin,
 			MetricsAndReadinessManager: metricsAndReadinessManager,
 			RegisterGRPCService: func(server grpc.ServiceRegistrar) error {
 				pbheadinfo.RegisterHeadInfoServer(server, blockStreamServer)

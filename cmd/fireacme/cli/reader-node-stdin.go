@@ -23,7 +23,7 @@ import (
 	"github.com/streamingfast/firehose-acme/codec"
 	"github.com/streamingfast/logging"
 	nodeManager "github.com/streamingfast/node-manager"
-	nodeMindreaderStdinApp "github.com/streamingfast/node-manager/app/node_mindreader_stdin"
+	nodeReaderStdinApp "github.com/streamingfast/node-manager/app/node_reader_stdin"
 	"github.com/streamingfast/node-manager/metrics"
 	"github.com/streamingfast/node-manager/mindreader"
 )
@@ -49,13 +49,13 @@ func init() {
 				return r, nil
 			}
 
-			metricID := "reader-geth-node-stdin"
+			metricID := "reader-node-stdin"
 			headBlockTimeDrift := metrics.NewHeadBlockTimeDrift(metricID)
 			headBlockNumber := metrics.NewHeadBlockNumber(metricID)
 			appReadiness := metrics.NewAppReadiness(metricID)
 			metricsAndReadinessManager := nodeManager.NewMetricsAndReadinessManager(headBlockTimeDrift, headBlockNumber, appReadiness, viper.GetDuration("reader-node-readiness-max-latency"))
 
-			return nodeMindreaderStdinApp.New(&nodeMindreaderStdinApp.Config{
+			return nodeReaderStdinApp.New(&nodeReaderStdinApp.Config{
 				GRPCAddr:                   viper.GetString("reader-node-grpc-listen-addr"),
 				OneBlocksStoreURL:          archiveStoreURL,
 				MindReadBlocksChanCapacity: viper.GetInt("reader-node-blocks-chan-capacity"),
@@ -63,7 +63,7 @@ func init() {
 				StopBlockNum:               viper.GetUint64("reader-node-stop-block-num"),
 				WorkingDir:                 MustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir")),
 				OneBlockSuffix:             viper.GetString("reader-node-one-block-suffix"),
-			}, &nodeMindreaderStdinApp.Modules{
+			}, &nodeReaderStdinApp.Modules{
 				ConsoleReaderFactory:       consoleReaderFactory,
 				MetricsAndReadinessManager: metricsAndReadinessManager,
 			}, appLogger, appTracer), nil

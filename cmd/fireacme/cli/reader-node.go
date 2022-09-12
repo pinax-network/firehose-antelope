@@ -16,12 +16,6 @@ package cli
 
 import (
 	"github.com/spf13/cobra"
-	"github.com/streamingfast/bstream/blockstream"
-	"github.com/streamingfast/firehose-acme/codec"
-	"github.com/streamingfast/logging"
-	nodeManager "github.com/streamingfast/node-manager"
-	reader "github.com/streamingfast/node-manager/mindreader"
-	"go.uber.org/zap"
 )
 
 func init() {
@@ -42,39 +36,4 @@ func registerReaderNodeFlags(cmd *cobra.Command) error {
 	`))
 
 	return nil
-}
-
-func getReaderLogPlugin(
-	blockStreamServer *blockstream.Server,
-	oneBlocksStoreURL string,
-	workingDir string,
-	batchStartBlockNum uint64,
-	batchStopBlockNum uint64,
-	blocksChanCapacity int,
-	oneBlockFileSuffix string,
-	operatorShutdownFunc func(error),
-	metricsAndReadinessManager *nodeManager.MetricsAndReadinessManager,
-	appLogger *zap.Logger,
-	appTracer logging.Tracer,
-) (*reader.MindReaderPlugin, error) {
-	consoleReaderFactory := func(lines chan string) (reader.ConsolerReader, error) {
-		return codec.NewConsoleReader(appLogger, lines)
-	}
-
-	return reader.NewMindReaderPlugin(
-		oneBlocksStoreURL,
-		workingDir,
-		consoleReaderFactory,
-		batchStartBlockNum,
-		batchStopBlockNum,
-		blocksChanCapacity,
-		metricsAndReadinessManager.UpdateHeadBlock,
-		func(error) {
-			operatorShutdownFunc(nil)
-		},
-		oneBlockFileSuffix,
-		blockStreamServer,
-		appLogger,
-		appTracer,
-	)
 }
