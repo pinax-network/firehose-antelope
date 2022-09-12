@@ -33,7 +33,7 @@ main() {
     usage_error "The 'dummy-blockchain' executable must be found within your PATH, install it from source of 'https://github.com/streamingfast/dummy-blockchain'"
   fi
 
-  exec dummy-blockchain --firehose-enabled --block-rate 6 start --store-dir "$chain_data" | $fireacme -c $(basename $ROOT).yaml start "$@"
+  exec dummy-blockchain --firehose-enabled --block-rate 60 start --store-dir "$chain_data" | $fireacme -c $(basename $ROOT).yaml start "$@"
 }
 
 usage_error() {
