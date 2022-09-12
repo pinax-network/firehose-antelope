@@ -9,7 +9,3 @@ start:
     reader-node-path: "dummy-blockchain"
     # Flags that will be added to the dummy chain process command
     reader-node-arguments: +--firehose-enabled --block-rate=6
-    # Once fully live with chain, those should be removed, they are used so that Firehose serves
-    # blocks even if the chain is not live yet.
-    firehose-real-time-tolerance: 999999999s
-    relayer-max-source-latency: 999999999s

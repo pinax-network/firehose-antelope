@@ -6,24 +6,24 @@ require (
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.8.1
-	github.com/streamingfast/bstream v0.0.2-0.20220831142019-0a0b0caa04c3
+	github.com/streamingfast/bstream v0.0.2-0.20220909121429-4647fd1522c9
 	github.com/streamingfast/cli v0.0.4-0.20220113202443-f7bcefa38f7e
 	github.com/streamingfast/dauth v0.0.0-20220404140613-a40f4cd81626
 	github.com/streamingfast/derr v0.0.0-20220526184630-695c21740145
-	github.com/streamingfast/dgrpc v0.0.0-20220829132503-5a93eff857a6
-	github.com/streamingfast/dlauncher v0.0.0-20220307153121-5674e1b64d40
+	github.com/streamingfast/dgrpc v0.0.0-20220909121013-162e9305bbfc
+	github.com/streamingfast/dlauncher v0.0.0-20220909121534-7a9aa91dbb32
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20220811180000-3e513057d17c
-	github.com/streamingfast/dstore v0.1.1-0.20220607202639-35118aeaf648
-	github.com/streamingfast/firehose v0.1.1-0.20220830152055-a665bb4336d3
+	github.com/streamingfast/dstore v0.1.1-0.20220830184623-b0f0cc804743
+	github.com/streamingfast/firehose v0.1.1-0.20220909121738-2f3bc007ea2b
 	github.com/streamingfast/firehose-acme/types v0.0.0-20220831185201-05ffef22e3a0
 	github.com/streamingfast/logging v0.0.0-20220511154537-ce373d264338
-	github.com/streamingfast/merger v0.0.3-0.20220728182037-7b5841d3c98f
-	github.com/streamingfast/node-manager v0.0.2-0.20220728194124-81a202e6dcfa
+	github.com/streamingfast/merger v0.0.3-0.20220909122033-9ca15beb25f5
+	github.com/streamingfast/node-manager v0.0.2-0.20220909122247-8e761977ad9f
 	github.com/streamingfast/pbgo v0.0.6-0.20220630154121-2e8bba36234e
-	github.com/streamingfast/relayer v0.0.2-0.20220729104233-021c788e2cc1
+	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20220727183125-3348eaca0e25
-	github.com/streamingfast/substreams v0.0.21-0.20220831182608-4b383d73e6dc
+	github.com/streamingfast/substreams v0.0.21-0.20220909123253-9f44d2ecc609
 	github.com/stretchr/testify v1.8.0
 	go.uber.org/zap v1.21.0
 	golang.org/x/exp v0.0.0-20220907003533-145caa8ea1d0
@@ -31,10 +31,10 @@ require (
 )
 
 require (
-	cloud.google.com/go v0.102.0 // indirect
+	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.3.0 // indirect
-	cloud.google.com/go/monitoring v1.4.0 // indirect
+	cloud.google.com/go/monitoring v1.6.0 // indirect
 	cloud.google.com/go/storage v1.22.1 // indirect
 	cloud.google.com/go/trace v1.2.0 // indirect
 	contrib.go.opencensus.io/exporter/stackdriver v0.13.10 // indirect
@@ -56,16 +56,20 @@ require (
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
+	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
+	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect
-	github.com/google/uuid v1.2.0 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.0.0-20220520183353-fd19c99a87aa // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.1.0 // indirect
 	github.com/googleapis/gax-go/v2 v2.4.0 // indirect
 	github.com/googleapis/go-type-adapters v1.0.0 // indirect
 	github.com/gorilla/mux v1.8.0 // indirect
@@ -131,16 +135,16 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20220607020251-c690dde0001d // indirect
-	golang.org/x/oauth2 v0.0.0-20220608161450-d0670ef3b1eb // indirect
+	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
+	golang.org/x/oauth2 v0.0.0-20220622183110-fd043fe589d2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
-	google.golang.org/api v0.84.0 // indirect
+	google.golang.org/api v0.91.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220616135557-88e70c0c3a90 // indirect
+	google.golang.org/genproto v0.0.0-20220808131553-a91ffa7f803e // indirect
 	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/olivere/elastic.v3 v3.0.75 // indirect

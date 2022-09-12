@@ -31,7 +31,6 @@ func init() {
 		Description: "Provides on-demand filtered blocks, depends on common-merged-blocks-store-url and common-live-blocks-addr",
 		RegisterFlags: func(cmd *cobra.Command) error {
 			cmd.Flags().String("firehose-grpc-listen-addr", FirehoseGRPCServingAddr, "Address on which the firehose will listen")
-			cmd.Flags().Duration("firehose-real-time-tolerance", 1*time.Minute, "firehose will became alive if now - block time is smaller then tolerance")
 
 			cmd.Flags().Bool("substreams-enabled", false, "Whether to enable substreams")
 			cmd.Flags().Bool("substreams-partial-mode-enabled", false, "Whether to enable partial stores generation support on this instance (usually for internal deployments only)")
@@ -90,7 +89,7 @@ func init() {
 					viper.GetBool("substreams-client-plaintext"),
 				)
 
-				sss := substreamsService.New(
+				sss, err := substreamsService.New(
 					stateStore,
 					"sf.aptos.type.v1.Block",
 					viper.GetInt("substreams-sub-request-parallel-jobs"),
@@ -98,6 +97,9 @@ func init() {
 					clientConfig,
 					opts...,
 				)
+				if err != nil {
+					return nil, fmt.Errorf("create substreams service: %w", err)
+				}
 
 				registerServiceExt = sss.Register
 			}

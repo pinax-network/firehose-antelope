@@ -183,7 +183,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			Operator:                   chainOperator,
 			MindreaderPlugin:           ReaderPlugin,
 			MetricsAndReadinessManager: metricsAndReadinessManager,
-			RegisterGRPCService: func(server *grpc.Server) error {
+			RegisterGRPCService: func(server grpc.ServiceRegistrar) error {
 				pbheadinfo.RegisterHeadInfoServer(server, blockStreamServer)
 				pbbstream.RegisterBlockStreamServer(server, blockStreamServer)
 
@@ -231,10 +231,12 @@ func buildNodeArguments(nodeDataDir, nodeRole string, args string) ([]string, er
 func buildMetricsAndReadinessManager(name string, maxLatency time.Duration) *nodeManager.MetricsAndReadinessManager {
 	headBlockTimeDrift := metrics.NewHeadBlockTimeDrift(name)
 	headBlockNumber := metrics.NewHeadBlockNumber(name)
+	appReadiness := metrics.NewAppReadiness(name)
 
 	metricsAndReadinessManager := nodeManager.NewMetricsAndReadinessManager(
 		headBlockTimeDrift,
 		headBlockNumber,
+		appReadiness,
 		maxLatency,
 	)
 	return metricsAndReadinessManager
