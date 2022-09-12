@@ -114,7 +114,7 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 
 	cr := testReaderConsoleReader(t, make(chan string, 10000), func() { fl.Close() })
 
-	go cr.ProcessData(fl)
+	go cr.processData(fl)
 
 	return cr
 }

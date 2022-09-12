@@ -164,7 +164,7 @@ func (r *ConsoleReader) next() (out *pbacme.Block, err error) {
 	return nil, io.EOF
 }
 
-func (r *ConsoleReader) ProcessData(reader io.Reader) error {
+func (r *ConsoleReader) processData(reader io.Reader) error {
 	scanner := r.buildScanner(reader)
 	for scanner.Scan() {
 		line := scanner.Text()
