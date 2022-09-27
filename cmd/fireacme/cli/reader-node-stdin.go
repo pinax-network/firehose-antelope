@@ -38,7 +38,7 @@ func init() {
 		RegisterFlags: func(cmd *cobra.Command) error { return nil },
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
-			archiveStoreURL := MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
+			archiveStoreURL := MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))
 
 			consoleReaderFactory := func(lines chan string) (mindreader.ConsolerReader, error) {
 				r, err := codec.NewConsoleReader(appLogger, lines)
