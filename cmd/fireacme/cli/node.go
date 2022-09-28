@@ -151,7 +151,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
-		oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))
+		oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
 		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir"))
 		gprcListenAddr := viper.GetString("reader-node-grpc-listen-addr")
 		batchStartBlockNum := viper.GetUint64("reader-node-start-block-num")

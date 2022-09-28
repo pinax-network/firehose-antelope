@@ -31,7 +31,7 @@ func init() {
 				return
 			}
 
-			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url"))); err != nil {
+			if err = mkdirStorePathIfLocal(mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))); err != nil {
 				return
 			}
 
@@ -41,7 +41,7 @@ func init() {
 			sfDataDir := runtime.AbsDataDir
 
 			return mergerApp.New(&mergerApp.Config{
-				StorageOneBlockFilesPath:     MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
+				StorageOneBlockFilesPath:     MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
 				StorageMergedBlocksFilesPath: MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
 				GRPCListenAddr:               viper.GetString("merger-grpc-listen-addr"),
 				PruneForkedBlocksAfter:       viper.GetUint64("merger-prune-forked-blocks-after"),
