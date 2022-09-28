@@ -105,7 +105,7 @@ func init() {
 			}
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
-				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-blocks-store-url")),
+				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
 				MergedBlocksStoreURL:    MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
 				BlockStreamAddr:         viper.GetString("common-live-blocks-addr"),
 				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
