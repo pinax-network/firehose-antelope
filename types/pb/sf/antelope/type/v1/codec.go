@@ -16,13 +16,9 @@ package pbantelope
 
 import (
 	"encoding/json"
-	"fmt"
-	"strings"
-	"time"
-
-	"github.com/golang/protobuf/ptypes"
 	"github.com/streamingfast/bstream"
 	"github.com/tidwall/gjson"
+	"strings"
 )
 
 // TODO: We should probably memoize all fields that requires computation
@@ -40,23 +36,24 @@ func (b *Block) PreviousID() string {
 	return b.Header.Previous
 }
 
-func (b *Block) Time() (time.Time, error) {
-	timestamp, err := ptypes.Timestamp(b.Header.Timestamp)
-	if err != nil {
-		return time.Time{}, fmt.Errorf("unable to turn google proto Timestamp into time.Time: %s", err)
-	}
-
-	return timestamp, nil
-}
-
-func (b *Block) MustTime() time.Time {
-	timestamp, err := b.Time()
-	if err != nil {
-		panic(err)
-	}
-
-	return timestamp
-}
+// todo legacy code should be replaced with timestamppb
+//func (b *Block) Time() (time.Time, error) {
+//	timestamp, err := ptypes.Timestamp(b.Header.Timestamp)
+//	if err != nil {
+//		return time.Time{}, fmt.Errorf("unable to turn google proto Timestamp into time.Time: %s", err)
+//	}
+//
+//	return timestamp, nil
+//}
+//
+//func (b *Block) MustTime() time.Time {
+//	timestamp, err := b.Time()
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	return timestamp
+//}
 
 func (b *Block) LIBNum() uint64 {
 	return uint64(b.DposIrreversibleBlocknum)
