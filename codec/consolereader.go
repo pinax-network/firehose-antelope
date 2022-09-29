@@ -29,7 +29,7 @@ import (
 	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 	eosio_v2_0 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.0"
 	eosio_v2_1 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.1"
-	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dmetrics"

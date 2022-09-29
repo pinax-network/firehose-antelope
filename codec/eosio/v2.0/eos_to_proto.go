@@ -20,18 +20,18 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dfuse-io/dfuse-eosio/codec/eosio"
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"go.uber.org/zap"
 )
 
-func TransactionTraceToDEOS(logger *zap.Logger, in *eos.TransactionTrace, opts ...eosio.ConversionOption) *pbcodec.TransactionTrace {
+func TransactionTraceToDEOS(logger *zap.Logger, in *eos.TransactionTrace, opts ...eosio.ConversionOption) *pbantelope.TransactionTrace {
 	id := in.ID.String()
 
-	out := &pbcodec.TransactionTrace{
+	out := &pbantelope.TransactionTrace{
 		Id:              id,
 		BlockNum:        uint64(in.BlockNum),
 		BlockTime:       mustProtoTimestamp(in.BlockTime.Time),
@@ -59,7 +59,7 @@ func TransactionTraceToDEOS(logger *zap.Logger, in *eos.TransactionTrace, opts .
 	return out
 }
 
-func ActionTracesToDEOS(actionTraces []eos.ActionTrace, opts ...eosio.ConversionOption) (out []*pbcodec.ActionTrace, someConsoleTruncated bool) {
+func ActionTracesToDEOS(actionTraces []eos.ActionTrace, opts ...eosio.ConversionOption) (out []*pbantelope.ActionTrace, someConsoleTruncated bool) {
 	if len(actionTraces) <= 0 {
 		return nil, false
 	}
@@ -82,7 +82,7 @@ func ActionTracesToDEOS(actionTraces []eos.ActionTrace, opts ...eosio.Conversion
 		return leftSeq < rightSeq
 	})
 
-	out = make([]*pbcodec.ActionTrace, len(actionTraces))
+	out = make([]*pbantelope.ActionTrace, len(actionTraces))
 	var consoleTruncated bool
 	for idx, actionTrace := range actionTraces {
 		out[idx], consoleTruncated = ActionTraceToDEOS(actionTrace, uint32(idx), opts...)
@@ -94,8 +94,8 @@ func ActionTracesToDEOS(actionTraces []eos.ActionTrace, opts ...eosio.Conversion
 	return
 }
 
-func ActionTraceToDEOS(in eos.ActionTrace, execIndex uint32, opts ...eosio.ConversionOption) (out *pbcodec.ActionTrace, consoleTruncated bool) {
-	out = &pbcodec.ActionTrace{
+func ActionTraceToDEOS(in eos.ActionTrace, execIndex uint32, opts ...eosio.ConversionOption) (out *pbantelope.ActionTrace, consoleTruncated bool) {
+	out = &pbantelope.ActionTrace{
 		Receiver:             string(in.Receiver),
 		Action:               eosio.ActionToDEOS(in.Action),
 		Elapsed:              int64(in.Elapsed),

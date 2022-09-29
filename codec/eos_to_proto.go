@@ -549,7 +549,7 @@ func TransactionStatusToEOS(in pbantelope.TransactionStatus) eos.TransactionStat
 }
 
 func ExtractEOSSignedTransactionFromReceipt(trxReceipt *pbantelope.TransactionReceipt) (*eos.SignedTransaction, error) {
-	eosPackedTx, err := pbcodecPackedTransactionToEOS(trxReceipt.PackedTransaction)
+	eosPackedTx, err := pbantelopePackedTransactionToEOS(trxReceipt.PackedTransaction)
 	if err != nil {
 		return nil, fmt.Errorf("pbantelope.PackedTransaction to EOS conversion failed: %s", err)
 	}
@@ -570,7 +570,7 @@ func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
 	return out
 }
 
-func pbcodecPackedTransactionToEOS(packedTrx *pbantelope.PackedTransaction) (*eos.PackedTransaction, error) {
+func pbantelopePackedTransactionToEOS(packedTrx *pbantelope.PackedTransaction) (*eos.PackedTransaction, error) {
 	signatures := make([]ecc.Signature, len(packedTrx.Signatures))
 	for i, signature := range packedTrx.Signatures {
 		eccSignature, err := ecc.NewSignature(signature)

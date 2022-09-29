@@ -4,7 +4,7 @@ import (
 	"testing"
 	"unicode/utf8"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -34,7 +34,7 @@ func TestLimitConsoleLengthConversionOption(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			actTrace := &pbcodec.ActionTrace{Console: test.in}
+			actTrace := &pbantelope.ActionTrace{Console: test.in}
 
 			option := LimitConsoleLengthConversionOption(test.maxByteCount)
 			option.(ActionConversionOption).Apply(actTrace)

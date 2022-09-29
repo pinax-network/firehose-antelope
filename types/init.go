@@ -35,7 +35,7 @@ func init() {
 func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
 	return bstream.NewDBinBlockReader(reader, func(contentType string, version int32) error {
 		protocol := pbbstream.Protocol(pbbstream.Protocol_value[contentType])
-		if protocol != pbbstream.Protocol_ETH && version != 1 {
+		if protocol != pbbstream.Protocol_EOS && version != 1 {
 			return fmt.Errorf("reader only knows about %s block kind at version 1, got %s at version %d", protocol, contentType, version)
 		}
 
@@ -44,5 +44,5 @@ func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
 }
 
 func blockWriterFactory(writer io.Writer) (bstream.BlockWriter, error) {
-	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_ETH.String(), 1)
+	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_EOS.String(), 1)
 }

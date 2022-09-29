@@ -3,7 +3,7 @@ package eosio
 import (
 	"unicode/utf8"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 )
 
@@ -57,17 +57,17 @@ type CreationFlatNode = [3]int
 type ConversionOption interface{}
 
 type ActionConversionOption interface {
-	Apply(actionTrace *pbcodec.ActionTrace)
+	Apply(actionTrace *pbantelope.ActionTrace)
 }
 
-type actionConversionOptionFunc func(actionTrace *pbcodec.ActionTrace)
+type actionConversionOptionFunc func(actionTrace *pbantelope.ActionTrace)
 
-func (f actionConversionOptionFunc) Apply(actionTrace *pbcodec.ActionTrace) {
+func (f actionConversionOptionFunc) Apply(actionTrace *pbantelope.ActionTrace) {
 	f(actionTrace)
 }
 
 func LimitConsoleLengthConversionOption(maxByteCount int) ConversionOption {
-	return actionConversionOptionFunc(func(in *pbcodec.ActionTrace) {
+	return actionConversionOptionFunc(func(in *pbantelope.ActionTrace) {
 		if maxByteCount == 0 {
 			return
 		}

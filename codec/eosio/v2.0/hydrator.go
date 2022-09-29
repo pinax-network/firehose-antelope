@@ -3,8 +3,8 @@ package eosio
 import (
 	"fmt"
 
-	"github.com/dfuse-io/dfuse-eosio/codec/eosio"
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"go.uber.org/zap"
 )
@@ -19,7 +19,7 @@ type Hydrator struct {
 	logger *zap.Logger
 }
 
-func (h *Hydrator) HydrateBlock(block *pbcodec.Block, input []byte) error {
+func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte) error {
 	h.logger.Debug("hydrating block from bytes")
 
 	blockState := &eos.BlockState{}
@@ -39,7 +39,8 @@ func (h *Hydrator) HydrateBlock(block *pbcodec.Block, input []byte) error {
 	block.BlockExtensions = eosio.ExtensionsToDEOS(signedBlock.BlockExtensions)
 	block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
 	block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
-	block.Validated = blockState.Validated
+	// todo not implemented in 3.1 ???
+	// block.Validated = blockState.Validated
 	block.BlockrootMerkle = eosio.BlockrootMerkleToDEOS(blockState.BlockrootMerkle)
 	block.ProducerToLastProduced = eosio.ProducerToLastProducedToDEOS(blockState.ProducerToLastProduced)
 	block.ProducerToLastImpliedIrb = eosio.ProducerToLastImpliedIrbToDEOS(blockState.ProducerToLastImpliedIRB)
@@ -107,7 +108,7 @@ func (h *Hydrator) HydrateBlock(block *pbcodec.Block, input []byte) error {
 	return nil
 }
 
-func (h *Hydrator) DecodeTransactionTrace(input []byte, opts ...eosio.ConversionOption) (*pbcodec.TransactionTrace, error) {
+func (h *Hydrator) DecodeTransactionTrace(input []byte, opts ...eosio.ConversionOption) (*pbantelope.TransactionTrace, error) {
 	trxTrace := &eos.TransactionTrace{}
 	if err := unmarshalBinary(input, trxTrace); err != nil {
 		return nil, fmt.Errorf("unmarshalling binary transaction trace: %w", err)

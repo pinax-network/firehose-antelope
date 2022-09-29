@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"math"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/lytics/ordpool"
@@ -141,7 +141,7 @@ func (c *ABIDecoder) startBlock(blockNum uint64) error {
 	return nil
 }
 
-func (c *ABIDecoder) endBlock(block *pbcodec.Block) error {
+func (c *ABIDecoder) endBlock(block *pbantelope.Block) error {
 	blockRef := block.AsRef()
 	zlog.Debug("post-processing block", zap.Stringer("block", blockRef))
 	if c.activeBlockNum == noActiveBlockNum {
@@ -167,7 +167,7 @@ func (c *ABIDecoder) endBlock(block *pbcodec.Block) error {
 	return nil
 }
 
-func (c *ABIDecoder) processTransaction(trxTrace *pbcodec.TransactionTrace) error {
+func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) error {
 	zlog.Debug("processing transaction for decoding", zap.String("trx_id", trxTrace.Id))
 
 	// Optimization: The truncation and ABI addition just below could share the same
@@ -229,7 +229,7 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbcodec.TransactionTrace) erro
 		// A deferred transaction push in the blockchain (using CLI and `--delay-sec`) does not have any action trace,
 		// let's use the most recent active ABI global sequence in those cases.
 		globalSequence := mostRecentActiveABI
-		if dtrxOp.Operation != pbcodec.DTrxOp_OPERATION_PUSH_CREATE {
+		if dtrxOp.Operation != pbantelope.DTrxOp_OPERATION_PUSH_CREATE {
 			globalSequence = actionTraceGlobalSequence(trxTrace.ActionTraces[dtrxOp.ActionIndex])
 		}
 
@@ -246,7 +246,7 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbcodec.TransactionTrace) erro
 	return c.addJobs(decodingJobs)
 }
 
-func (c *ABIDecoder) processImplicitTransactions(trxOps []*pbcodec.TrxOp) error {
+func (c *ABIDecoder) processImplicitTransactions(trxOps []*pbantelope.TrxOp) error {
 	var decodingJobs []decodingJob
 
 	for _, trxOp := range trxOps {
@@ -263,7 +263,7 @@ func (c *ABIDecoder) processImplicitTransactions(trxOps []*pbcodec.TrxOp) error 
 	return c.addJobs(decodingJobs)
 }
 
-func actionTraceGlobalSequence(actionTrace *pbcodec.ActionTrace) uint64 {
+func actionTraceGlobalSequence(actionTrace *pbantelope.ActionTrace) uint64 {
 	globalSequence := mostRecentActiveABI
 	if actionTrace.Receipt != nil && actionTrace.Receipt.GlobalSequence != 0 {
 		globalSequence = actionTrace.Receipt.GlobalSequence
@@ -272,7 +272,7 @@ func actionTraceGlobalSequence(actionTrace *pbcodec.ActionTrace) uint64 {
 	return globalSequence
 }
 
-func (c *ABIDecoder) findFirstGlobalSequence(trxTrace *pbcodec.TransactionTrace) (uint64, bool) {
+func (c *ABIDecoder) findFirstGlobalSequence(trxTrace *pbantelope.TransactionTrace) (uint64, bool) {
 	if trxTrace.HasBeenReverted() || len(trxTrace.ActionTraces) <= 0 {
 		return 0, false
 	}
@@ -314,7 +314,7 @@ func (c *ABIDecoder) createLocalABICache(trxID string, operations []abiOperation
 	return abiCache, nil
 }
 
-func (c *ABIDecoder) extractABIOperations(trxTrace *pbcodec.TransactionTrace) (out []abiOperation, err error) {
+func (c *ABIDecoder) extractABIOperations(trxTrace *pbantelope.TransactionTrace) (out []abiOperation, err error) {
 	for i, actionTrace := range trxTrace.ActionTraces {
 		// If the action trace receipt is `nil`, it means the action failed, in which case, we don't care about those `setabi`
 		if actionTrace.FullName() == "eosio:eosio:setabi" && actionTrace.Receipt != nil {
@@ -367,7 +367,7 @@ func (j actionDecodingJob) kind() string { return "action" }
 func (j dtrxDecodingJob) kind() string   { return "dtrx" }
 
 type actionDecodingJob struct {
-	action         *pbcodec.Action
+	action         *pbantelope.Action
 	actualblockNum uint64
 	actualTrxID    string
 	globalSequence uint64
@@ -381,9 +381,9 @@ type dtrxDecodingJob struct {
 func (d *ABIDecoder) addJobs(jobs []decodingJob) error {
 
 	for _, job := range jobs {
-		if traceEnabled {
-			zlog.Debug("adding decoding job to queue", zap.String("kind", job.kind()))
-		}
+		// if traceEnabled {
+		zlog.Debug("adding decoding job to queue", zap.String("kind", job.kind()))
+		// }
 
 		d.poolIn <- job //FIXME catch shutdown or smth
 		//		select {
@@ -414,9 +414,9 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 	}
 
 	job := inJob.(decodingJob)
-	if traceEnabled {
-		zlog.Debug("executing decoding job", zap.String("kind", job.kind()))
-	}
+	// if traceEnabled {
+	zlog.Debug("executing decoding job", zap.String("kind", job.kind()))
+	// }
 
 	if job.blockNum() != d.activeBlockNum {
 		return nil, fmt.Errorf("trying to decode a job for block num %d while decoding queue block num is %d", job.blockNum(), d.activeBlockNum)
@@ -432,23 +432,23 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 	}
 }
 
-func (d *ABIDecoder) decodeAction(action *pbcodec.Action, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
-	if traceEnabled {
-		zlog.Debug("decoding action", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-	}
+func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
+	// if traceEnabled {
+	zlog.Debug("decoding action", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+	//}
 
 	if len(action.RawData) <= 0 {
-		if traceEnabled {
-			zlog.Debug("skipping action since no hex data found", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		}
+		// if traceEnabled {
+		zlog.Debug("skipping action since no hex data found", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		// }
 		return nil
 	}
 
 	// Transfer raw data min length is 8 bytes for `from`, 8 bytes for `to`, 16 bytes for `quantity` and `1 byte` for memo length
 	if action.Account == "eosio.token" && action.Name == "transfer" && len(action.RawData) >= 33 {
-		if traceEnabled {
-			zlog.Debug("decoding action using pre-built eosio.token:transfer decoder", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		}
+		// if traceEnabled {
+		zlog.Debug("decoding action using pre-built eosio.token:transfer decoder", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		// }
 
 		var err error
 		action.JsonData, err = decodeTransfer(action.RawData)
@@ -468,23 +468,23 @@ func (d *ABIDecoder) decodeAction(action *pbcodec.Action, globalSequence uint64,
 
 	abi := d.findABI(action.Account, globalSequence, localCache)
 	if abi == nil {
-		if traceEnabled {
-			zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		}
+		// if traceEnabled {
+		zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		// }
 		return nil
 	}
 
 	actionDef := abi.ActionForName(eos.ActionName(action.Name))
 	if actionDef == nil {
-		if traceEnabled {
-			zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		}
+		// if traceEnabled {
+		zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		// }
 		return nil
 	}
 
-	if traceEnabled {
-		zlog.Debug("found ABI and action definition, performing decoding", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-	}
+	// if traceEnabled {
+	zlog.Debug("found ABI and action definition, performing decoding", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+	// }
 
 	decoder := eos.NewDecoder(action.RawData)
 	jsonData, err := abi.Decode(decoder, actionDef.Type)

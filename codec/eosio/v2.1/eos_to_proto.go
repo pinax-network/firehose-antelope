@@ -8,15 +8,15 @@ import (
 	"sort"
 	"time"
 
-	"github.com/dfuse-io/dfuse-eosio/codec/eosio"
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"go.uber.org/zap"
 )
 
-func TransactionReceiptToDEOS(txReceipt *TransactionReceipt) *pbcodec.TransactionReceipt {
-	receipt := &pbcodec.TransactionReceipt{
+func TransactionReceiptToDEOS(txReceipt *TransactionReceipt) *pbantelope.TransactionReceipt {
+	receipt := &pbantelope.TransactionReceipt{
 		Status:               TransactionStatusToDEOS(txReceipt.Status),
 		CpuUsageMicroSeconds: txReceipt.CPUUsageMicroSeconds,
 		NetUsageWords:        uint32(txReceipt.NetUsageWords),
@@ -24,7 +24,7 @@ func TransactionReceiptToDEOS(txReceipt *TransactionReceipt) *pbcodec.Transactio
 
 	receipt.Id = txReceipt.Transaction.ID.String()
 	if txReceipt.Transaction.Packed != nil {
-		receipt.PackedTransaction = &pbcodec.PackedTransaction{
+		receipt.PackedTransaction = &pbantelope.PackedTransaction{
 			Signatures:            SignaturesToDEOS(txReceipt.Transaction.Packed.Signatures),
 			Compression:           uint32(txReceipt.Transaction.Packed.Compression),
 			PackedContextFreeData: txReceipt.Transaction.Packed.PackedContextFreeData,
@@ -35,8 +35,8 @@ func TransactionReceiptToDEOS(txReceipt *TransactionReceipt) *pbcodec.Transactio
 	return receipt
 }
 
-func PackedTransactionToDEOS(in *PackedTransaction) *pbcodec.PackedTransaction {
-	out := &pbcodec.PackedTransaction{
+func PackedTransactionToDEOS(in *PackedTransaction) *pbantelope.PackedTransaction {
+	out := &pbantelope.PackedTransaction{
 		Compression:       uint32(in.Compression),
 		PackedTransaction: in.PackedTransaction,
 	}
@@ -69,10 +69,10 @@ func PackedTransactionToDEOS(in *PackedTransaction) *pbcodec.PackedTransaction {
 	return out
 }
 
-func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eosio.ConversionOption) *pbcodec.TransactionTrace {
+func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eosio.ConversionOption) *pbantelope.TransactionTrace {
 	id := in.ID.String()
 
-	out := &pbcodec.TransactionTrace{
+	out := &pbantelope.TransactionTrace{
 		Id:              id,
 		BlockNum:        uint64(in.BlockNum),
 		BlockTime:       mustProtoTimestamp(in.BlockTime.Time),
@@ -100,7 +100,7 @@ func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eo
 	return out
 }
 
-func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOption) (out []*pbcodec.ActionTrace, someConsoleTruncated bool) {
+func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOption) (out []*pbantelope.ActionTrace, someConsoleTruncated bool) {
 	if len(actionTraces) <= 0 {
 		return nil, false
 	}
@@ -123,7 +123,7 @@ func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOpt
 		return leftSeq < rightSeq
 	})
 
-	out = make([]*pbcodec.ActionTrace, len(actionTraces))
+	out = make([]*pbantelope.ActionTrace, len(actionTraces))
 	var consoleTruncated bool
 	for idx, actionTrace := range actionTraces {
 		out[idx], consoleTruncated = ActionTraceToDEOS(actionTrace, uint32(idx), opts...)
@@ -135,8 +135,8 @@ func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOpt
 	return
 }
 
-func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.ConversionOption) (out *pbcodec.ActionTrace, consoleTruncated bool) {
-	out = &pbcodec.ActionTrace{
+func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.ConversionOption) (out *pbantelope.ActionTrace, consoleTruncated bool) {
+	out = &pbantelope.ActionTrace{
 		Receiver:         string(in.Receiver),
 		Action:           eosio.ActionToDEOS(in.Action),
 		Elapsed:          int64(in.ElapsedUs),
@@ -153,7 +153,7 @@ func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.Conversi
 		CreatorActionOrdinal: uint32(in.CreatorActionOrdinal),
 		ExecutionIndex:       execIndex,
 		ErrorCode:            eosio.ErrorCodeToDEOS(in.ErrorCode),
-		ReturnValue:          in.ReturnValue,
+		RawReturnValue:       in.ReturnValue,
 	}
 	out.ClosestUnnotifiedAncestorActionOrdinal = uint32(in.ClosestUnnotifiedAncestorActionOrdinal) // freaking long line, stay away from me
 
@@ -171,14 +171,14 @@ func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.Conversi
 	return out, initialConsoleLength != len(out.Console)
 }
 
-func AccountDeltasToDEOS(deltas []AccountDelta) (out []*pbcodec.AccountDelta) {
+func AccountDeltasToDEOS(deltas []AccountDelta) (out []*pbantelope.AccountDelta) {
 	if len(deltas) <= 0 {
 		return nil
 	}
 
-	out = make([]*pbcodec.AccountDelta, len(deltas))
+	out = make([]*pbantelope.AccountDelta, len(deltas))
 	for i, delta := range deltas {
-		out[i] = &pbcodec.AccountDelta{
+		out[i] = &pbantelope.AccountDelta{
 			Account: string(delta.Account),
 			Delta:   int64(delta.Delta),
 		}
@@ -186,14 +186,14 @@ func AccountDeltasToDEOS(deltas []AccountDelta) (out []*pbcodec.AccountDelta) {
 	return
 }
 
-func AccountRAMDeltasToDEOS(deltas []AccountDelta) (out []*pbcodec.AccountRAMDelta) {
+func AccountRAMDeltasToDEOS(deltas []AccountDelta) (out []*pbantelope.AccountRAMDelta) {
 	if len(deltas) <= 0 {
 		return nil
 	}
 
-	out = make([]*pbcodec.AccountRAMDelta, len(deltas))
+	out = make([]*pbantelope.AccountRAMDelta, len(deltas))
 	for i, delta := range deltas {
-		out[i] = &pbcodec.AccountRAMDelta{
+		out[i] = &pbantelope.AccountRAMDelta{
 			Account: string(delta.Account),
 			Delta:   int64(delta.Delta),
 		}
@@ -201,20 +201,20 @@ func AccountRAMDeltasToDEOS(deltas []AccountDelta) (out []*pbcodec.AccountRAMDel
 	return
 }
 
-func TransactionStatusToDEOS(in eos.TransactionStatus) pbcodec.TransactionStatus {
+func TransactionStatusToDEOS(in eos.TransactionStatus) pbantelope.TransactionStatus {
 	switch in {
 	case eos.TransactionStatusExecuted:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXECUTED
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXECUTED
 	case eos.TransactionStatusSoftFail:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL
 	case eos.TransactionStatusHardFail:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL
 	case eos.TransactionStatusDelayed:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_DELAYED
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_DELAYED
 	case eos.TransactionStatusExpired:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXPIRED
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXPIRED
 	default:
-		return pbcodec.TransactionStatus_TRANSACTIONSTATUS_UNKNOWN
+		return pbantelope.TransactionStatus_TRANSACTIONSTATUS_UNKNOWN
 	}
 }
 

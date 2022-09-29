@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/dfuse-io/dfuse-eosio/codec"
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/codec"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/golang/protobuf/ptypes"
@@ -19,7 +19,7 @@ import (
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
-	pbbstream "github.com/streamingfast/pbgo/dfuse/bstream/v1"
+	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
@@ -65,10 +65,10 @@ type Counts struct {
 	ActTraceTotalCount int
 }
 
-func Block(t testing.T, blkID string, components ...interface{}) *pbcodec.Block {
+func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Block {
 	ref := bstream.NewBlockRefFromID(blkID)
 
-	pbblock := &pbcodec.Block{
+	pbblock := &pbantelope.Block{
 		Id:     blkID,
 		Number: uint32(ref.Num()),
 	}
@@ -80,7 +80,7 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbcodec.Block 
 	require.NoError(t, err)
 
 	pbblock.DposIrreversibleBlocknum = pbblock.Number - 1
-	pbblock.Header = &pbcodec.BlockHeader{
+	pbblock.Header = &pbantelope.BlockHeader{
 		Previous:  fmt.Sprintf("%08x%s", pbblock.Number-1, blkID[8:]),
 		Producer:  "tester",
 		Timestamp: blockTimestamp,
@@ -98,13 +98,13 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbcodec.Block 
 			pbblock.Header.Timestamp, err = ptypes.TimestampProto(time.Time(v))
 			require.NoError(t, err)
 
-		case *pbcodec.TransactionTrace:
+		case *pbantelope.TransactionTrace:
 			v.BlockNum = pbblock.Num()
 			v.BlockTime, err = ptypes.TimestampProto(pbblock.MustTime())
 			require.NoError(t, err)
 
 			pbblock.UnfilteredTransactionTraces = append(pbblock.UnfilteredTransactionTraces, v)
-		case *pbcodec.TrxOp:
+		case *pbantelope.TrxOp:
 			pbblock.UnfilteredImplicitTransactionOps = append(pbblock.UnfilteredImplicitTransactionOps, v)
 		case *autoGlobalSequence:
 		case FilteredBlock:
@@ -164,14 +164,14 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbcodec.Block 
 	return pbblock
 }
 
-func ToBstreamBlock(t testing.T, block *pbcodec.Block) *bstream.Block {
+func ToBstreamBlock(t testing.T, block *pbantelope.Block) *bstream.Block {
 	blk, err := codec.BlockFromProto(block)
 	require.NoError(t, err)
 
 	return blk
 }
 
-func ToBstreamBlocks(t testing.T, blocks []*pbcodec.Block) (out []*bstream.Block) {
+func ToBstreamBlocks(t testing.T, blocks []*pbantelope.Block) (out []*bstream.Block) {
 	out = make([]*bstream.Block, len(blocks))
 	for i, block := range blocks {
 		out[i] = ToBstreamBlock(t, block)
@@ -179,7 +179,7 @@ func ToBstreamBlocks(t testing.T, blocks []*pbcodec.Block) (out []*bstream.Block
 	return
 }
 
-func ToPbbstreamBlock(t testing.T, block *pbcodec.Block) *pbbstream.Block {
+func ToPbbstreamBlock(t testing.T, block *pbantelope.Block) *pbbstream.Block {
 	blk, err := ToBstreamBlock(t, block).ToProto()
 	require.NoError(t, err)
 
@@ -188,10 +188,10 @@ func ToPbbstreamBlock(t testing.T, block *pbcodec.Block) *pbbstream.Block {
 
 type TrxID string
 
-func TrxTrace(t testing.T, components ...interface{}) *pbcodec.TransactionTrace {
-	trace := &pbcodec.TransactionTrace{
-		Receipt: &pbcodec.TransactionReceiptHeader{
-			Status: pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXECUTED,
+func TrxTrace(t testing.T, components ...interface{}) *pbantelope.TransactionTrace {
+	trace := &pbantelope.TransactionTrace{
+		Receipt: &pbantelope.TransactionReceiptHeader{
+			Status: pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXECUTED,
 		},
 	}
 
@@ -199,15 +199,15 @@ func TrxTrace(t testing.T, components ...interface{}) *pbcodec.TransactionTrace 
 		switch v := element.(type) {
 		case TrxID:
 			trace.Id = string(v)
-		case *pbcodec.ActionTrace:
+		case *pbantelope.ActionTrace:
 			trace.ActionTraces = append(trace.ActionTraces, v)
-		case *pbcodec.DBOp:
+		case *pbantelope.DBOp:
 			trace.DbOps = append(trace.DbOps, v)
-		case *pbcodec.DTrxOp:
+		case *pbantelope.DTrxOp:
 			trace.DtrxOps = append(trace.DtrxOps, v)
-		case *pbcodec.TableOp:
+		case *pbantelope.TableOp:
 			trace.TableOps = append(trace.TableOps, v)
-		case pbcodec.TransactionStatus:
+		case pbantelope.TransactionStatus:
 			trace.Receipt.Status = v
 		default:
 			failInvalidComponent(t, "transaction trace", element)
@@ -227,24 +227,24 @@ func TrxTrace(t testing.T, components ...interface{}) *pbcodec.TransactionTrace 
 	return trace
 }
 
-func SignedTrx(t testing.T, elements ...interface{}) *pbcodec.SignedTransaction {
-	signedTrx := &pbcodec.SignedTransaction{}
+func SignedTrx(t testing.T, elements ...interface{}) *pbantelope.SignedTransaction {
+	signedTrx := &pbantelope.SignedTransaction{}
 	signedTrx.Transaction = Trx(t, elements...)
 
 	return signedTrx
 }
 
-type ContextFreeAction *pbcodec.Action
+type ContextFreeAction *pbantelope.Action
 
-func Trx(t testing.T, elements ...interface{}) *pbcodec.Transaction {
-	trx := &pbcodec.Transaction{}
+func Trx(t testing.T, elements ...interface{}) *pbantelope.Transaction {
+	trx := &pbantelope.Transaction{}
 
 	for _, element := range elements {
 		switch v := element.(type) {
-		case *pbcodec.Action:
+		case *pbantelope.Action:
 			trx.Actions = append(trx.Actions, v)
 		case ContextFreeAction:
-			trx.ContextFreeActions = append(trx.ContextFreeActions, (*pbcodec.Action)(v))
+			trx.ContextFreeActions = append(trx.ContextFreeActions, (*pbantelope.Action)(v))
 		default:
 			failInvalidComponent(t, "transaction", element)
 		}
@@ -269,7 +269,7 @@ type ActionIndex uint32
 type ExecutionIndex uint32
 type GlobalSequence uint64
 
-func ActionTrace(t testing.T, receiverAccountActionNameTriplet string, components ...interface{}) *pbcodec.ActionTrace {
+func ActionTrace(t testing.T, receiverAccountActionNameTriplet string, components ...interface{}) *pbantelope.ActionTrace {
 	parts := strings.Split(receiverAccountActionNameTriplet, ":")
 	receiver := parts[0]
 
@@ -283,9 +283,9 @@ func ActionTrace(t testing.T, receiverAccountActionNameTriplet string, component
 		actionName = parts[2]
 	}
 
-	actTrace := &pbcodec.ActionTrace{
+	actTrace := &pbantelope.ActionTrace{
 		Receiver: receiver,
-		Receipt: &pbcodec.ActionReceipt{
+		Receipt: &pbantelope.ActionReceipt{
 			Receiver: receiver,
 		},
 		Action: Action(t, account+":"+actionName, components...),
@@ -294,7 +294,7 @@ func ActionTrace(t testing.T, receiverAccountActionNameTriplet string, component
 	return transformActionTrace(t, actTrace, components)
 }
 
-func ActionTraceFail(t testing.T, tripletName string, components ...interface{}) *pbcodec.ActionTrace {
+func ActionTraceFail(t testing.T, tripletName string, components ...interface{}) *pbantelope.ActionTrace {
 	components = append(components, GlobalSequence(0))
 	out := ActionTrace(t, tripletName, components...)
 	out.Receipt = nil
@@ -302,7 +302,7 @@ func ActionTraceFail(t testing.T, tripletName string, components ...interface{})
 	return out
 }
 
-func ActionTraceSetABI(t testing.T, account string, abi *eos.ABI, components ...interface{}) *pbcodec.ActionTrace {
+func ActionTraceSetABI(t testing.T, account string, abi *eos.ABI, components ...interface{}) *pbantelope.ActionTrace {
 	var abiHex []byte
 	var err error
 	if abi != nil {
@@ -317,12 +317,12 @@ func ActionTraceSetABI(t testing.T, account string, abi *eos.ABI, components ...
 	jsonData, err := json.Marshal(setABI)
 	require.NoError(t, err)
 
-	actTrace := &pbcodec.ActionTrace{
+	actTrace := &pbantelope.ActionTrace{
 		Receiver: "eosio",
-		Receipt: &pbcodec.ActionReceipt{
+		Receipt: &pbantelope.ActionReceipt{
 			Receiver: "eosio",
 		},
-		Action: &pbcodec.Action{
+		Action: &pbantelope.Action{
 			Account:  "eosio",
 			Name:     "setabi",
 			JsonData: string(jsonData),
@@ -333,7 +333,7 @@ func ActionTraceSetABI(t testing.T, account string, abi *eos.ABI, components ...
 	return transformActionTrace(t, actTrace, components)
 }
 
-func transformActionTrace(t testing.T, actTrace *pbcodec.ActionTrace, components []interface{}) *pbcodec.ActionTrace {
+func transformActionTrace(t testing.T, actTrace *pbantelope.ActionTrace, components []interface{}) *pbantelope.ActionTrace {
 	ignoreIfActionComponent := ignoreComponent(func(component interface{}) bool {
 		switch component.(type) {
 		case actionComponent:
@@ -371,7 +371,7 @@ func CFAAction(t testing.T, pairName string, abi *eos.ABI, data string) ContextF
 
 type Authorization string
 
-func (a Authorization) apply(action *pbcodec.Action) {
+func (a Authorization) apply(action *pbantelope.Action) {
 	parts := strings.Split(string(a), "@")
 	account := parts[0]
 
@@ -380,14 +380,14 @@ func (a Authorization) apply(action *pbcodec.Action) {
 		permission = parts[1]
 	}
 
-	action.Authorization = append(action.Authorization, &pbcodec.PermissionLevel{
+	action.Authorization = append(action.Authorization, &pbantelope.PermissionLevel{
 		Actor:      account,
 		Permission: permission,
 	})
 }
 
 type actionComponent interface {
-	apply(action *pbcodec.Action)
+	apply(action *pbantelope.Action)
 }
 
 type authorizations []string
@@ -396,13 +396,13 @@ func Authorizations(elements ...string) authorizations {
 	return authorizations(elements)
 }
 
-func (a authorizations) apply(action *pbcodec.Action) {
+func (a authorizations) apply(action *pbantelope.Action) {
 	for _, authorization := range a {
 		Authorization(authorization).apply(action)
 	}
 }
 
-func Action(t testing.T, pairName string, components ...interface{}) *pbcodec.Action {
+func Action(t testing.T, pairName string, components ...interface{}) *pbantelope.Action {
 	parts := strings.Split(pairName, ":")
 	account := parts[0]
 	actionName := parts[1]
@@ -417,7 +417,7 @@ func Action(t testing.T, pairName string, components ...interface{}) *pbcodec.Ac
 		require.NoError(t, err)
 	}
 
-	action := &pbcodec.Action{
+	action := &pbantelope.Action{
 		Account:  account,
 		Name:     actionName,
 		RawData:  rawData,
@@ -482,8 +482,8 @@ func hasComponent(components []interface{}, doesMatch func(component interface{}
 	return findComponent(components, doesMatch) != nil
 }
 
-func TrxOp(t testing.T, signedTrx *pbcodec.SignedTransaction) *pbcodec.TrxOp {
-	op := &pbcodec.TrxOp{
+func TrxOp(t testing.T, signedTrx *pbantelope.SignedTransaction) *pbantelope.TrxOp {
+	op := &pbantelope.TrxOp{
 		Transaction: signedTrx,
 	}
 
@@ -492,11 +492,11 @@ func TrxOp(t testing.T, signedTrx *pbcodec.SignedTransaction) *pbcodec.TrxOp {
 
 type DtrxOpPayer string
 
-func DtrxOp(t testing.T, operation string, trxID string, components ...interface{}) *pbcodec.DTrxOp {
-	opName := pbcodec.DTrxOp_Operation_value["OPERATION_"+strings.ToUpper(operation)]
+func DtrxOp(t testing.T, operation string, trxID string, components ...interface{}) *pbantelope.DTrxOp {
+	opName := pbantelope.DTrxOp_Operation_value["OPERATION_"+strings.ToUpper(operation)]
 
-	op := &pbcodec.DTrxOp{
-		Operation:     pbcodec.DTrxOp_Operation(opName),
+	op := &pbantelope.DTrxOp{
+		Operation:     pbantelope.DTrxOp_Operation(opName),
 		TransactionId: trxID,
 	}
 
@@ -506,7 +506,7 @@ func DtrxOp(t testing.T, operation string, trxID string, components ...interface
 			op.ActionIndex = uint32(v)
 		case DtrxOpPayer:
 			op.Payer = string(v)
-		case *pbcodec.SignedTransaction:
+		case *pbantelope.SignedTransaction:
 			op.Transaction = v
 		default:
 			failInvalidComponent(t, "dtrx op", component)
@@ -525,7 +525,7 @@ func ToTimestamp(t time.Time) *pbts.Timestamp {
 	return el
 }
 
-func DBOp(t testing.T, op string, path string, payer string, data string, components ...interface{}) *pbcodec.DBOp {
+func DBOp(t testing.T, op string, path string, payer string, data string, components ...interface{}) *pbantelope.DBOp {
 	paths := strings.Split(path, "/")
 
 	// Split those with → instead, will probably improve readability
@@ -543,8 +543,8 @@ func DBOp(t testing.T, op string, path string, payer string, data string, compon
 		op = longOp
 	}
 
-	dbOp := &pbcodec.DBOp{
-		Operation:  pbcodec.DBOp_Operation(pbcodec.DBOp_Operation_value["OPERATION_"+op]),
+	dbOp := &pbantelope.DBOp{
+		Operation:  pbantelope.DBOp_Operation(pbantelope.DBOp_Operation_value["OPERATION_"+op]),
 		Code:       paths[0],
 		TableName:  paths[1],
 		Scope:      paths[2],
@@ -591,10 +591,10 @@ func DBOp(t testing.T, op string, path string, payer string, data string, compon
 	return dbOp
 }
 
-type OldPerm *pbcodec.PermissionObject
-type NewPerm *pbcodec.PermissionObject
+type OldPerm *pbantelope.PermissionObject
+type NewPerm *pbantelope.PermissionObject
 
-func PermOp(t testing.T, op string, components ...interface{}) *pbcodec.PermOp {
+func PermOp(t testing.T, op string, components ...interface{}) *pbantelope.PermOp {
 	op = strings.ToUpper(op)
 	shortOpToLongOp := map[string]string{
 		"INS": "INSERT",
@@ -606,8 +606,8 @@ func PermOp(t testing.T, op string, components ...interface{}) *pbcodec.PermOp {
 		op = longOp
 	}
 
-	permOp := &pbcodec.PermOp{
-		Operation: pbcodec.PermOp_Operation(pbcodec.PermOp_Operation_value["OPERATION_"+op]),
+	permOp := &pbantelope.PermOp{
+		Operation: pbantelope.PermOp_Operation(pbantelope.PermOp_Operation_value["OPERATION_"+op]),
 	}
 
 	for _, component := range components {
@@ -628,10 +628,10 @@ func PermOp(t testing.T, op string, components ...interface{}) *pbcodec.PermOp {
 
 type PublicKey string
 
-func Permission(t testing.T, accountPermission string, components ...interface{}) *pbcodec.PermissionObject {
+func Permission(t testing.T, accountPermission string, components ...interface{}) *pbantelope.PermissionObject {
 	paths := strings.Split(accountPermission, "@")
 
-	permission := &pbcodec.PermissionObject{
+	permission := &pbantelope.PermissionObject{
 		Owner: paths[0],
 		Name:  paths[1],
 	}
@@ -639,9 +639,9 @@ func Permission(t testing.T, accountPermission string, components ...interface{}
 	for _, component := range components {
 		switch v := component.(type) {
 		case PublicKey:
-			keyWeight := &pbcodec.KeyWeight{PublicKey: string(v), Weight: 1}
+			keyWeight := &pbantelope.KeyWeight{PublicKey: string(v), Weight: 1}
 			if permission.Authority == nil {
-				permission.Authority = &pbcodec.Authority{}
+				permission.Authority = &pbantelope.Authority{}
 			}
 
 			permission.Authority.Keys = append(permission.Authority.Keys, keyWeight)
@@ -653,11 +653,11 @@ func Permission(t testing.T, accountPermission string, components ...interface{}
 	return permission
 }
 
-func TableOp(t testing.T, op string, path string, payer string) *pbcodec.TableOp {
+func TableOp(t testing.T, op string, path string, payer string) *pbantelope.TableOp {
 	paths := strings.Split(path, "/")
 
-	return &pbcodec.TableOp{
-		Operation: pbcodec.TableOp_Operation(pbcodec.TableOp_Operation_value["OPERATION_"+strings.ToUpper(op)]),
+	return &pbantelope.TableOp{
+		Operation: pbantelope.TableOp_Operation(pbantelope.TableOp_Operation_value["OPERATION_"+strings.ToUpper(op)]),
 		Code:      paths[0],
 		TableName: paths[1],
 		Scope:     paths[2],
