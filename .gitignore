@@ -1,5 +1,6 @@
 .idea/
 .DS_Store
+test.out
 
 # To facilitate development, you can use [direnv](https://direnv.net/) to auto-load
 # some environment variables. We have in `devel` a shim script called directly `fireacme`
