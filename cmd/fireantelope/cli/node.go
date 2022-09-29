@@ -2,10 +2,10 @@ package cli
 
 import (
 	"fmt"
+	"github.com/EOS-Nation/firehose-antelope/codec"
 	"strings"
 	"time"
 
-	"github.com/EOS-Nation/firehose-antelope/codec"
 	"github.com/EOS-Nation/firehose-antelope/nodemanager"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

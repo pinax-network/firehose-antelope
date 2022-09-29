@@ -1,11 +1,15 @@
 package codec
 
 import (
+	"os"
+
 	"github.com/streamingfast/logging"
+	"go.uber.org/zap"
 )
 
-var zlog, _ = logging.PackageLogger("codec", "github.com/streamingfast/firehose-aptos/nodemanager/codec/tests")
-
 func init() {
-	logging.InstantiateLoggers()
+	if os.Getenv("DEBUG") != "" || os.Getenv("TRACE") == "true" {
+		logger, _ := zap.NewDevelopment()
+		logging.Override(logger)
+	}
 }
