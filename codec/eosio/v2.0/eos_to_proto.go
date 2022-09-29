@@ -15,17 +15,13 @@
 package eosio
 
 import (
-	"fmt"
-	"math"
-	"sort"
-	"time"
-
 	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"math"
+	"sort"
 )
 
 func TransactionTraceToDEOS(logger *zap.Logger, in *eos.TransactionTrace, opts ...eosio.ConversionOption) *pbantelope.TransactionTrace {
@@ -34,7 +30,7 @@ func TransactionTraceToDEOS(logger *zap.Logger, in *eos.TransactionTrace, opts .
 	out := &pbantelope.TransactionTrace{
 		Id:              id,
 		BlockNum:        uint64(in.BlockNum),
-		BlockTime:       mustProtoTimestamp(in.BlockTime.Time),
+		BlockTime:       timestamppb.New(in.BlockTime.Time),
 		ProducerBlockId: in.ProducerBlockID.String(),
 		Elapsed:         int64(in.Elapsed),
 		NetUsage:        uint64(in.NetUsage),
@@ -104,7 +100,7 @@ func ActionTraceToDEOS(in eos.ActionTrace, execIndex uint32, opts ...eosio.Conve
 		ContextFree:          in.ContextFree,
 		ProducerBlockId:      in.ProducerBlockID.String(),
 		BlockNum:             uint64(in.BlockNum),
-		BlockTime:            mustProtoTimestamp(in.BlockTime.Time),
+		BlockTime:            timestamppb.New(in.BlockTime.Time),
 		AccountRamDeltas:     eosio.AccountRAMDeltasToDEOS(in.AccountRAMDeltas),
 		Exception:            eosio.ExceptionToDEOS(in.Except),
 		ActionOrdinal:        uint32(in.ActionOrdinal),
@@ -140,14 +136,6 @@ func hexBytesToBytesSlices(in []eos.HexBytes) [][]byte {
 	out := make([][]byte, len(in))
 	for i, s := range in {
 		out[i] = s
-	}
-	return out
-}
-
-func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
-	out, err := ptypes.TimestampProto(in)
-	if err != nil {
-		panic(fmt.Sprintf("invalid timestamp conversion %q: %s", in, err))
 	}
 	return out
 }

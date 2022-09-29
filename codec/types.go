@@ -18,6 +18,7 @@ import (
 	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Specification struct {
@@ -56,7 +57,7 @@ func (p *permissionObject) ToProto() *pbantelope.PermissionObject {
 		ParentId:    p.ParentID,
 		Owner:       string(p.Owner),
 		Name:        p.Name,
-		LastUpdated: mustProtoTimestamp(p.LastUpdated.Time),
+		LastUpdated: timestamppb.New(p.LastUpdated.Time),
 		Authority:   eosio.AuthoritiesToDEOS(p.Auth),
 	}
 }

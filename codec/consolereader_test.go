@@ -19,6 +19,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"os"
 	"os/exec"
@@ -32,10 +33,10 @@ import (
 	eosio_v2_0 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.0"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/andreyvit/diff"
-	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/proto"
 )
 
 // todo delete legacy benchmark replaced with console_reader_bench_test.go
@@ -317,10 +318,10 @@ func Test_BlockRlimitOp(t *testing.T) {
 			require.Equal(t, test.expectedErr, err)
 
 			if test.expectedErr == nil {
-				require.Len(t, ctx.block.RlimitOps, 1)
+				require.Len(t, ctx.currentBlock.RlimitOps, 1)
 
 				expected := protoJSONMarshalIndent(t, test.expected)
-				actual := protoJSONMarshalIndent(t, ctx.block.RlimitOps[0])
+				actual := protoJSONMarshalIndent(t, ctx.currentBlock.RlimitOps[0])
 
 				assert.JSONEq(t, expected, actual, diff.LineDiff(expected, actual))
 			}
@@ -374,10 +375,10 @@ func Test_TraceRlimitOp(t *testing.T) {
 			require.Equal(t, test.expectedErr, err)
 
 			if test.expectedErr == nil {
-				require.Len(t, ctx.trx.RlimitOps, 1)
+				require.Len(t, ctx.currentTrace.RlimitOps, 1)
 
 				expected := protoJSONMarshalIndent(t, test.expected)
-				actual := protoJSONMarshalIndent(t, ctx.trx.RlimitOps[0])
+				actual := protoJSONMarshalIndent(t, ctx.currentTrace.RlimitOps[0])
 
 				assert.JSONEq(t, expected, actual, diff.LineDiff(expected, actual))
 			}
@@ -451,10 +452,10 @@ func Test_readRAMOp(t *testing.T) {
 			require.Equal(t, test.expectedErr, err)
 
 			if test.expectedErr == nil {
-				require.Len(t, ctx.trx.RamOps, 1)
+				require.Len(t, ctx.currentTrace.RamOps, 1)
 
 				expected := protoJSONMarshalIndent(t, test.expected)
-				actual := protoJSONMarshalIndent(t, ctx.trx.RamOps[0])
+				actual := protoJSONMarshalIndent(t, ctx.currentTrace.RamOps[0])
 
 				assert.JSONEq(t, expected, actual, diff.LineDiff(expected, actual))
 			}
@@ -546,10 +547,10 @@ func Test_readKvOp(t *testing.T) {
 			require.Equal(t, test.expectedErr, err)
 
 			if test.expectedErr == nil {
-				require.Len(t, ctx.trx.KvOps, 1)
+				require.Len(t, ctx.currentTrace.KvOps, 1)
 
 				expected := protoJSONMarshalIndent(t, test.expected)
-				actual := protoJSONMarshalIndent(t, ctx.trx.KvOps[0])
+				actual := protoJSONMarshalIndent(t, ctx.currentTrace.KvOps[0])
 
 				assert.JSONEq(t, expected, actual, diff.LineDiff(expected, actual))
 			}
@@ -583,7 +584,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    1,
 					Owner:       "eosio.ins",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 			},
@@ -598,14 +599,14 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    2,
 					Owner:       "eosio.old",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 				NewPerm: &pbantelope.PermissionObject{
 					ParentId:    3,
 					Owner:       "eosio.new",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 			},
@@ -620,7 +621,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    4,
 					Owner:       "eosio.rem",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 				NewPerm: nil,
@@ -640,7 +641,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    1,
 					Owner:       "eosio.ins",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 			},
@@ -656,7 +657,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    2,
 					Owner:       "eosio.old",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 				NewPerm: &pbantelope.PermissionObject{
@@ -664,7 +665,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    3,
 					Owner:       "eosio.new",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 			},
@@ -680,7 +681,7 @@ func Test_readPermOp(t *testing.T) {
 					ParentId:    4,
 					Owner:       "eosio.rem",
 					Name:        "prod.major",
-					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
+					LastUpdated: timestamppb.New(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
 				NewPerm: nil,
@@ -697,10 +698,10 @@ func Test_readPermOp(t *testing.T) {
 			require.Equal(t, test.expectedErr, err)
 
 			if test.expectedErr == nil {
-				require.Len(t, ctx.trx.PermOps, 1)
+				require.Len(t, ctx.currentTrace.PermOps, 1)
 
 				expected := protoJSONMarshalIndent(t, test.expected)
-				actual := protoJSONMarshalIndent(t, ctx.trx.PermOps[0])
+				actual := protoJSONMarshalIndent(t, ctx.currentTrace.PermOps[0])
 
 				assert.JSONEq(t, expected, actual, diff.LineDiff(expected, actual))
 			}

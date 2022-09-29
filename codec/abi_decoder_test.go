@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/json"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"regexp"
 	"strconv"
@@ -14,12 +15,11 @@ import (
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/streamingfast/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 )
 
 func TestABIDecoder(t *testing.T) {
@@ -373,10 +373,16 @@ func TestABIDecoder(t *testing.T) {
 	}
 
 	toString := func(in proto.Message) string {
-		out, err := (&jsonpb.Marshaler{}).MarshalToString(in)
-		require.NoError(t, err)
 
-		return out
+		res, err := proto.Marshal(in)
+		require.NoError(t, err)
+		return string(res)
+
+		// todo legacy code, check if properly replaced
+		//out, err := (&jsonpb.Marshaler{}).MarshalToString(in)
+		//require.NoError(t, err)
+		//
+		//return out
 	}
 
 	hexRegex := regexp.MustCompile("^[0-9a-fA-F]+$")
@@ -492,14 +498,11 @@ func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...int
 	blockTime, err := time.Parse(time.RFC3339, "2006-01-02T15:04:05.5Z")
 	require.NoError(t, err)
 
-	blockTimestamp, err := ptypes.TimestampProto(blockTime)
-	require.NoError(t, err)
-
 	pbblock.DposIrreversibleBlocknum = pbblock.Number - 1
 	pbblock.Header = &pbantelope.BlockHeader{
 		Previous:  previousBlkID,
 		Producer:  "tester",
-		Timestamp: blockTimestamp,
+		Timestamp: timestamppb.New(blockTime),
 	}
 
 	for _, element := range elements {

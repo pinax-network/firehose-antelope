@@ -18,14 +18,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"sort"
-	"time"
-
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/protobuf/types/known/timestamppb"
+	"sort"
 )
 
 func checksumsToBytesSlices(in []eos.Checksum256) [][]byte {
@@ -53,7 +50,7 @@ func bytesSlicesToHexBytes(in [][]byte) []eos.HexBytes {
 }
 
 func BlockHeaderToEOS(in *pbantelope.BlockHeader) *eos.BlockHeader {
-	stamp, _ := ptypes.Timestamp(in.Timestamp)
+	stamp := in.Timestamp.AsTime()
 	prev, _ := hex.DecodeString(in.Previous)
 	out := &eos.BlockHeader{
 		Timestamp:        eos.BlockTimestamp{Time: stamp},
@@ -521,14 +518,12 @@ func LogContextToEOS(in *pbantelope.Exception_LogContext) *eos.ExceptLogContext 
 	}
 }
 
-func TimestampToJSONTime(in *timestamp.Timestamp) eos.JSONTime {
-	out, _ := ptypes.Timestamp(in)
-	return eos.JSONTime{Time: out}
+func TimestampToJSONTime(in *timestamppb.Timestamp) eos.JSONTime {
+	return eos.JSONTime{Time: in.AsTime()}
 }
 
-func TimestampToBlockTimestamp(in *timestamp.Timestamp) eos.BlockTimestamp {
-	out, _ := ptypes.Timestamp(in)
-	return eos.BlockTimestamp{Time: out}
+func TimestampToBlockTimestamp(in *timestamppb.Timestamp) eos.BlockTimestamp {
+	return eos.BlockTimestamp{Time: in.AsTime()}
 }
 
 func TransactionStatusToEOS(in pbantelope.TransactionStatus) eos.TransactionStatus {
@@ -562,13 +557,14 @@ func ExtractEOSSignedTransactionFromReceipt(trxReceipt *pbantelope.TransactionRe
 	return signedTransaction, nil
 }
 
-func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
-	out, err := ptypes.TimestampProto(in)
-	if err != nil {
-		panic(fmt.Sprintf("invalid timestamp conversion %q: %s", in, err))
-	}
-	return out
-}
+// todo legacy code should not error anymore using timestamppb
+//func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
+//	out, err := ptypes.TimestampProto(in)
+//	if err != nil {
+//		panic(fmt.Sprintf("invalid timestamp conversion %q: %s", in, err))
+//	}
+//	return out
+//}
 
 func pbantelopePackedTransactionToEOS(packedTrx *pbantelope.PackedTransaction) (*eos.PackedTransaction, error) {
 	signatures := make([]ecc.Signature, len(packedTrx.Signatures))

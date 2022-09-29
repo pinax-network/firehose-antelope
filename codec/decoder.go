@@ -18,9 +18,9 @@ import (
 	"fmt"
 
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
+	"google.golang.org/protobuf/proto"
 )
 
 // BlockDecoder transforms a `bstream.Block` payload into a proper `pbantelope.Block` value

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/EOS-Nation/firehose-antelope/types"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"reflect"
 	"strings"
@@ -13,8 +14,6 @@ import (
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
-	"github.com/golang/protobuf/ptypes"
-	pbts "github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/mitchellh/go-testing-interface"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
@@ -76,14 +75,11 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 	blockTime, err := time.Parse(time.RFC3339, "2006-01-02T15:04:05.5Z")
 	require.NoError(t, err)
 
-	blockTimestamp, err := ptypes.TimestampProto(blockTime)
-	require.NoError(t, err)
-
 	pbblock.DposIrreversibleBlocknum = pbblock.Number - 1
 	pbblock.Header = &pbantelope.BlockHeader{
 		Previous:  fmt.Sprintf("%08x%s", pbblock.Number-1, blkID[8:]),
 		Producer:  "tester",
-		Timestamp: blockTimestamp,
+		Timestamp: timestamppb.New(blockTime),
 	}
 
 	for _, component := range components {
@@ -92,16 +88,13 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 			blockTime, err := time.Parse(time.RFC3339, string(v))
 			require.NoError(t, err)
 
-			pbblock.Header.Timestamp, err = ptypes.TimestampProto(blockTime)
-			require.NoError(t, err)
+			pbblock.Header.Timestamp = timestamppb.New(blockTime)
 		case BlockTimestamp:
-			pbblock.Header.Timestamp, err = ptypes.TimestampProto(time.Time(v))
-			require.NoError(t, err)
+			pbblock.Header.Timestamp = timestamppb.New(time.Time(v))
 
 		case *pbantelope.TransactionTrace:
 			v.BlockNum = pbblock.Num()
-			v.BlockTime, err = ptypes.TimestampProto(pbblock.MustTime())
-			require.NoError(t, err)
+			v.BlockTime = timestamppb.New(pbblock.Time())
 
 			pbblock.UnfilteredTransactionTraces = append(pbblock.UnfilteredTransactionTraces, v)
 		case *pbantelope.TrxOp:
@@ -514,15 +507,6 @@ func DtrxOp(t testing.T, operation string, trxID string, components ...interface
 	}
 
 	return op
-}
-
-func ToTimestamp(t time.Time) *pbts.Timestamp {
-	el, err := ptypes.TimestampProto(t)
-	if err != nil {
-		panic(err)
-	}
-
-	return el
 }
 
 func DBOp(t testing.T, op string, path string, payer string, data string, components ...interface{}) *pbantelope.DBOp {

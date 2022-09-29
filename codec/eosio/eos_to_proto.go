@@ -18,13 +18,10 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"time"
-
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func ActivatedProtocolFeaturesToDEOS(in *eos.ProtocolFeatureActivationSet) *pbantelope.ActivatedProtocolFeatures {
@@ -87,7 +84,7 @@ func BlockrootMerkleToDEOS(merkle *eos.MerkleRoot) *pbantelope.BlockRootMerkle {
 
 func BlockHeaderToDEOS(blockHeader *eos.BlockHeader) *pbantelope.BlockHeader {
 	out := &pbantelope.BlockHeader{
-		Timestamp:        mustProtoTimestamp(blockHeader.Timestamp.Time),
+		Timestamp:        timestamppb.New(blockHeader.Timestamp.Time),
 		Producer:         string(blockHeader.Producer),
 		Confirmed:        uint32(blockHeader.Confirmed),
 		Previous:         blockHeader.Previous.String(),
@@ -321,7 +318,7 @@ func TransactionToDEOS(trx *eos.Transaction) *pbantelope.Transaction {
 
 func TransactionHeaderToDEOS(trx *eos.TransactionHeader) *pbantelope.TransactionHeader {
 	out := &pbantelope.TransactionHeader{
-		Expiration:       mustProtoTimestamp(trx.Expiration.Time),
+		Expiration:       timestamppb.New(trx.Expiration.Time),
 		RefBlockNum:      uint32(trx.RefBlockNum),
 		RefBlockPrefix:   trx.RefBlockPrefix,
 		MaxNetUsageWords: uint32(trx.MaxNetUsageWords),
@@ -481,7 +478,7 @@ func LogContextToDEOS(in eos.ExceptLogContext) *pbantelope.Exception_LogContext 
 		Method:     in.Method,
 		Hostname:   in.Hostname,
 		ThreadName: in.ThreadName,
-		Timestamp:  mustProtoTimestamp(in.Timestamp.Time),
+		Timestamp:  timestamppb.New(in.Timestamp.Time),
 	}
 	if in.Context != nil {
 		out.Context = LogContextToDEOS(*in.Context)
@@ -518,14 +515,6 @@ func hexBytesToBytesSlices(in []eos.HexBytes) [][]byte {
 	out := make([][]byte, len(in))
 	for i, s := range in {
 		out[i] = s
-	}
-	return out
-}
-
-func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
-	out, err := ptypes.TimestampProto(in)
-	if err != nil {
-		panic(fmt.Sprintf("invalid timestamp conversion %q: %s", in, err))
 	}
 	return out
 }
