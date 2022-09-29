@@ -21,7 +21,6 @@ require (
 	github.com/streamingfast/dmetrics v0.0.0-20220811180000-3e513057d17c
 	github.com/streamingfast/dstore v0.1.1-0.20220830184623-b0f0cc804743
 	github.com/streamingfast/firehose v0.1.1-0.20220909121738-2f3bc007ea2b
-	github.com/streamingfast/firehose-acme/types v0.0.0-20220831185201-05ffef22e3a0
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20220511154537-ce373d264338
 	github.com/streamingfast/merger v0.0.3-0.20220909122033-9ca15beb25f5
@@ -163,3 +162,5 @@ require (
 )
 
 replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
+
+replace github.com/eoscanada/eos-go => github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393
