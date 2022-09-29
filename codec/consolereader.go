@@ -173,18 +173,11 @@ type parseCtx struct {
 	currentTrace         *pbantelope.TransactionTrace
 	currentTraceLogCount int
 
-	abiDecoder *ABIDecoder
-	// block          *pbantelope.Block
-	// activeBlockNum int64
+	abiDecoder     *ABIDecoder
+	activeBlockNum int64
 
-	finalizing bool
-
-	// trx         *pbantelope.TransactionTrace
-	creationOps []*creationOp
-
+	creationOps       []*creationOp
 	conversionOptions []eosio.ConversionOption
-
-	blockStoreURL string
 
 	stats       *parsingStats
 	globalStats *consoleReaderStats
@@ -258,7 +251,7 @@ type parseCtx struct {
 //}
 
 func (c *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
-	v, err := c.next(readBlock)
+	v, err := c.next()
 	if err != nil {
 		return nil, err
 	}
@@ -610,7 +603,7 @@ func (ctx *parseCtx) resetBlock() {
 	// The nodeos bootstrap phase at chain initialization happens before the first block is ever
 	// produced. As such, those operations needs to be attached to initial block. Hence, let's
 	// reset recorded ops only if a block existed previously.
-	if ctx.currentBlock.Number != 0 {
+	if ctx.activeBlockNum != 0 {
 		ctx.resetTrx()
 	}
 
@@ -618,7 +611,7 @@ func (ctx *parseCtx) resetBlock() {
 }
 
 func (ctx *parseCtx) resetTrx() {
-	ctx.trx = &pbantelope.TransactionTrace{}
+	ctx.currentTrace = &pbantelope.TransactionTrace{}
 	ctx.creationOps = nil
 }
 
@@ -627,15 +620,15 @@ func (ctx *parseCtx) recordCreationOp(operation *creationOp) {
 }
 
 func (ctx *parseCtx) recordDBOp(operation *pbantelope.DBOp) {
-	ctx.trx.DbOps = append(ctx.trx.DbOps, operation)
+	ctx.currentTrace.DbOps = append(ctx.currentTrace.DbOps, operation)
 }
 
 func (ctx *parseCtx) recordKVOp(operation *pbantelope.KVOp) {
-	ctx.trx.KvOps = append(ctx.trx.KvOps, operation)
+	ctx.currentTrace.KvOps = append(ctx.currentTrace.KvOps, operation)
 }
 
 func (ctx *parseCtx) recordDTrxOp(transaction *pbantelope.DTrxOp) {
-	ctx.trx.DtrxOps = append(ctx.trx.DtrxOps, transaction)
+	ctx.currentTrace.DtrxOps = append(ctx.currentTrace.DtrxOps, transaction)
 
 	if transaction.Operation == pbantelope.DTrxOp_OPERATION_FAILED {
 		ctx.revertOpsDueToFailedTransaction()
@@ -643,35 +636,35 @@ func (ctx *parseCtx) recordDTrxOp(transaction *pbantelope.DTrxOp) {
 }
 
 func (ctx *parseCtx) recordFeatureOp(operation *pbantelope.FeatureOp) {
-	ctx.trx.FeatureOps = append(ctx.trx.FeatureOps, operation)
+	ctx.currentTrace.FeatureOps = append(ctx.currentTrace.FeatureOps, operation)
 }
 
 func (ctx *parseCtx) recordPermOp(operation *pbantelope.PermOp) {
-	ctx.trx.PermOps = append(ctx.trx.PermOps, operation)
+	ctx.currentTrace.PermOps = append(ctx.currentTrace.PermOps, operation)
 }
 
 func (ctx *parseCtx) recordRAMOp(operation *pbantelope.RAMOp) {
-	ctx.trx.RamOps = append(ctx.trx.RamOps, operation)
+	ctx.currentTrace.RamOps = append(ctx.currentTrace.RamOps, operation)
 }
 
 func (ctx *parseCtx) recordRAMCorrectionOp(operation *pbantelope.RAMCorrectionOp) {
-	ctx.trx.RamCorrectionOps = append(ctx.trx.RamCorrectionOps, operation)
+	ctx.currentTrace.RamCorrectionOps = append(ctx.currentTrace.RamCorrectionOps, operation)
 }
 
 func (ctx *parseCtx) recordRlimitOp(operation *pbantelope.RlimitOp) {
 	if operation.IsGlobalKind() {
-		ctx.block.RlimitOps = append(ctx.block.RlimitOps, operation)
+		ctx.currentBlock.RlimitOps = append(ctx.currentBlock.RlimitOps, operation)
 	} else if operation.IsLocalKind() {
-		ctx.trx.RlimitOps = append(ctx.trx.RlimitOps, operation)
+		ctx.currentTrace.RlimitOps = append(ctx.currentTrace.RlimitOps, operation)
 	}
 }
 
 func (ctx *parseCtx) recordTableOp(operation *pbantelope.TableOp) {
-	ctx.trx.TableOps = append(ctx.trx.TableOps, operation)
+	ctx.currentTrace.TableOps = append(ctx.currentTrace.TableOps, operation)
 }
 
 func (ctx *parseCtx) recordTrxOp(operation *pbantelope.TrxOp) {
-	ctx.block.UnfilteredImplicitTransactionOps = append(ctx.block.UnfilteredImplicitTransactionOps, operation)
+	ctx.currentBlock.UnfilteredImplicitTransactionOps = append(ctx.currentBlock.UnfilteredImplicitTransactionOps, operation)
 }
 
 func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error {
@@ -682,7 +675,7 @@ func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error
 		// handler trace and the actual deferred transaction trace that failed.
 
 		// The deferred transaction removal RAM op needs to be attached to the failed trace, not the onerror handler
-		ctx.trx.RamOps = ctx.transferDeferredRemovedRAMOp(ctx.trx.RamOps, failedTrace)
+		ctx.currentTrace.RamOps = ctx.transferDeferredRemovedRAMOp(ctx.currentTrace.RamOps, failedTrace)
 
 		// The only possibilty to have failed deferred trace, is when the deferred execution
 		// resulted in a subjetive failure, which is really a soft fail. So, when the receipt is
@@ -696,7 +689,7 @@ func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error
 		// We add the failed deferred trace first, before the "real" trace (the `onerror` handler)
 		// since it was ultimetaly ran first. There is no ops possible on the trace expect the
 		// transferred RAM op, so it's all good to attach it directly.
-		ctx.block.UnfilteredTransactionTraces = append(ctx.block.UnfilteredTransactionTraces, failedTrace)
+		ctx.currentBlock.UnfilteredTransactionTraces = append(ctx.currentBlock.UnfilteredTransactionTraces, failedTrace)
 
 		if err := ctx.abiDecoder.processTransaction(failedTrace); err != nil {
 			return fmt.Errorf("abi decoding failed trace: %w", err)
@@ -719,17 +712,17 @@ func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error
 	}
 
 	trace.CreationTree = eosio.CreationTreeToDEOS(toFlatTree(creationTreeRoots...))
-	trace.DtrxOps = ctx.trx.DtrxOps
-	trace.DbOps = ctx.trx.DbOps
-	trace.KvOps = ctx.trx.KvOps
-	trace.FeatureOps = ctx.trx.FeatureOps
-	trace.PermOps = ctx.trx.PermOps
-	trace.RamOps = ctx.trx.RamOps
-	trace.RamCorrectionOps = ctx.trx.RamCorrectionOps
-	trace.RlimitOps = ctx.trx.RlimitOps
-	trace.TableOps = ctx.trx.TableOps
+	trace.DtrxOps = ctx.currentTrace.DtrxOps
+	trace.DbOps = ctx.currentTrace.DbOps
+	trace.KvOps = ctx.currentTrace.KvOps
+	trace.FeatureOps = ctx.currentTrace.FeatureOps
+	trace.PermOps = ctx.currentTrace.PermOps
+	trace.RamOps = ctx.currentTrace.RamOps
+	trace.RamCorrectionOps = ctx.currentTrace.RamCorrectionOps
+	trace.RlimitOps = ctx.currentTrace.RlimitOps
+	trace.TableOps = ctx.currentTrace.TableOps
 
-	ctx.block.UnfilteredTransactionTraces = append(ctx.block.UnfilteredTransactionTraces, trace)
+	ctx.currentBlock.UnfilteredTransactionTraces = append(ctx.currentBlock.UnfilteredTransactionTraces, trace)
 
 	if err := ctx.abiDecoder.processTransaction(trace); err != nil {
 		return fmt.Errorf("abi decoding trace: %w", err)
@@ -742,10 +735,10 @@ func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error
 func (ctx *parseCtx) revertOpsDueToFailedTransaction() {
 	// We must keep the deferred removal, as this RAM changed is **not** reverted by nodeos, unlike all other ops
 	// as well as the RLimitOps, which happens at a location that does not revert.
-	toRestoreRlimitOps := ctx.trx.RlimitOps
+	toRestoreRlimitOps := ctx.currentTrace.RlimitOps
 
 	var deferredRemovalRAMOp *pbantelope.RAMOp
-	for _, op := range ctx.trx.RamOps {
+	for _, op := range ctx.currentTrace.RamOps {
 		if op.Namespace == pbantelope.RAMOp_NAMESPACE_DEFERRED_TRX && op.Action == pbantelope.RAMOp_ACTION_REMOVE {
 			deferredRemovalRAMOp = op
 			break
@@ -753,9 +746,9 @@ func (ctx *parseCtx) revertOpsDueToFailedTransaction() {
 	}
 
 	ctx.resetTrx()
-	ctx.trx.RlimitOps = toRestoreRlimitOps
+	ctx.currentTrace.RlimitOps = toRestoreRlimitOps
 	if deferredRemovalRAMOp != nil {
-		ctx.trx.RamOps = []*pbantelope.RAMOp{deferredRemovalRAMOp}
+		ctx.currentTrace.RamOps = []*pbantelope.RAMOp{deferredRemovalRAMOp}
 	}
 }
 
@@ -818,14 +811,14 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
 	}
 
-	if err := ctx.hydrator.HydrateBlock(ctx.block, blockStateHex); err != nil {
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex); err != nil {
 		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
 	}
 
-	block := ctx.block
+	block := ctx.currentBlock
 
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
-	err = ctx.abiDecoder.endBlock(ctx.block)
+	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
 	if err != nil {
 		return nil, fmt.Errorf("abi decoding post-process failed: %w", err)
 	}
