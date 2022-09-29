@@ -222,7 +222,7 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) e
 	for _, actionTrace := range trxTrace.ActionTraces {
 		globalSequence := actionTraceGlobalSequence(actionTrace)
 
-		decodingJobs = append(decodingJobs, actionDecodingJob{actionTrace.Action, c.activeBlockNum, trxTrace.Id, globalSequence, localCache})
+		decodingJobs = append(decodingJobs, actionTraceDecodingJob{actionTrace, commonDecodingJob{c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
 	}
 
 	for _, dtrxOp := range trxTrace.DtrxOps {
@@ -234,11 +234,11 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) e
 		}
 
 		for _, action := range dtrxOp.Transaction.Transaction.ContextFreeActions {
-			decodingJobs = append(decodingJobs, dtrxDecodingJob{actionDecodingJob{action, c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
+			decodingJobs = append(decodingJobs, dtrxDecodingJob{action, commonDecodingJob{c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
 		}
 
 		for _, action := range dtrxOp.Transaction.Transaction.Actions {
-			decodingJobs = append(decodingJobs, dtrxDecodingJob{actionDecodingJob{action, c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
+			decodingJobs = append(decodingJobs, dtrxDecodingJob{action, commonDecodingJob{c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
 		}
 	}
 
@@ -251,11 +251,11 @@ func (c *ABIDecoder) processImplicitTransactions(trxOps []*pbantelope.TrxOp) err
 
 	for _, trxOp := range trxOps {
 		for _, action := range trxOp.Transaction.Transaction.ContextFreeActions {
-			decodingJobs = append(decodingJobs, dtrxDecodingJob{actionDecodingJob{action, c.activeBlockNum, trxOp.TransactionId, mostRecentActiveABI, emptyCache}})
+			decodingJobs = append(decodingJobs, dtrxDecodingJob{action, commonDecodingJob{c.activeBlockNum, trxOp.TransactionId, mostRecentActiveABI, emptyCache}})
 		}
 
 		for _, action := range trxOp.Transaction.Transaction.Actions {
-			decodingJobs = append(decodingJobs, dtrxDecodingJob{actionDecodingJob{action, c.activeBlockNum, trxOp.TransactionId, mostRecentActiveABI, emptyCache}})
+			decodingJobs = append(decodingJobs, dtrxDecodingJob{action, commonDecodingJob{c.activeBlockNum, trxOp.TransactionId, mostRecentActiveABI, emptyCache}})
 		}
 	}
 
@@ -357,25 +357,30 @@ type decodingJob interface {
 	trxID() string
 }
 
-func (j actionDecodingJob) blockNum() uint64 { return j.actualblockNum }
-func (j dtrxDecodingJob) blockNum() uint64   { return j.actionDecodingJob.actualblockNum }
+func (j actionTraceDecodingJob) blockNum() uint64 { return j.actualblockNum }
+func (j dtrxDecodingJob) blockNum() uint64        { return j.commonDecodingJob.actualblockNum }
 
-func (j actionDecodingJob) trxID() string { return j.actualTrxID }
-func (j dtrxDecodingJob) trxID() string   { return j.actionDecodingJob.actualTrxID }
+func (j actionTraceDecodingJob) trxID() string { return j.actualTrxID }
+func (j dtrxDecodingJob) trxID() string        { return j.commonDecodingJob.actualTrxID }
 
-func (j actionDecodingJob) kind() string { return "action" }
-func (j dtrxDecodingJob) kind() string   { return "dtrx" }
+func (j actionTraceDecodingJob) kind() string { return "action_trace" }
+func (j dtrxDecodingJob) kind() string        { return "dtrx" }
 
-type actionDecodingJob struct {
-	action         *pbantelope.Action
+type commonDecodingJob struct {
 	actualblockNum uint64
 	actualTrxID    string
 	globalSequence uint64
 	localCache     *ABICache
 }
 
+type actionTraceDecodingJob struct {
+	actionTrace *pbantelope.ActionTrace
+	commonDecodingJob
+}
+
 type dtrxDecodingJob struct {
-	actionDecodingJob
+	action *pbantelope.Action
+	commonDecodingJob
 }
 
 func (d *ABIDecoder) addJobs(jobs []decodingJob) error {
@@ -423,8 +428,8 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 	}
 
 	switch v := inJob.(type) {
-	case actionDecodingJob:
-		return []interface{}{job.kind()}, d.decodeAction(v.action, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
+	case actionTraceDecodingJob:
+		return []interface{}{job.kind()}, d.decodeActionTrace(v.actionTrace, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
 	case dtrxDecodingJob:
 		return []interface{}{job.kind()}, d.decodeAction(v.action, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
 	default:
@@ -432,7 +437,43 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 	}
 }
 
+func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
+
+	action := actionTrace.Action
+
+	err := d.decodeAction(action, globalSequence, trxID, blockNum, localCache)
+	if err != nil {
+		return err
+	}
+
+	if len(actionTrace.RawReturnValue) > 0 {
+
+		abi := d.findABI(action.Account, globalSequence, localCache)
+		if abi == nil {
+			zlog.Debug("skipping action result since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+			return nil
+		}
+
+		res, err := abi.DecodeActionResult(actionTrace.RawReturnValue, eos.ActionName(actionTrace.Action.Name))
+		if err != nil {
+			zlog.Debug("skipping action result since we were not able to decode it against ABI",
+				zap.Uint64("block_num", blockNum),
+				zap.String("trx_id", trxID),
+				zap.String("action", action.SimpleName()),
+				zap.Uint64("global_sequence", globalSequence),
+				zap.Error(err),
+			)
+			return nil
+		}
+
+		actionTrace.JsonReturnValue = string(res)
+	}
+
+	return nil
+}
+
 func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
+
 	// if traceEnabled {
 	zlog.Debug("decoding action", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 	//}
