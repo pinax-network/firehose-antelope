@@ -20,6 +20,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/EOS-Nation/firehose-antelope/types"
+	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
 	"os"
@@ -105,11 +106,6 @@ func TestParseFromFile(t *testing.T) {
 				out, err := cr.ReadBlock()
 				if err != nil {
 					return nil, err
-				}
-
-				// todo out might be nil here, is this EOS specifc? Need to check
-				if out.ToProtocol() == nil {
-					return nil, fmt.Errorf("no block read")
 				}
 
 				return out.ToProtocol().(*pbantelope.Block), nil
@@ -225,19 +221,32 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 	fl, err := os.Open(filename)
 	require.NoError(t, err)
 
-	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() })
+	// todo use this if you want A LOT of logging
+	// cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, zaptest.NewLogger(t))
+	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, nil)
 
 	go cr.ProcessData(fl)
 
 	return cr
 }
 
-func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()) *ConsoleReader {
+func testReaderConsoleReader(helperFunc func(), lines chan string, closer func(), logger *zap.Logger) *ConsoleReader {
+
 	l := &ConsoleReader{
-		lines:  lines,
-		close:  closer,
-		ctx:    &parseCtx{logger: zlogTest, globalStats: newConsoleReaderStats()},
+		lines: lines,
+		close: closer,
+		ctx: &parseCtx{
+			logger:       zlogTest,
+			globalStats:  newConsoleReaderStats(),
+			currentBlock: &pbantelope.Block{},
+			currentTrace: &pbantelope.TransactionTrace{},
+			abiDecoder:   newABIDecoder(),
+		},
 		logger: zlogTest,
+	}
+
+	if logger != nil {
+		l.logger = logger
 	}
 
 	return l

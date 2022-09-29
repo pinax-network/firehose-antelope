@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/EOS-Nation/firehose-antelope/types"
 	"io"
 	"os"
 	"strconv"
@@ -267,7 +268,7 @@ func (c *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
 func (c *ConsoleReader) next() (out interface{}, err error) {
 
 	ctx := c.ctx
-	c.logger.Debug("next")
+	c.logger.Debug("next()")
 
 	for line := range c.lines {
 
@@ -792,7 +793,7 @@ func (ctx *parseCtx) readStartBlock(line string) error {
 // Line format:
 //
 //	ACCEPTED_BLOCK ${block_num} ${block_state_hex}
-func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
+func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 	chunks := strings.SplitN(line, " ", 3)
 	if len(chunks) != 3 {
 		return nil, fmt.Errorf("expected 3 fields, got %d", len(chunks))
@@ -826,7 +827,8 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 
 	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
 	ctx.resetBlock()
-	return block, nil
+
+	return types.BlockFromProto(block)
 }
 
 // Line format:

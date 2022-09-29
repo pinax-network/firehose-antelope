@@ -17,6 +17,7 @@ package codec
 import (
 	"bytes"
 	"fmt"
+	"go.uber.org/zap/zaptest"
 	"io"
 	"os"
 	"testing"
@@ -42,7 +43,7 @@ func BenchmarkConsoleReader(b *testing.B) {
 			channel <- string(line)
 		}
 
-		readers[n] = testReaderConsoleReader(b.Helper, channel, func() {})
+		readers[n] = testReaderConsoleReader(b.Helper, channel, func() {}, zaptest.NewLogger(b))
 
 		// We close it right now, it will still be fully consumed
 		close(channel)
