@@ -3,7 +3,7 @@ module github.com/EOS-Nation/firehose-antelope
 go 1.18
 
 require (
-	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929140406-f08abcebd8ac
+	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929140743-3c98e4792b9c
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/eoscanada/eos-go v0.10.2
