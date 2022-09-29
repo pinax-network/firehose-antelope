@@ -251,6 +251,7 @@ type parseCtx struct {
 //}
 
 func (c *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
+
 	v, err := c.next()
 	if err != nil {
 		return nil, err
