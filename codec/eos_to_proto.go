@@ -21,7 +21,7 @@ import (
 	"sort"
 	"time"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
 	"github.com/golang/protobuf/ptypes"
@@ -52,7 +52,7 @@ func bytesSlicesToHexBytes(in [][]byte) []eos.HexBytes {
 	return out
 }
 
-func BlockHeaderToEOS(in *pbcodec.BlockHeader) *eos.BlockHeader {
+func BlockHeaderToEOS(in *pbantelope.BlockHeader) *eos.BlockHeader {
 	stamp, _ := ptypes.Timestamp(in.Timestamp)
 	prev, _ := hex.DecodeString(in.Previous)
 	out := &eos.BlockHeader{
@@ -73,9 +73,9 @@ func BlockHeaderToEOS(in *pbcodec.BlockHeader) *eos.BlockHeader {
 	return out
 }
 
-func BlockSigningAuthorityToEOS(in *pbcodec.BlockSigningAuthority) *eos.BlockSigningAuthority {
+func BlockSigningAuthorityToEOS(in *pbantelope.BlockSigningAuthority) *eos.BlockSigningAuthority {
 	switch v := in.Variant.(type) {
-	case *pbcodec.BlockSigningAuthority_V0:
+	case *pbantelope.BlockSigningAuthority_V0:
 		return &eos.BlockSigningAuthority{
 			BaseVariant: eos.BaseVariant{
 				TypeID: eos.BlockSigningAuthorityVariant.TypeID("block_signing_authority_v0"),
@@ -90,21 +90,21 @@ func BlockSigningAuthorityToEOS(in *pbcodec.BlockSigningAuthority) *eos.BlockSig
 	}
 }
 
-func ProducerScheduleToEOS(in *pbcodec.ProducerSchedule) *eos.ProducerSchedule {
+func ProducerScheduleToEOS(in *pbantelope.ProducerSchedule) *eos.ProducerSchedule {
 	return &eos.ProducerSchedule{
 		Version:   in.Version,
 		Producers: ProducerKeysToEOS(in.Producers),
 	}
 }
 
-func ProducerAuthorityScheduleToEOS(in *pbcodec.ProducerAuthoritySchedule) *eos.ProducerAuthoritySchedule {
+func ProducerAuthorityScheduleToEOS(in *pbantelope.ProducerAuthoritySchedule) *eos.ProducerAuthoritySchedule {
 	return &eos.ProducerAuthoritySchedule{
 		Version:   in.Version,
 		Producers: ProducerAuthoritiesToEOS(in.Producers),
 	}
 }
 
-func ProducerKeysToEOS(in []*pbcodec.ProducerKey) (out []eos.ProducerKey) {
+func ProducerKeysToEOS(in []*pbantelope.ProducerKey) (out []eos.ProducerKey) {
 	out = make([]eos.ProducerKey, len(in))
 	for i, producer := range in {
 		// panic on error instead?
@@ -132,7 +132,7 @@ func PublicKeysToEOS(in []string) (out []*ecc.PublicKey) {
 	return
 }
 
-func ExtensionsToEOS(in []*pbcodec.Extension) (out []*eos.Extension) {
+func ExtensionsToEOS(in []*pbantelope.Extension) (out []*eos.Extension) {
 	if len(in) <= 0 {
 		return nil
 	}
@@ -147,7 +147,7 @@ func ExtensionsToEOS(in []*pbcodec.Extension) (out []*eos.Extension) {
 	return
 }
 
-func ProducerAuthoritiesToEOS(producerAuthorities []*pbcodec.ProducerAuthority) (out []*eos.ProducerAuthority) {
+func ProducerAuthoritiesToEOS(producerAuthorities []*pbantelope.ProducerAuthority) (out []*eos.ProducerAuthority) {
 	if len(producerAuthorities) <= 0 {
 		return nil
 	}
@@ -162,7 +162,7 @@ func ProducerAuthoritiesToEOS(producerAuthorities []*pbcodec.ProducerAuthority) 
 	return
 }
 
-func TransactionReceiptHeaderToEOS(in *pbcodec.TransactionReceiptHeader) *eos.TransactionReceiptHeader {
+func TransactionReceiptHeaderToEOS(in *pbantelope.TransactionReceiptHeader) *eos.TransactionReceiptHeader {
 	return &eos.TransactionReceiptHeader{
 		Status:               TransactionStatusToEOS(in.Status),
 		CPUUsageMicroSeconds: in.CpuUsageMicroSeconds,
@@ -183,7 +183,7 @@ func SignaturesToEOS(in []string) []ecc.Signature {
 	return out
 }
 
-func TransactionTraceToEOS(in *pbcodec.TransactionTrace) (out *eos.TransactionTrace) {
+func TransactionTraceToEOS(in *pbantelope.TransactionTrace) (out *eos.TransactionTrace) {
 	out = &eos.TransactionTrace{
 		ID:              ChecksumToEOS(in.Id),
 		BlockNum:        uint32(in.BlockNum),
@@ -207,7 +207,7 @@ func TransactionTraceToEOS(in *pbcodec.TransactionTrace) (out *eos.TransactionTr
 	return out
 }
 
-func AuthoritiesToEOS(authority *pbcodec.Authority) eos.Authority {
+func AuthoritiesToEOS(authority *pbantelope.Authority) eos.Authority {
 	return eos.Authority{
 		Threshold: authority.Threshold,
 		Keys:      KeyWeightsToEOS(authority.Keys),
@@ -216,7 +216,7 @@ func AuthoritiesToEOS(authority *pbcodec.Authority) eos.Authority {
 	}
 }
 
-func WaitWeightsToEOS(waits []*pbcodec.WaitWeight) (out []eos.WaitWeight) {
+func WaitWeightsToEOS(waits []*pbantelope.WaitWeight) (out []eos.WaitWeight) {
 	if len(waits) <= 0 {
 		return nil
 	}
@@ -231,7 +231,7 @@ func WaitWeightsToEOS(waits []*pbcodec.WaitWeight) (out []eos.WaitWeight) {
 	return out
 }
 
-func PermissionLevelWeightsToEOS(weights []*pbcodec.PermissionLevelWeight) (out []eos.PermissionLevelWeight) {
+func PermissionLevelWeightsToEOS(weights []*pbantelope.PermissionLevelWeight) (out []eos.PermissionLevelWeight) {
 	if len(weights) == 0 {
 		return []eos.PermissionLevelWeight{}
 	}
@@ -246,14 +246,14 @@ func PermissionLevelWeightsToEOS(weights []*pbcodec.PermissionLevelWeight) (out 
 	return
 }
 
-func PermissionLevelToEOS(perm *pbcodec.PermissionLevel) eos.PermissionLevel {
+func PermissionLevelToEOS(perm *pbantelope.PermissionLevel) eos.PermissionLevel {
 	return eos.PermissionLevel{
 		Actor:      eos.AccountName(perm.Actor),
 		Permission: eos.PermissionName(perm.Permission),
 	}
 }
 
-func KeyWeightsToEOS(keys []*pbcodec.KeyWeight) (out []eos.KeyWeight) {
+func KeyWeightsToEOS(keys []*pbantelope.KeyWeight) (out []eos.KeyWeight) {
 	if len(keys) <= 0 {
 		return nil
 	}
@@ -269,7 +269,7 @@ func KeyWeightsToEOS(keys []*pbcodec.KeyWeight) (out []eos.KeyWeight) {
 
 }
 
-func KeyWeightsPToEOS(keys []*pbcodec.KeyWeight) (out []*eos.KeyWeight) {
+func KeyWeightsPToEOS(keys []*pbantelope.KeyWeight) (out []*eos.KeyWeight) {
 	if len(keys) <= 0 {
 		return nil
 	}
@@ -285,7 +285,7 @@ func KeyWeightsPToEOS(keys []*pbcodec.KeyWeight) (out []*eos.KeyWeight) {
 
 }
 
-func TransactionToEOS(trx *pbcodec.Transaction) *eos.Transaction {
+func TransactionToEOS(trx *pbantelope.Transaction) *eos.Transaction {
 	var contextFreeActions []*eos.Action
 	if len(trx.ContextFreeActions) > 0 {
 		contextFreeActions = make([]*eos.Action, len(trx.ContextFreeActions))
@@ -310,7 +310,7 @@ func TransactionToEOS(trx *pbcodec.Transaction) *eos.Transaction {
 	}
 }
 
-func TransactionHeaderToEOS(trx *pbcodec.TransactionHeader) *eos.TransactionHeader {
+func TransactionHeaderToEOS(trx *pbantelope.TransactionHeader) *eos.TransactionHeader {
 	out := &eos.TransactionHeader{
 		Expiration:       TimestampToJSONTime(trx.Expiration),
 		RefBlockNum:      uint16(trx.RefBlockNum),
@@ -323,7 +323,7 @@ func TransactionHeaderToEOS(trx *pbcodec.TransactionHeader) *eos.TransactionHead
 	return out
 }
 
-func SignedTransactionToEOS(trx *pbcodec.SignedTransaction) *eos.SignedTransaction {
+func SignedTransactionToEOS(trx *pbantelope.SignedTransaction) *eos.SignedTransaction {
 	return &eos.SignedTransaction{
 		Transaction:     TransactionToEOS(trx.Transaction),
 		Signatures:      SignaturesToEOS(trx.Signatures),
@@ -331,7 +331,7 @@ func SignedTransactionToEOS(trx *pbcodec.SignedTransaction) *eos.SignedTransacti
 	}
 }
 
-func ActionTracesToEOS(actionTraces []*pbcodec.ActionTrace) (out []eos.ActionTrace) {
+func ActionTracesToEOS(actionTraces []*pbantelope.ActionTrace) (out []eos.ActionTrace) {
 	if len(actionTraces) <= 0 {
 		return nil
 	}
@@ -346,7 +346,7 @@ func ActionTracesToEOS(actionTraces []*pbcodec.ActionTrace) (out []eos.ActionTra
 	return
 }
 
-func AuthSequenceListToEOS(in []*pbcodec.AuthSequence) (out []eos.TransactionTraceAuthSequence) {
+func AuthSequenceListToEOS(in []*pbantelope.AuthSequence) (out []eos.TransactionTraceAuthSequence) {
 	if len(in) == 0 {
 		return []eos.TransactionTraceAuthSequence{}
 	}
@@ -359,7 +359,7 @@ func AuthSequenceListToEOS(in []*pbcodec.AuthSequence) (out []eos.TransactionTra
 	return
 }
 
-func AuthSequenceToEOS(in *pbcodec.AuthSequence) eos.TransactionTraceAuthSequence {
+func AuthSequenceToEOS(in *pbantelope.AuthSequence) eos.TransactionTraceAuthSequence {
 	return eos.TransactionTraceAuthSequence{
 		Account:  eos.AccountName(in.AccountName),
 		Sequence: eos.Uint64(in.Sequence),
@@ -374,7 +374,7 @@ func ErrorCodeToEOS(in uint64) *eos.Uint64 {
 	return nil
 }
 
-func ActionTraceToEOS(in *pbcodec.ActionTrace) (out eos.ActionTrace) {
+func ActionTraceToEOS(in *pbantelope.ActionTrace) (out eos.ActionTrace) {
 	out = eos.ActionTrace{
 		Receiver:             eos.AccountName(in.Receiver),
 		Action:               ActionToEOS(in.Action),
@@ -419,7 +419,7 @@ func ChecksumToEOS(in string) eos.Checksum256 {
 	return eos.Checksum256(out)
 }
 
-func ActionToEOS(action *pbcodec.Action) (out *eos.Action) {
+func ActionToEOS(action *pbantelope.Action) (out *eos.Action) {
 	d := eos.ActionData{}
 	d.SetToServer(false) // rather, what we expect FROM `nodeos` servers
 
@@ -441,7 +441,7 @@ func ActionToEOS(action *pbcodec.Action) (out *eos.Action) {
 	return out
 }
 
-func AuthorizationToEOS(authorization []*pbcodec.PermissionLevel) (out []eos.PermissionLevel) {
+func AuthorizationToEOS(authorization []*pbantelope.PermissionLevel) (out []eos.PermissionLevel) {
 	if len(authorization) == 0 {
 		return []eos.PermissionLevel{}
 	}
@@ -453,7 +453,7 @@ func AuthorizationToEOS(authorization []*pbcodec.PermissionLevel) (out []eos.Per
 	return
 }
 
-func AccountRAMDeltasToEOS(deltas []*pbcodec.AccountRAMDelta) (out []*eos.AccountRAMDelta) {
+func AccountRAMDeltasToEOS(deltas []*pbantelope.AccountRAMDelta) (out []*eos.AccountRAMDelta) {
 	if len(deltas) == 0 {
 		return []*eos.AccountRAMDelta{}
 	}
@@ -468,7 +468,7 @@ func AccountRAMDeltasToEOS(deltas []*pbcodec.AccountRAMDelta) (out []*eos.Accoun
 	return
 }
 
-func ExceptionToEOS(in *pbcodec.Exception) *eos.Except {
+func ExceptionToEOS(in *pbantelope.Exception) *eos.Except {
 	if in == nil {
 		return nil
 	}
@@ -501,7 +501,7 @@ func ExceptionToEOS(in *pbcodec.Exception) *eos.Except {
 	return out
 }
 
-func LogContextToEOS(in *pbcodec.Exception_LogContext) *eos.ExceptLogContext {
+func LogContextToEOS(in *pbantelope.Exception_LogContext) *eos.ExceptLogContext {
 	if in == nil {
 		return nil
 	}
@@ -531,27 +531,27 @@ func TimestampToBlockTimestamp(in *timestamp.Timestamp) eos.BlockTimestamp {
 	return eos.BlockTimestamp{Time: out}
 }
 
-func TransactionStatusToEOS(in pbcodec.TransactionStatus) eos.TransactionStatus {
+func TransactionStatusToEOS(in pbantelope.TransactionStatus) eos.TransactionStatus {
 	switch in {
-	case pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXECUTED:
+	case pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXECUTED:
 		return eos.TransactionStatusExecuted
-	case pbcodec.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL:
+	case pbantelope.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL:
 		return eos.TransactionStatusSoftFail
-	case pbcodec.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL:
+	case pbantelope.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL:
 		return eos.TransactionStatusHardFail
-	case pbcodec.TransactionStatus_TRANSACTIONSTATUS_DELAYED:
+	case pbantelope.TransactionStatus_TRANSACTIONSTATUS_DELAYED:
 		return eos.TransactionStatusDelayed
-	case pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXPIRED:
+	case pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXPIRED:
 		return eos.TransactionStatusExpired
 	default:
 		return eos.TransactionStatusUnknown
 	}
 }
 
-func ExtractEOSSignedTransactionFromReceipt(trxReceipt *pbcodec.TransactionReceipt) (*eos.SignedTransaction, error) {
+func ExtractEOSSignedTransactionFromReceipt(trxReceipt *pbantelope.TransactionReceipt) (*eos.SignedTransaction, error) {
 	eosPackedTx, err := pbcodecPackedTransactionToEOS(trxReceipt.PackedTransaction)
 	if err != nil {
-		return nil, fmt.Errorf("pbcodec.PackedTransaction to EOS conversion failed: %s", err)
+		return nil, fmt.Errorf("pbantelope.PackedTransaction to EOS conversion failed: %s", err)
 	}
 
 	signedTransaction, err := eosPackedTx.UnpackBare()
@@ -570,7 +570,7 @@ func mustProtoTimestamp(in time.Time) *timestamp.Timestamp {
 	return out
 }
 
-func pbcodecPackedTransactionToEOS(packedTrx *pbcodec.PackedTransaction) (*eos.PackedTransaction, error) {
+func pbcodecPackedTransactionToEOS(packedTrx *pbantelope.PackedTransaction) (*eos.PackedTransaction, error) {
 	signatures := make([]ecc.Signature, len(packedTrx.Signatures))
 	for i, signature := range packedTrx.Signatures {
 		eccSignature, err := ecc.NewSignature(signature)

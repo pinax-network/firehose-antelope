@@ -20,119 +20,141 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"os/exec"
-	"path/filepath"
+	"reflect"
+	"strings"
 	"testing"
 	"time"
 
 	_ "net/http/pprof"
 
+	eosio_v2_0 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.0"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/andreyvit/diff"
-	eosio_v2_0 "github.com/dfuse-io/dfuse-eosio/codec/eosio/v2.0"
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
 	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"go.uber.org/zap"
 )
 
-func TestConsoleReaderPerformances(t *testing.T) {
-	dmlogBenchmarkFile := os.Getenv("PERF_DMLOG_BENCHMARK_FILE")
-	if dmlogBenchmarkFile == "" || !fileExists(dmlogBenchmarkFile) {
-		t.Skipf("Environment variable 'PERF_DMLOG_BENCHMARK_FILE' not set or value %q is not an existing file", dmlogBenchmarkFile)
-		return
-	}
-
-	go func() {
-		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
-			zlog.Info("listening localhost:6060", zap.Error(err))
-		}
-	}()
-
-	fl, err := os.Open(dmlogBenchmarkFile)
-	require.NoError(t, err)
-
-	r, err := NewConsoleReader(fl)
-	require.NoError(t, err)
-	defer r.Close()
-
-	count := 1999
-
-	t0 := time.Now()
-
-	for i := 0; i < count; i++ {
-		blki, err := r.Read()
-		require.NoError(t, err)
-
-		blk := blki.(*pbcodec.Block)
-		fmt.Fprintln(os.Stderr, "Processing block", blk.Num())
-	}
-
-	d1 := time.Since(t0)
-	perSec := float64(count) / (float64(d1) / float64(time.Second))
-	fmt.Printf("%d blocks in %s (%f blocks/sec)", count, d1, perSec)
-}
+// todo delete legacy benchmark replaced with console_reader_bench_test.go
+//func TestConsoleReaderPerformances(t *testing.T) {
+//	dmlogBenchmarkFile := os.Getenv("PERF_DMLOG_BENCHMARK_FILE")
+//	if dmlogBenchmarkFile == "" || !fileExists(dmlogBenchmarkFile) {
+//		t.Skipf("Environment variable 'PERF_DMLOG_BENCHMARK_FILE' not set or value %q is not an existing file", dmlogBenchmarkFile)
+//		return
+//	}
+//
+//	go func() {
+//		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
+//			zlogTest.Info("listening localhost:6060", zap.Error(err))
+//		}
+//	}()
+//
+//	fl, err := os.Open(dmlogBenchmarkFile)
+//	require.NoError(t, err)
+//
+//	r, err := NewConsoleReader(fl)
+//	require.NoError(t, err)
+//	defer r.Close()
+//
+//	count := 1999
+//
+//	t0 := time.Now()
+//
+//	for i := 0; i < count; i++ {
+//		blki, err := r.Read()
+//		require.NoError(t, err)
+//
+//		blk := blki.(*pbantelope.Block)
+//		fmt.Fprintln(os.Stderr, "Processing block", blk.Num())
+//	}
+//
+//	d1 := time.Since(t0)
+//	perSec := float64(count) / (float64(d1) / float64(time.Second))
+//	fmt.Printf("%d blocks in %s (%f blocks/sec)", count, d1, perSec)
+//}
 
 func TestParseFromFile(t *testing.T) {
 
 	tests := []struct {
-		name          string
-		deepMindFile  string
-		includeBlock  func(block *pbcodec.Block) bool
-		readerOptions []ConsoleReaderOption
+		name         string
+		deepMindFile string
+		includeBlock func(block *pbantelope.Block) bool
+		// readerOptions []ConsoleReaderOption
 	}{
-		{"full", "testdata/deep-mind.dmlog", nil, nil},
-		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", nil, nil},
-		{"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole, []ConsoleReaderOption{LimitConsoleLength(10)}},
+		{"full", "testdata/deep-mind.dmlog", nil /*nil*/},
+		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", nil /*nil*/},
+		{"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole /*[]ConsoleReaderOption{LimitConsoleLength(10)}*/},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(strings.Replace(test.deepMindFile, "testdata/", "", 1), func(t *testing.T) {
+			// todo check if we need to test for expected panics
+			//defer func() {
+			//	if r := recover(); r != nil {
+			//		require.Equal(t, test.expectedPanicErr, r, "Panicked with %s", r)
+			//	}
+			//}()
 
-			cr := testFileConsoleReader(t, test.deepMindFile, test.readerOptions...)
+			cr := testFileConsoleReader(t, test.deepMindFile)
+
+			var reader ObjectReader = func() (interface{}, error) {
+				out, err := cr.ReadBlock()
+				if err != nil {
+					return nil, err
+				}
+
+				return out.ToProtocol().(*pbantelope.Block), nil
+			}
+
 			buf := &bytes.Buffer{}
+			buf.Write([]byte("["))
+			first := true
 
 			for {
-				out, err := cr.Read()
-				if out != nil && out.(*pbcodec.Block) != nil {
-					blk := out.(*pbcodec.Block)
-					if test.includeBlock != nil && !test.includeBlock(blk) {
-						continue
+				out, err := reader()
+				if v, ok := out.(proto.Message); ok && !isNil(v) {
+					if !first {
+						buf.Write([]byte(","))
 					}
+					first = false
 
-					if len(buf.Bytes()) != 0 {
-						buf.Write([]byte("\n"))
-					}
+					value, err := jsonpb.MarshalIndentToString(v, "  ")
+					require.NoError(t, err)
 
-					buf.Write([]byte(protoJSONMarshalIndent(t, blk)))
+					buf.Write([]byte(value))
 				}
 
 				if err == io.EOF {
 					break
 				}
 
-				if err != nil {
-					// It appears that since our error can be quite large, the `require.NoError`
-					// seems to not print it in full when an error occurred. In fact, it only
-					// prints an unexpected error occurred. To ensure the error is debuggable,
-					// we print it first when an error is present.
-					fmt.Println(err)
+				if len(buf.Bytes()) != 0 {
+					buf.Write([]byte("\n"))
 				}
+
+				//if test.expectedErr == nil {
+				//	require.NoError(t, err)
+				//} else if err != nil {
+				//	require.Equal(t, test.expectedErr, err)
+				//	return
+				//}
 				require.NoError(t, err)
 			}
+			buf.Write([]byte("]"))
 
-			goldenFile := filepath.Join("testdata", test.name+".golden.json")
+			goldenFile := test.deepMindFile + ".golden.json"
 			if os.Getenv("GOLDEN_UPDATE") == "true" {
 				err := os.WriteFile(goldenFile, buf.Bytes(), os.ModePerm)
 				require.NoError(t, err)
 			}
+
 			cnt, err := os.ReadFile(goldenFile)
 			require.NoError(t, err)
 
-			if !assert.Equal(t, string(cnt), buf.String()) {
+			if !assert.JSONEq(t, string(cnt), buf.String()) {
 				t.Error("previous diff:\n" + unifiedDiff(t, cnt, buf.Bytes()))
 			}
 		})
@@ -163,8 +185,8 @@ func TestGeneratePBBlocks(t *testing.T) {
 
 	for {
 		out, err := cr.Read()
-		if out != nil && out.(*pbcodec.Block) != nil {
-			block := out.(*pbcodec.Block)
+		if out != nil && out.(*pbantelope.Block) != nil {
+			block := out.(*pbantelope.Block)
 
 			outputFile, err := os.Create(fmt.Sprintf("testdata/pbblocks/battlefield-block.%d.deos.pb", block.Number))
 			require.NoError(t, err)
@@ -186,60 +208,66 @@ func TestGeneratePBBlocks(t *testing.T) {
 	}
 }
 
-func testFileConsoleReader(t *testing.T, filename string, options ...ConsoleReaderOption) *ConsoleReader {
+func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 	t.Helper()
 
 	fl, err := os.Open(filename)
 	require.NoError(t, err)
 
-	return testReaderConsoleReader(t, fl, func() { fl.Close() }, options...)
+	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() })
+
+	go cr.ProcessData(fl)
+
+	return cr
 }
 
-func testReaderConsoleReader(t *testing.T, reader io.Reader, closer func(), options ...ConsoleReaderOption) *ConsoleReader {
-	t.Helper()
+func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()) *ConsoleReader {
+	l := &ConsoleReader{
+		lines:  lines,
+		close:  closer,
+		ctx:    &parseCtx{logger: zlogTest, globalStats: newConsoleReaderStats()},
+		logger: zlogTest,
+	}
 
-	consoleReader, err := NewConsoleReader(reader, options...)
-	require.NoError(t, err)
-
-	return consoleReader
+	return l
 }
 
 func Test_BlockRlimitOp(t *testing.T) {
 	tests := []struct {
 		line        string
-		expected    *pbcodec.RlimitOp
+		expected    *pbantelope.RlimitOp
 		expectedErr error
 	}{
 		{
 			`RLIMIT_OP CONFIG INS {"cpu_limit_parameters":{"target":20000,"max":200000,"periods":120,"max_multiplier":1000,"contract_rate":{"numerator":99,"denominator":100},"expand_rate":{"numerator":1000,"denominator":999}},"net_limit_parameters":{"target":104857,"max":1048576,"periods":120,"max_multiplier":1000,"contract_rate":{"numerator":99,"denominator":100},"expand_rate":{"numerator":1000,"denominator":999}},"account_cpu_usage_average_window":172800,"account_net_usage_average_window":172800}`,
-			&pbcodec.RlimitOp{
-				Operation: pbcodec.RlimitOp_OPERATION_INSERT,
-				Kind: &pbcodec.RlimitOp_Config{
-					Config: &pbcodec.RlimitConfig{
-						CpuLimitParameters: &pbcodec.ElasticLimitParameters{
+			&pbantelope.RlimitOp{
+				Operation: pbantelope.RlimitOp_OPERATION_INSERT,
+				Kind: &pbantelope.RlimitOp_Config{
+					Config: &pbantelope.RlimitConfig{
+						CpuLimitParameters: &pbantelope.ElasticLimitParameters{
 							Target:        20000,
 							Max:           200000,
 							Periods:       120,
 							MaxMultiplier: 1000,
-							ContractRate: &pbcodec.Ratio{
+							ContractRate: &pbantelope.Ratio{
 								Numerator:   99,
 								Denominator: 100,
 							},
-							ExpandRate: &pbcodec.Ratio{
+							ExpandRate: &pbantelope.Ratio{
 								Numerator:   1000,
 								Denominator: 999,
 							},
 						},
-						NetLimitParameters: &pbcodec.ElasticLimitParameters{
+						NetLimitParameters: &pbantelope.ElasticLimitParameters{
 							Target:        104857,
 							Max:           1048576,
 							Periods:       120,
 							MaxMultiplier: 1000,
-							ContractRate: &pbcodec.Ratio{
+							ContractRate: &pbantelope.Ratio{
 								Numerator:   99,
 								Denominator: 100,
 							},
-							ExpandRate: &pbcodec.Ratio{
+							ExpandRate: &pbantelope.Ratio{
 								Numerator:   1000,
 								Denominator: 999,
 							},
@@ -253,16 +281,16 @@ func Test_BlockRlimitOp(t *testing.T) {
 		},
 		{
 			`RLIMIT_OP STATE INS {"average_block_net_usage":{"last_ordinal":1,"value_ex":2,"consumed":3},"average_block_cpu_usage":{"last_ordinal":4,"value_ex":5,"consumed":6},"pending_net_usage":7,"pending_cpu_usage":8,"total_net_weight":9,"total_cpu_weight":10,"total_ram_bytes":11,"virtual_net_limit":1048576,"virtual_cpu_limit":200000}`,
-			&pbcodec.RlimitOp{
-				Operation: pbcodec.RlimitOp_OPERATION_INSERT,
-				Kind: &pbcodec.RlimitOp_State{
-					State: &pbcodec.RlimitState{
-						AverageBlockNetUsage: &pbcodec.UsageAccumulator{
+			&pbantelope.RlimitOp{
+				Operation: pbantelope.RlimitOp_OPERATION_INSERT,
+				Kind: &pbantelope.RlimitOp_State{
+					State: &pbantelope.RlimitState{
+						AverageBlockNetUsage: &pbantelope.UsageAccumulator{
 							LastOrdinal: 1,
 							ValueEx:     2,
 							Consumed:    3,
 						},
-						AverageBlockCpuUsage: &pbcodec.UsageAccumulator{
+						AverageBlockCpuUsage: &pbantelope.UsageAccumulator{
 							LastOrdinal: 4,
 							ValueEx:     5,
 							Consumed:    6,
@@ -303,15 +331,15 @@ func Test_BlockRlimitOp(t *testing.T) {
 func Test_TraceRlimitOp(t *testing.T) {
 	tests := []struct {
 		line        string
-		expected    *pbcodec.RlimitOp
+		expected    *pbantelope.RlimitOp
 		expectedErr error
 	}{
 		{
 			`RLIMIT_OP ACCOUNT_LIMITS INS {"owner":"eosio.ram","net_weight":-1,"cpu_weight":-1,"ram_bytes":-1}`,
-			&pbcodec.RlimitOp{
-				Operation: pbcodec.RlimitOp_OPERATION_INSERT,
-				Kind: &pbcodec.RlimitOp_AccountLimits{
-					AccountLimits: &pbcodec.RlimitAccountLimits{
+			&pbantelope.RlimitOp{
+				Operation: pbantelope.RlimitOp_OPERATION_INSERT,
+				Kind: &pbantelope.RlimitOp_AccountLimits{
+					AccountLimits: &pbantelope.RlimitAccountLimits{
 						Owner:     "eosio.ram",
 						NetWeight: -1,
 						CpuWeight: -1,
@@ -323,13 +351,13 @@ func Test_TraceRlimitOp(t *testing.T) {
 		},
 		{
 			`RLIMIT_OP ACCOUNT_USAGE UPD {"owner":"eosio","net_usage":{"last_ordinal":0,"value_ex":868696,"consumed":1},"cpu_usage":{"last_ordinal":0,"value_ex":572949,"consumed":101},"ram_usage":1181072}`,
-			&pbcodec.RlimitOp{
-				Operation: pbcodec.RlimitOp_OPERATION_UPDATE,
-				Kind: &pbcodec.RlimitOp_AccountUsage{
-					AccountUsage: &pbcodec.RlimitAccountUsage{
+			&pbantelope.RlimitOp{
+				Operation: pbantelope.RlimitOp_OPERATION_UPDATE,
+				Kind: &pbantelope.RlimitOp_AccountUsage{
+					AccountUsage: &pbantelope.RlimitAccountUsage{
 						Owner:    "eosio",
-						NetUsage: &pbcodec.UsageAccumulator{LastOrdinal: 0, ValueEx: 868696, Consumed: 1},
-						CpuUsage: &pbcodec.UsageAccumulator{LastOrdinal: 0, ValueEx: 572949, Consumed: 101},
+						NetUsage: &pbantelope.UsageAccumulator{LastOrdinal: 0, ValueEx: 868696, Consumed: 1},
+						CpuUsage: &pbantelope.UsageAccumulator{LastOrdinal: 0, ValueEx: 572949, Consumed: 101},
 						RamUsage: 1181072,
 					},
 				},
@@ -362,22 +390,22 @@ func Test_readRAMOp(t *testing.T) {
 		name            string
 		line            string
 		parseCtxFactory func() *parseCtx
-		expected        *pbcodec.RAMOp
+		expected        *pbantelope.RAMOp
 		expectedErr     error
 	}{
 		{
 			"kv create standard",
 			`RAM_OP 0 0186e46a800000000091aa074d2ae8000080000001 kv create . ultra.test 645533 148`,
 			newParseCtx,
-			&pbcodec.RAMOp{
-				Operation:   pbcodec.RAMOp_OPERATION_DEPRECATED,
+			&pbantelope.RAMOp{
+				Operation:   pbantelope.RAMOp_OPERATION_DEPRECATED,
 				ActionIndex: 0,
 				Payer:       "ultra.test",
 				Delta:       148,
 				Usage:       645533,
-				Namespace:   pbcodec.RAMOp_NAMESPACE_KV,
+				Namespace:   pbantelope.RAMOp_NAMESPACE_KV,
 				UniqueKey:   "0186e46a800000000091aa074d2ae8000080000001",
-				Action:      pbcodec.RAMOp_ACTION_ADD,
+				Action:      pbantelope.RAMOp_ACTION_ADD,
 			},
 			nil,
 		},
@@ -385,15 +413,15 @@ func Test_readRAMOp(t *testing.T) {
 			"kv update standard",
 			`RAM_OP 0 0186e46a800000000091aa074d2ae8000080000001 kv update . ultra.test 645533 148`,
 			newParseCtx,
-			&pbcodec.RAMOp{
-				Operation:   pbcodec.RAMOp_OPERATION_DEPRECATED,
+			&pbantelope.RAMOp{
+				Operation:   pbantelope.RAMOp_OPERATION_DEPRECATED,
 				ActionIndex: 0,
 				Payer:       "ultra.test",
 				Delta:       148,
 				Usage:       645533,
-				Namespace:   pbcodec.RAMOp_NAMESPACE_KV,
+				Namespace:   pbantelope.RAMOp_NAMESPACE_KV,
 				UniqueKey:   "0186e46a800000000091aa074d2ae8000080000001",
-				Action:      pbcodec.RAMOp_ACTION_UPDATE,
+				Action:      pbantelope.RAMOp_ACTION_UPDATE,
 			},
 			nil,
 		},
@@ -401,15 +429,15 @@ func Test_readRAMOp(t *testing.T) {
 			"kv erase standard",
 			`RAM_OP 0 0186e46a800000000091aa074d2ae8000080000001 kv erase . ultra.test 645533 148`,
 			newParseCtx,
-			&pbcodec.RAMOp{
-				Operation:   pbcodec.RAMOp_OPERATION_DEPRECATED,
+			&pbantelope.RAMOp{
+				Operation:   pbantelope.RAMOp_OPERATION_DEPRECATED,
 				ActionIndex: 0,
 				Payer:       "ultra.test",
 				Delta:       148,
 				Usage:       645533,
-				Namespace:   pbcodec.RAMOp_NAMESPACE_KV,
+				Namespace:   pbantelope.RAMOp_NAMESPACE_KV,
 				UniqueKey:   "0186e46a800000000091aa074d2ae8000080000001",
-				Action:      pbcodec.RAMOp_ACTION_REMOVE,
+				Action:      pbantelope.RAMOp_ACTION_REMOVE,
 			},
 			nil,
 		},
@@ -446,15 +474,15 @@ func Test_readKvOp(t *testing.T) {
 		name            string
 		line            string
 		parseCtxFactory func() *parseCtx
-		expected        *pbcodec.KVOp
+		expected        *pbantelope.KVOp
 		expectedErr     error
 	}{
 		{
 			"insert standard",
 			`KV_OP INS 0 battlefield john b6876876616c7565 78c159f95d672d640539`,
 			newParseCtx,
-			&pbcodec.KVOp{
-				Operation:   pbcodec.KVOp_OPERATION_INSERT,
+			&pbantelope.KVOp{
+				Operation:   pbantelope.KVOp_OPERATION_INSERT,
 				ActionIndex: 0,
 				Code:        "battlefield",
 				OldPayer:    "",
@@ -469,8 +497,8 @@ func Test_readKvOp(t *testing.T) {
 			"update standard",
 			`KV_OP UPD 1 battlefield john:jane b6876876616c7565 78c159f95d672d640539:78c159f95d672d640561`,
 			newParseCtx,
-			&pbcodec.KVOp{
-				Operation:   pbcodec.KVOp_OPERATION_UPDATE,
+			&pbantelope.KVOp{
+				Operation:   pbantelope.KVOp_OPERATION_UPDATE,
 				ActionIndex: 1,
 				Code:        "battlefield",
 				OldPayer:    "john",
@@ -496,8 +524,8 @@ func Test_readKvOp(t *testing.T) {
 			"remove standard",
 			`KV_OP REM 2 battlefield jane b6876876616c7565 78c159f95d672d640561`,
 			newParseCtx,
-			&pbcodec.KVOp{
-				Operation:   pbcodec.KVOp_OPERATION_REMOVE,
+			&pbantelope.KVOp{
+				Operation:   pbantelope.KVOp_OPERATION_REMOVE,
 				ActionIndex: 2,
 				Code:        "battlefield",
 				OldPayer:    "jane",
@@ -530,11 +558,11 @@ func Test_readKvOp(t *testing.T) {
 }
 
 func Test_readPermOp(t *testing.T) {
-	auth := &pbcodec.Authority{
+	auth := &pbantelope.Authority{
 		Threshold: 1,
-		Accounts: []*pbcodec.PermissionLevelWeight{
+		Accounts: []*pbantelope.PermissionLevelWeight{
 			{
-				Permission: &pbcodec.PermissionLevel{Actor: "eosio", Permission: "active"},
+				Permission: &pbantelope.PermissionLevel{Actor: "eosio", Permission: "active"},
 				Weight:     1,
 			},
 		},
@@ -542,16 +570,16 @@ func Test_readPermOp(t *testing.T) {
 
 	tests := []struct {
 		line        string
-		expected    *pbcodec.PermOp
+		expected    *pbantelope.PermOp
 		expectedErr error
 	}{
 		{
 			`PERM_OP INS 0 {"parent":1,"owner":"eosio.ins","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_INSERT,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_INSERT,
 				ActionIndex: 0,
 				OldPerm:     nil,
-				NewPerm: &pbcodec.PermissionObject{
+				NewPerm: &pbantelope.PermissionObject{
 					ParentId:    1,
 					Owner:       "eosio.ins",
 					Name:        "prod.major",
@@ -563,17 +591,17 @@ func Test_readPermOp(t *testing.T) {
 		},
 		{
 			`PERM_OP UPD 0 {"old":{"parent":2,"owner":"eosio.old","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}},"new":{"parent":3,"owner":"eosio.new","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_UPDATE,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_UPDATE,
 				ActionIndex: 0,
-				OldPerm: &pbcodec.PermissionObject{
+				OldPerm: &pbantelope.PermissionObject{
 					ParentId:    2,
 					Owner:       "eosio.old",
 					Name:        "prod.major",
 					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
-				NewPerm: &pbcodec.PermissionObject{
+				NewPerm: &pbantelope.PermissionObject{
 					ParentId:    3,
 					Owner:       "eosio.new",
 					Name:        "prod.major",
@@ -585,10 +613,10 @@ func Test_readPermOp(t *testing.T) {
 		},
 		{
 			`PERM_OP REM 0 {"parent":4,"owner":"eosio.rem","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_REMOVE,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_REMOVE,
 				ActionIndex: 0,
-				OldPerm: &pbcodec.PermissionObject{
+				OldPerm: &pbantelope.PermissionObject{
 					ParentId:    4,
 					Owner:       "eosio.rem",
 					Name:        "prod.major",
@@ -603,11 +631,11 @@ func Test_readPermOp(t *testing.T) {
 		// New format
 		{
 			`PERM_OP INS 0 2 {"parent":1,"owner":"eosio.ins","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_INSERT,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_INSERT,
 				ActionIndex: 0,
 				OldPerm:     nil,
-				NewPerm: &pbcodec.PermissionObject{
+				NewPerm: &pbantelope.PermissionObject{
 					Id:          2,
 					ParentId:    1,
 					Owner:       "eosio.ins",
@@ -620,10 +648,10 @@ func Test_readPermOp(t *testing.T) {
 		},
 		{
 			`PERM_OP UPD 0 4 {"old":{"parent":2,"owner":"eosio.old","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}},"new":{"parent":3,"owner":"eosio.new","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_UPDATE,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_UPDATE,
 				ActionIndex: 0,
-				OldPerm: &pbcodec.PermissionObject{
+				OldPerm: &pbantelope.PermissionObject{
 					Id:          4,
 					ParentId:    2,
 					Owner:       "eosio.old",
@@ -631,7 +659,7 @@ func Test_readPermOp(t *testing.T) {
 					LastUpdated: mustProtoTimestamp(mustTimeParse("2018-06-08T08:08:08.888")),
 					Authority:   auth,
 				},
-				NewPerm: &pbcodec.PermissionObject{
+				NewPerm: &pbantelope.PermissionObject{
 					Id:          4,
 					ParentId:    3,
 					Owner:       "eosio.new",
@@ -644,10 +672,10 @@ func Test_readPermOp(t *testing.T) {
 		},
 		{
 			`PERM_OP REM 0 3 {"parent":4,"owner":"eosio.rem","name":"prod.major","last_updated":"2018-06-08T08:08:08.888","auth":{"threshold":1,"keys":[],"accounts":[{"permission":{"actor":"eosio","permission":"active"},"weight":1}],"waits":[]}}`,
-			&pbcodec.PermOp{
-				Operation:   pbcodec.PermOp_OPERATION_REMOVE,
+			&pbantelope.PermOp{
+				Operation:   pbantelope.PermOp_OPERATION_REMOVE,
 				ActionIndex: 0,
-				OldPerm: &pbcodec.PermissionObject{
+				OldPerm: &pbantelope.PermissionObject{
 					Id:          3,
 					ParentId:    4,
 					Owner:       "eosio.rem",
@@ -851,7 +879,7 @@ func fileExists(path string) bool {
 	return !info.IsDir()
 }
 
-func blockWithConsole(block *pbcodec.Block) bool {
+func blockWithConsole(block *pbantelope.Block) bool {
 	for _, trxTrace := range block.TransactionTraces() {
 		for _, actTrace := range trxTrace.ActionTraces {
 			if len(actTrace.Console) > 0 {
@@ -865,9 +893,18 @@ func blockWithConsole(block *pbcodec.Block) bool {
 
 func newParseCtx() *parseCtx {
 	return &parseCtx{
-		hydrator:   eosio_v2_0.NewHydrator(zlog),
-		abiDecoder: newABIDecoder(),
-		block:      &pbcodec.Block{},
-		trx:        &pbcodec.TransactionTrace{},
+		hydrator:     eosio_v2_0.NewHydrator(zlogTest),
+		abiDecoder:   newABIDecoder(),
+		currentBlock: &pbantelope.Block{},
+		currentTrace: &pbantelope.TransactionTrace{},
 	}
+}
+
+func isNil(v interface{}) bool {
+	if v == nil {
+		return true
+	}
+
+	rv := reflect.ValueOf(v)
+	return rv.Kind() == reflect.Ptr && rv.IsNil()
 }

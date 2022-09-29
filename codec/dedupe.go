@@ -1,11 +1,11 @@
 package codec
 
 import (
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 )
 
-func DeduplicateTransactionTrace(trx *pbcodec.TransactionTrace) {
-	digs := make(map[string]*pbcodec.Action)
+func DeduplicateTransactionTrace(trx *pbantelope.TransactionTrace) {
+	digs := make(map[string]*pbantelope.Action)
 
 	// loop through act_digest
 	for _, act := range trx.ActionTraces {
@@ -15,7 +15,7 @@ func DeduplicateTransactionTrace(trx *pbcodec.TransactionTrace) {
 			if act.Action.Account == "eosio" && act.Action.Name == "setabi" {
 				// In the SLIM case where a `setabi` would make the JSON decoding different
 				// after `setabi` is called.  Wow, such powerful!  Execution order assumed.
-				digs = make(map[string]*pbcodec.Action)
+				digs = make(map[string]*pbantelope.Action)
 			}
 
 			d := act.Receipt.Digest
@@ -35,8 +35,8 @@ func DeduplicateTransactionTrace(trx *pbcodec.TransactionTrace) {
 	}
 }
 
-func ReduplicateTransactionTrace(trx *pbcodec.TransactionTrace) {
-	digs := make(map[string]*pbcodec.Action)
+func ReduplicateTransactionTrace(trx *pbantelope.TransactionTrace) {
+	digs := make(map[string]*pbantelope.Action)
 	for _, act := range trx.ActionTraces {
 		if act.Receipt != nil {
 			if act.Action == nil {

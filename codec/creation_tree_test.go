@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/dfuse-io/dfuse-eosio/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

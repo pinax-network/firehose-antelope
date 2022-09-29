@@ -15,18 +15,16 @@
 package codec
 
 import (
-	"context"
-	"errors"
 	"fmt"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
-	"github.com/streamingfast/dstore"
-	pbbstream "github.com/streamingfast/pbgo/dfuse/bstream/v1"
+	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 )
 
-func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
+func BlockFromProto(b *pbantelope.Block) (*bstream.Block, error) {
+
 	content, err := proto.Marshal(b)
 	if err != nil {
 		return nil, fmt.Errorf("unable to marshal to binary form: %s", err)
@@ -37,7 +35,7 @@ func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
 		return nil, err
 	}
 
-	return &bstream.Block{
+	blk := &bstream.Block{
 		Id:             b.ID(),
 		Number:         b.Num(),
 		PreviousId:     b.PreviousID(),
@@ -45,37 +43,42 @@ func BlockFromProto(b *pbcodec.Block) (*bstream.Block, error) {
 		LibNum:         b.LIBNum(),
 		PayloadKind:    pbbstream.Protocol_EOS,
 		PayloadVersion: 1,
-		PayloadBuffer:  content,
-	}, nil
-}
-
-func BlockstoreStartBlockResolver(blocksStore dstore.Store) bstream.StartBlockResolver {
-	var errFound = errors.New("found")
-
-	return func(ctx context.Context, targetBlockNum uint64) (uint64, string, error) {
-		var dposLibNum uint32
-		num := uint32(targetBlockNum)
-		fs := bstream.NewFileSource(blocksStore, targetBlockNum, 1, nil, bstream.HandlerFunc(func(block *bstream.Block, _ interface{}) error {
-			if block.Number == uint64(num) {
-				dposLibNum = uint32(block.LibNum)
-				return errFound
-			}
-
-			return nil
-		}))
-
-		go fs.Run()
-
-		select {
-		case <-ctx.Done():
-			fs.Shutdown(context.Canceled)
-			return 0, "", ctx.Err()
-		case <-fs.Terminated():
-		}
-
-		if dposLibNum != 0 {
-			return uint64(dposLibNum), "", nil
-		}
-		return 0, "", fs.Err()
 	}
+
+	return bstream.GetBlockPayloadSetter(blk, content)
 }
+
+// todo legacy function, bstream.StartBlockResolver has been removed, not sure if and how we need to replace
+//func BlockstoreStartBlockResolver(blocksStore dstore.Store) bstream.StartBlockResolver {
+//	var errFound = errors.New("found")
+//
+//	return func(ctx context.Context, targetBlockNum uint64) (uint64, string, error) {
+//		var dposLibNum uint32
+//		num := uint32(targetBlockNum)
+//
+//		handlerFunc := bstream.HandlerFunc(func(block *bstream.Block, _ interface{}) error {
+//			if block.Number == uint64(num) {
+//				dposLibNum = uint32(block.LibNum)
+//				return errFound
+//			}
+//
+//			return nil
+//		})
+//
+//		fs := bstream.NewFileSource(blocksStore, targetBlockNum, handlerFunc, zlog, nil)
+//
+//		go fs.Run()
+//
+//		select {
+//		case <-ctx.Done():
+//			fs.Shutdown(context.Canceled)
+//			return 0, "", ctx.Err()
+//		case <-fs.Terminated():
+//		}
+//
+//		if dposLibNum != 0 {
+//			return uint64(dposLibNum), "", nil
+//		}
+//		return 0, "", fs.Err()
+//	}
+//}

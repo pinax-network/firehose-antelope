@@ -18,7 +18,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dfuse-io/dfuse-eosio/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 )
 
 type nodes []*node

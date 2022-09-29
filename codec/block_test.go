@@ -14,41 +14,32 @@
 
 package codec
 
-import (
-	"context"
-	"os"
-	"testing"
-
-	"github.com/streamingfast/dstore"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-)
-
-func Test_BlockstoreStartBlockResolver_Canceled(t *testing.T) {
-	bs := dstore.NewMockStore(nil)
-	resolver := BlockstoreStartBlockResolver(bs)
-
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
-
-	found, irrID, err := resolver(ctx, 10)
-	require.Equal(t, context.Canceled, err)
-	assert.Equal(t, uint64(0), found)
-	assert.Equal(t, "", irrID)
-}
-
-func Test_BlockstoreStartBlockResolver(t *testing.T) {
-	sourceStoreURL := os.Getenv("TEST_SOURCE_STORE_URL") // based on eos-mainnet chain
-	if sourceStoreURL == "" {
-		t.Skip()
-	}
-	bs, err := dstore.NewDBinStore(sourceStoreURL)
-	require.NoError(t, err)
-
-	resolver := BlockstoreStartBlockResolver(bs)
-	found, irrID, err := resolver(context.Background(), 1000001)
-	require.NoError(t, err)
-	assert.Equal(t, uint64(999673), found)
-	assert.Equal(t, "", irrID)
-
-}
+// todo legacy tests, see BlockstoreStartBlockResolver() for context
+//func Test_BlockstoreStartBlockResolver_Canceled(t *testing.T) {
+//	bs := dstore.NewMockStore(nil)
+//	resolver := BlockstoreStartBlockResolver(bs)
+//
+//	ctx, cancel := context.WithCancel(context.Background())
+//	cancel()
+//
+//	found, irrID, err := resolver(ctx, 10)
+//	require.Equal(t, context.Canceled, err)
+//	assert.Equal(t, uint64(0), found)
+//	assert.Equal(t, "", irrID)
+//}
+//
+//func Test_BlockstoreStartBlockResolver(t *testing.T) {
+//	sourceStoreURL := os.Getenv("TEST_SOURCE_STORE_URL") // based on eos-mainnet chain
+//	if sourceStoreURL == "" {
+//		t.Skip()
+//	}
+//	bs, err := dstore.NewDBinStore(sourceStoreURL)
+//	require.NoError(t, err)
+//
+//	resolver := BlockstoreStartBlockResolver(bs)
+//	found, irrID, err := resolver(context.Background(), 1000001)
+//	require.NoError(t, err)
+//	assert.Equal(t, uint64(999673), found)
+//	assert.Equal(t, "", irrID)
+//
+//}

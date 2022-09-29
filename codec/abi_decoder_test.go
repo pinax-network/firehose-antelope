@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/golang/protobuf/proto"
@@ -32,11 +32,11 @@ func TestABIDecoder(t *testing.T) {
 	type testData struct {
 		name         string
 		abiDumps     map[string]*eos.ABI
-		blocks       []*pbcodec.Block
+		blocks       []*pbantelope.Block
 		expectations []expectation
 	}
 
-	in := func(blocks ...*pbcodec.Block) []*pbcodec.Block {
+	in := func(blocks ...*pbantelope.Block) []*pbantelope.Block {
 		return blocks
 	}
 
@@ -47,8 +47,8 @@ func TestABIDecoder(t *testing.T) {
 	testABI3 := readABI(t, "test.3.abi.json")
 	systemABI := readABI(t, "system.abi.json")
 
-	softFailStatus := pbcodec.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL
-	hardFailStatus := pbcodec.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL
+	softFailStatus := pbantelope.TransactionStatus_TRANSACTIONSTATUS_SOFTFAIL
+	hardFailStatus := pbantelope.TransactionStatus_TRANSACTIONSTATUS_HARDFAIL
 
 	tests := []testData{
 		{
@@ -391,13 +391,13 @@ func TestABIDecoder(t *testing.T) {
 		return int(out)
 	}
 
-	extractTrace := func(testData *testData, regexMatch []string) (block *pbcodec.Block, trace *pbcodec.TransactionTrace) {
+	extractTrace := func(testData *testData, regexMatch []string) (block *pbantelope.Block, trace *pbantelope.TransactionTrace) {
 		block = testData.blocks[toInt(regexMatch[1])]
 		trace = block.UnfilteredTransactionTraces[toInt(regexMatch[2])]
 		return
 	}
 
-	assertMatchAction := func(expected string, action *pbcodec.Action) {
+	assertMatchAction := func(expected string, action *pbantelope.Action) {
 		if hexRegex.MatchString(expected) {
 			require.Equal(t, expected, hex.EncodeToString(action.RawData), toString(action))
 			require.Empty(t, action.JsonData, "JsonData should be empty\n%s", toString(action))
@@ -483,8 +483,8 @@ func fullMatchRegex(regex *regexp.Regexp, content string) []string {
 	return match[0]
 }
 
-func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...interface{}) *pbcodec.Block {
-	pbblock := &pbcodec.Block{
+func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...interface{}) *pbantelope.Block {
+	pbblock := &pbantelope.Block{
 		Id:     blkID,
 		Number: eos.BlockNum(blkID),
 	}
@@ -496,7 +496,7 @@ func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...int
 	require.NoError(t, err)
 
 	pbblock.DposIrreversibleBlocknum = pbblock.Number - 1
-	pbblock.Header = &pbcodec.BlockHeader{
+	pbblock.Header = &pbantelope.BlockHeader{
 		Previous:  previousBlkID,
 		Producer:  "tester",
 		Timestamp: blockTimestamp,
@@ -504,10 +504,10 @@ func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...int
 
 	for _, element := range elements {
 		switch v := element.(type) {
-		case *pbcodec.TransactionTrace:
+		case *pbantelope.TransactionTrace:
 			pbblock.UnfilteredTransactionTraceCount++
 			pbblock.UnfilteredTransactionTraces = append(pbblock.UnfilteredTransactionTraces, v)
-		case *pbcodec.TrxOp:
+		case *pbantelope.TrxOp:
 			pbblock.UnfilteredImplicitTransactionOps = append(pbblock.UnfilteredImplicitTransactionOps, v)
 		}
 	}
@@ -515,24 +515,24 @@ func testBlock(t *testing.T, blkID string, previousBlkID string, elements ...int
 	return pbblock
 }
 
-func trxTrace(t *testing.T, elements ...interface{}) *pbcodec.TransactionTrace {
-	trace := &pbcodec.TransactionTrace{
-		Receipt: &pbcodec.TransactionReceiptHeader{
-			Status: pbcodec.TransactionStatus_TRANSACTIONSTATUS_EXECUTED,
+func trxTrace(t *testing.T, elements ...interface{}) *pbantelope.TransactionTrace {
+	trace := &pbantelope.TransactionTrace{
+		Receipt: &pbantelope.TransactionReceiptHeader{
+			Status: pbantelope.TransactionStatus_TRANSACTIONSTATUS_EXECUTED,
 		},
 	}
 
 	for _, element := range elements {
 		switch v := element.(type) {
-		case *pbcodec.ActionTrace:
+		case *pbantelope.ActionTrace:
 			trace.ActionTraces = append(trace.ActionTraces, v)
-		case *pbcodec.DBOp:
+		case *pbantelope.DBOp:
 			trace.DbOps = append(trace.DbOps, v)
-		case *pbcodec.DTrxOp:
+		case *pbantelope.DTrxOp:
 			trace.DtrxOps = append(trace.DtrxOps, v)
-		case *pbcodec.TableOp:
+		case *pbantelope.TableOp:
 			trace.TableOps = append(trace.TableOps, v)
-		case pbcodec.TransactionStatus:
+		case pbantelope.TransactionStatus:
 			trace.Receipt.Status = v
 		}
 	}
@@ -540,40 +540,40 @@ func trxTrace(t *testing.T, elements ...interface{}) *pbcodec.TransactionTrace {
 	return trace
 }
 
-func signedTrx(t *testing.T, elements ...interface{}) *pbcodec.SignedTransaction {
-	signedTrx := &pbcodec.SignedTransaction{}
+func signedTrx(t *testing.T, elements ...interface{}) *pbantelope.SignedTransaction {
+	signedTrx := &pbantelope.SignedTransaction{}
 	signedTrx.Transaction = trx(t, elements...)
 
 	return signedTrx
 }
 
-type ContextFreeAction *pbcodec.Action
+type ContextFreeAction *pbantelope.Action
 
-func trx(t *testing.T, elements ...interface{}) *pbcodec.Transaction {
-	trx := &pbcodec.Transaction{}
+func trx(t *testing.T, elements ...interface{}) *pbantelope.Transaction {
+	trx := &pbantelope.Transaction{}
 
 	for _, element := range elements {
 		switch v := element.(type) {
-		case *pbcodec.Action:
+		case *pbantelope.Action:
 			trx.Actions = append(trx.Actions, v)
 		case ContextFreeAction:
-			trx.ContextFreeActions = append(trx.ContextFreeActions, (*pbcodec.Action)(v))
+			trx.ContextFreeActions = append(trx.ContextFreeActions, (*pbantelope.Action)(v))
 		}
 	}
 
 	return trx
 }
 
-func actionTrace(t *testing.T, tripletName string, executionIndex uint32, globalSequence uint64, abi *eos.ABI, data string) *pbcodec.ActionTrace {
+func actionTrace(t *testing.T, tripletName string, executionIndex uint32, globalSequence uint64, abi *eos.ABI, data string) *pbantelope.ActionTrace {
 	parts := strings.Split(tripletName, ":")
 	receiver := parts[0]
 	account := parts[1]
 	actionName := parts[2]
 
-	return &pbcodec.ActionTrace{
+	return &pbantelope.ActionTrace{
 		ExecutionIndex: executionIndex,
 		Receiver:       receiver,
-		Receipt: &pbcodec.ActionReceipt{
+		Receipt: &pbantelope.ActionReceipt{
 			Receiver:       receiver,
 			GlobalSequence: globalSequence,
 		},
@@ -581,14 +581,14 @@ func actionTrace(t *testing.T, tripletName string, executionIndex uint32, global
 	}
 }
 
-func actionTraceFail(t *testing.T, tripletName string, executionIndex uint32, abi *eos.ABI, data string) *pbcodec.ActionTrace {
+func actionTraceFail(t *testing.T, tripletName string, executionIndex uint32, abi *eos.ABI, data string) *pbantelope.ActionTrace {
 	out := actionTrace(t, tripletName, executionIndex, 0, abi, data)
 	out.Receipt = nil
 
 	return out
 }
 
-func actionTraceSetABI(t *testing.T, account string, executionIndex uint32, globalSequence uint64, abi *eos.ABI) *pbcodec.ActionTrace {
+func actionTraceSetABI(t *testing.T, account string, executionIndex uint32, globalSequence uint64, abi *eos.ABI) *pbantelope.ActionTrace {
 	abiData, err := eos.MarshalBinary(abi)
 	require.NoError(t, err)
 
@@ -596,14 +596,14 @@ func actionTraceSetABI(t *testing.T, account string, executionIndex uint32, glob
 	rawData, err := eos.MarshalBinary(setABI)
 	require.NoError(t, err)
 
-	return &pbcodec.ActionTrace{
+	return &pbantelope.ActionTrace{
 		ExecutionIndex: executionIndex,
 		Receiver:       "eosio",
-		Receipt: &pbcodec.ActionReceipt{
+		Receipt: &pbantelope.ActionReceipt{
 			Receiver:       "eosio",
 			GlobalSequence: globalSequence,
 		},
-		Action: &pbcodec.Action{
+		Action: &pbantelope.Action{
 			Account: "eosio",
 			Name:    "setabi",
 			RawData: rawData,
@@ -615,7 +615,7 @@ func cfaAction(t *testing.T, pairName string, abi *eos.ABI, data string) Context
 	return ContextFreeAction(action(t, pairName, abi, data))
 }
 
-func action(t *testing.T, pairName string, abi *eos.ABI, data string) *pbcodec.Action {
+func action(t *testing.T, pairName string, abi *eos.ABI, data string) *pbantelope.Action {
 	parts := strings.Split(pairName, ":")
 	account := parts[0]
 	actionName := parts[1]
@@ -627,26 +627,26 @@ func action(t *testing.T, pairName string, abi *eos.ABI, data string) *pbcodec.A
 		require.NoError(t, err)
 	}
 
-	return &pbcodec.Action{
+	return &pbantelope.Action{
 		Account: account,
 		Name:    actionName,
 		RawData: rawData,
 	}
 }
 
-func trxOp(t *testing.T, signedTrx *pbcodec.SignedTransaction) *pbcodec.TrxOp {
-	op := &pbcodec.TrxOp{
+func trxOp(t *testing.T, signedTrx *pbantelope.SignedTransaction) *pbantelope.TrxOp {
+	op := &pbantelope.TrxOp{
 		Transaction: signedTrx,
 	}
 
 	return op
 }
 
-func dtrxOp(t *testing.T, actionIndex uint32, operation string, signedTrx *pbcodec.SignedTransaction) *pbcodec.DTrxOp {
-	opName := pbcodec.DTrxOp_Operation_value["OPERATION_"+strings.ToUpper(operation)]
+func dtrxOp(t *testing.T, actionIndex uint32, operation string, signedTrx *pbantelope.SignedTransaction) *pbantelope.DTrxOp {
+	opName := pbantelope.DTrxOp_Operation_value["OPERATION_"+strings.ToUpper(operation)]
 
-	op := &pbcodec.DTrxOp{
-		Operation:   pbcodec.DTrxOp_Operation(opName),
+	op := &pbantelope.DTrxOp{
+		Operation:   pbantelope.DTrxOp_Operation(opName),
 		ActionIndex: actionIndex,
 		Transaction: signedTrx,
 	}
@@ -654,7 +654,7 @@ func dtrxOp(t *testing.T, actionIndex uint32, operation string, signedTrx *pbcod
 	return op
 }
 
-func maybePrintBlock(t *testing.T, block *pbcodec.Block) {
+func maybePrintBlock(t *testing.T, block *pbantelope.Block) {
 	if os.Getenv("DEBUG") == "" && os.Getenv("TRACE") != "true" {
 		return
 	}

@@ -17,14 +17,15 @@ package codec
 import (
 	"fmt"
 
-	pbcodec "github.com/dfuse-io/dfuse-eosio/pb/dfuse/eosio/codec/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/golang/protobuf/proto"
 	"github.com/streamingfast/bstream"
-	pbbstream "github.com/streamingfast/pbgo/dfuse/bstream/v1"
+	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 )
 
-// BlockDecoder transforms a `bstream.Block` payload into a proper `deth.Block` value
+// BlockDecoder transforms a `bstream.Block` payload into a proper `pbantelope.Block` value
 func BlockDecoder(blk *bstream.Block) (interface{}, error) {
+
 	if blk.Kind() != pbbstream.Protocol_EOS {
 		return nil, fmt.Errorf("expected kind %s, got %s", pbbstream.Protocol_EOS, blk.Kind())
 	}
@@ -33,8 +34,13 @@ func BlockDecoder(blk *bstream.Block) (interface{}, error) {
 		return nil, fmt.Errorf("this decoder only knows about bstream.Block version 1, got %d", blk.Version())
 	}
 
-	block := new(pbcodec.Block)
-	err := proto.Unmarshal(blk.Payload(), block)
+	pl, err := blk.Payload.Get()
+	if err != nil {
+		return nil, fmt.Errorf("unable to get payload: %s", err)
+	}
+
+	block := new(pbantelope.Block)
+	err = proto.Unmarshal(pl, block)
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode payload: %s", err)
 	}

@@ -15,19 +15,12 @@
 package codec
 
 import (
-	"os"
-
 	"github.com/streamingfast/logging"
 	"go.uber.org/zap"
 )
 
-var traceEnabled = false
 var zlog *zap.Logger
 
 func init() {
-	logging.Register("github.com/dfuse-io/dfuse-eosio/codec", &zlog)
-
-	if os.Getenv("TRACE") == "true" {
-		traceEnabled = true
-	}
+	zlog, _ = logging.PackageLogger("codec", "github.com/EOS-Nation/firehose-antelope/codec")
 }

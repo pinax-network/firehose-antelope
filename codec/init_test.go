@@ -1,15 +1,11 @@
 package codec
 
-import (
-	"os"
+import "github.com/streamingfast/logging"
 
-	"github.com/streamingfast/logging"
-	"go.uber.org/zap"
-)
+var zlogTest, _ = logging.PackageLogger("fireantelope", "github.com/EOS-Nation/firehose-antelope/codec.tests")
 
 func init() {
-	if os.Getenv("DEBUG") != "" || os.Getenv("TRACE") == "true" {
-		logger, _ := zap.NewDevelopment()
-		logging.Override(logger)
-	}
+	logging.InstantiateLoggers()
 }
+
+type ObjectReader func() (interface{}, error)

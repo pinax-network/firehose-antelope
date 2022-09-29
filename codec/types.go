@@ -16,7 +16,7 @@ package codec
 
 import (
 	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
-	pbcodec "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 )
 
@@ -51,8 +51,8 @@ type permissionObject struct {
 	Auth        *eos.Authority  `json:"auth"`
 }
 
-func (p *permissionObject) ToProto() *pbcodec.PermissionObject {
-	return &pbcodec.PermissionObject{
+func (p *permissionObject) ToProto() *pbantelope.PermissionObject {
+	return &pbantelope.PermissionObject{
 		ParentId:    p.ParentID,
 		Owner:       string(p.Owner),
 		Name:        p.Name,
@@ -74,9 +74,9 @@ type rlimitState struct {
 	VirtualCpuLimit      eos.Uint64        `json:"virtual_cpu_limit"`
 }
 
-func (s *rlimitState) ToProto() *pbcodec.RlimitOp_State {
-	return &pbcodec.RlimitOp_State{
-		State: &pbcodec.RlimitState{
+func (s *rlimitState) ToProto() *pbantelope.RlimitOp_State {
+	return &pbantelope.RlimitOp_State{
+		State: &pbantelope.RlimitState{
 			AverageBlockNetUsage: s.AverageBlockNetUsage.ToProto(),
 			AverageBlockCpuUsage: s.AverageBlockCpuUsage.ToProto(),
 			PendingNetUsage:      uint64(s.PendingNetUsage),
@@ -98,9 +98,9 @@ type rlimitConfig struct {
 	AccountNetUsageAverageWindow uint32                 `json:"account_net_usage_average_window"`
 }
 
-func (c *rlimitConfig) ToProto() *pbcodec.RlimitOp_Config {
-	return &pbcodec.RlimitOp_Config{
-		Config: &pbcodec.RlimitConfig{
+func (c *rlimitConfig) ToProto() *pbantelope.RlimitOp_Config {
+	return &pbantelope.RlimitOp_Config{
+		Config: &pbantelope.RlimitConfig{
 			CpuLimitParameters:           c.CPULimitParameters.ToProto(),
 			NetLimitParameters:           c.NetLimitParameters.ToProto(),
 			AccountCpuUsageAverageWindow: c.AccountCpuUsageAverageWindow,
@@ -116,9 +116,9 @@ type rlimitAccountLimits struct {
 	RamBytes  eos.Int64       `json:"ram_bytes"`
 }
 
-func (u *rlimitAccountLimits) ToProto() *pbcodec.RlimitOp_AccountLimits {
-	return &pbcodec.RlimitOp_AccountLimits{
-		AccountLimits: &pbcodec.RlimitAccountLimits{
+func (u *rlimitAccountLimits) ToProto() *pbantelope.RlimitOp_AccountLimits {
+	return &pbantelope.RlimitOp_AccountLimits{
+		AccountLimits: &pbantelope.RlimitAccountLimits{
 			Owner:     string(u.Owner),
 			NetWeight: int64(u.NetWeight),
 			CpuWeight: int64(u.CpuWeight),
@@ -134,9 +134,9 @@ type rlimitAccountUsage struct {
 	RamUsage eos.Uint64        `json:"ram_usage"`
 }
 
-func (c *rlimitAccountUsage) ToProto() *pbcodec.RlimitOp_AccountUsage {
-	return &pbcodec.RlimitOp_AccountUsage{
-		AccountUsage: &pbcodec.RlimitAccountUsage{
+func (c *rlimitAccountUsage) ToProto() *pbantelope.RlimitOp_AccountUsage {
+	return &pbantelope.RlimitOp_AccountUsage{
+		AccountUsage: &pbantelope.RlimitAccountUsage{
 			Owner:    string(c.Owner),
 			NetUsage: c.NetUsage.ToProto(),
 			CpuUsage: c.CpuUsage.ToProto(),
@@ -151,8 +151,8 @@ type usageAccumulator struct {
 	Consumed    eos.Uint64 `json:"consumed"`
 }
 
-func (a *usageAccumulator) ToProto() *pbcodec.UsageAccumulator {
-	return &pbcodec.UsageAccumulator{
+func (a *usageAccumulator) ToProto() *pbantelope.UsageAccumulator {
+	return &pbantelope.UsageAccumulator{
 		LastOrdinal: a.LastOrdinal,
 		ValueEx:     uint64(a.ValueEx),
 		Consumed:    uint64(a.Consumed),
@@ -168,8 +168,8 @@ type elasticLimitParameters struct {
 	ExpandRate    ratio      `json:"expand_rate"`
 }
 
-func (p *elasticLimitParameters) ToProto() *pbcodec.ElasticLimitParameters {
-	return &pbcodec.ElasticLimitParameters{
+func (p *elasticLimitParameters) ToProto() *pbantelope.ElasticLimitParameters {
+	return &pbantelope.ElasticLimitParameters{
 		Target:        uint64(p.Target),
 		Max:           uint64(p.Max),
 		Periods:       p.Periods,
@@ -184,8 +184,8 @@ type ratio struct {
 	Denominator eos.Uint64 `json:"denominator"`
 }
 
-func (r *ratio) ToProto() *pbcodec.Ratio {
-	return &pbcodec.Ratio{
+func (r *ratio) ToProto() *pbantelope.Ratio {
+	return &pbantelope.Ratio{
 		Numerator:   uint64(r.Numerator),
 		Denominator: uint64(r.Denominator),
 	}
