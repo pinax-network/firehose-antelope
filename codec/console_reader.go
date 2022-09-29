@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EOS-Nation/firehose-antelope/types"
-	pbacme "github.com/EOS-Nation/firehose-antelope/types/pb/sf/acme/type/v1"
 	"github.com/streamingfast/bstream"
+	"github.com/streamingfast/firehose-acme/types"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 

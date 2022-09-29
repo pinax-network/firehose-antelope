@@ -21,11 +21,11 @@ import (
 	"io"
 	"strconv"
 
-	pbacme "github.com/EOS-Nation/firehose-antelope/types/pb/sf/acme/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dstore"
+	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 
