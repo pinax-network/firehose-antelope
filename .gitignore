@@ -18,7 +18,7 @@
 .envrc*
 *.spkg
 
-/fireacme
+/fireantelope
 /dist
 
 firehose-data

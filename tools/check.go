@@ -17,10 +17,10 @@ package tools
 import (
 	"fmt"
 
+	pbacme "github.com/EOS-Nation/firehose-antelope/types/pb/sf/acme/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
-	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	sftools "github.com/streamingfast/sf-tools"
 )
 

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/EOS-Nation/firehose-antelope/types"
+	pbacme "github.com/EOS-Nation/firehose-antelope/types/pb/sf/acme/type/v1"
 	"github.com/streamingfast/bstream"
-	"github.com/streamingfast/firehose-acme/types"
-	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 
@@ -37,7 +37,7 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 	return l, nil
 }
 
-//todo: WTF?
+// todo: WTF?
 func (r *ConsoleReader) Done() <-chan interface{} {
 	return r.done
 }

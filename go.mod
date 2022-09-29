@@ -1,4 +1,4 @@
-module github.com/streamingfast/firehose-acme
+module github.com/EOS-Nation/firehose-antelope
 
 go 1.18
 

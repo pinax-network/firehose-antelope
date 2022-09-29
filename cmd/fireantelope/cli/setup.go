@@ -27,7 +27,7 @@ func setupCmd(cmd *cobra.Command) error {
 		}
 
 		if !exists && isMatchingCommand(cmds, forceConfigOn) {
-			return fmt.Errorf("config file %q not found. Did you 'fireacme init'?", configFile)
+			return fmt.Errorf("config file %q not found. Did you 'fireantelope init'?", configFile)
 		}
 
 		if exists {
@@ -64,7 +64,7 @@ func setupCmd(cmd *cobra.Command) error {
 		LogListenAddr: viper.GetString("global-log-level-switcher-listen-addr"),
 		LogToStderr:   true,
 	})
-	launcher.SetupTracing("fireacme")
+	launcher.SetupTracing("fireantelope")
 	launcher.SetupAnalyticsMetrics(rootLog, viper.GetString("global-metrics-listen-addr"), viper.GetString("global-pprof-listen-addr"))
 
 	return nil

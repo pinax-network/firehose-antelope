@@ -110,7 +110,7 @@ ls -las ./firehose-data/storage/merged-blocks
 We have also built tools that allow you to introspect block files:
 
 ```bash
-go install ../../cmd/fireacme && fireacme tools print blocks --store ./firehose-data/storage/merged-blocks 100
+go install ../../cmd/fireantelope && fireantelope tools print blocks --store ./firehose-data/storage/merged-blocks 100
 ```
 
 At this point we have `reader-node` process running as well a `relayer` & `firehose` process. Both of these processes work together to provide the Firehose data stream.

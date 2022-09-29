@@ -3,7 +3,7 @@
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 clean=
-fireacme="$ROOT/../fireacme"
+fireantelope="$ROOT/../fireacme"
 
 main() {
   pushd "$ROOT" &> /dev/null

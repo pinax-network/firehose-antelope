@@ -17,10 +17,10 @@ package cli
 import (
 	"fmt"
 
+	"github.com/EOS-Nation/firehose-antelope/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/dlauncher/launcher"
-	"github.com/streamingfast/firehose-acme/codec"
 	"github.com/streamingfast/logging"
 	nodeManager "github.com/streamingfast/node-manager"
 	nodeReaderStdinApp "github.com/streamingfast/node-manager/app/node_reader_stdin"
@@ -29,7 +29,7 @@ import (
 )
 
 func init() {
-	appLogger, appTracer := logging.PackageLogger("reader-node-stdin", "github.com/streamingfast/firehose-acme/fireacme/cli/reader-node-stdin")
+	appLogger, appTracer := logging.PackageLogger("reader-node-stdin", "github.com/streamingfast/firehose-acme/fireantelope/cli/reader-node-stdin")
 
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:            "reader-node-stdin",

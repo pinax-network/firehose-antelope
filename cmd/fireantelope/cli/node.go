@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/EOS-Nation/firehose-antelope/codec"
+	"github.com/EOS-Nation/firehose-antelope/nodemanager"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream/blockstream"
 	"github.com/streamingfast/dlauncher/launcher"
-	"github.com/streamingfast/firehose-acme/codec"
-	"github.com/streamingfast/firehose-acme/nodemanager"
 	"github.com/streamingfast/logging"
 	nodeManager "github.com/streamingfast/node-manager"
 	nodeManagerApp "github.com/streamingfast/node-manager/app/node_manager2"
@@ -41,7 +41,7 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 		is intercepted, split line by line and each line is then transformed and logged through the Firehose stack
 		logging system. The transformation extracts the level and remove the timestamps creating a 'sanitized' version
 		of the logs emitted by the blockchain's managed client process. If this is not desirable, disabled the flag
-		and all the invoked process standard error will be redirect to 'fireacme' standard's output.
+		and all the invoked process standard error will be redirect to 'fireantelope' standard's output.
 	`, flagPrefix+"path"))
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")

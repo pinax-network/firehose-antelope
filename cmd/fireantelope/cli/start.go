@@ -27,7 +27,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var StartCmd = &cobra.Command{Use: "start", Short: "Starts `fireacme` services all at once", RunE: firehoseCmdStartE, Args: cobra.ArbitraryArgs}
+var StartCmd = &cobra.Command{Use: "start", Short: "Starts `fireantelope` services all at once", RunE: firehoseCmdStartE, Args: cobra.ArbitraryArgs}
 
 func init() {
 	RootCmd.AddCommand(StartCmd)
@@ -37,7 +37,7 @@ func firehoseCmdStartE(cmd *cobra.Command, args []string) (err error) {
 	cmd.SilenceUsage = true
 
 	dataDir := viper.GetString("global-data-dir")
-	rootLog.Debug("fireacme binary started", zap.String("data_dir", dataDir))
+	rootLog.Debug("fireantelope binary started", zap.String("data_dir", dataDir))
 
 	configFile := viper.GetString("global-config-file")
 	rootLog.Info(fmt.Sprintf("starting Firehose on Acme with config file '%s'", configFile))
