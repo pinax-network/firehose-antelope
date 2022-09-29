@@ -279,9 +279,9 @@ func (c *ConsoleReader) next() (out interface{}, err error) {
 			continue
 		}
 
-		if traceEnabled {
-			c.logger.Debug("extracing deep mind data from line", zap.String("line", line))
-		}
+		// if traceEnabled {
+		c.logger.Debug("extracing deep mind data from line", zap.String("line", line))
+		// }
 
 		// Order of conditions is based (approximately) on those that will appear more often
 		switch {
@@ -1491,9 +1491,9 @@ func (ctx *parseCtx) readABIDump(line string) error {
 		rawABI = chunks[3]
 	}
 
-	if traceEnabled {
-		zlog.Debug("read initial ABI for contract", zap.String("contract", contract))
-	}
+	// if traceEnabled {
+	zlog.Debug("read initial ABI for contract", zap.String("contract", contract))
+	// }
 
 	return ctx.abiDecoder.addInitialABI(contract, rawABI)
 }

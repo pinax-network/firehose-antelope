@@ -127,14 +127,14 @@ func (c *ABICache) truncateAfterOrEqualTo(globalSequence uint64) {
 		}
 
 		pivot, preservedSet, cutSet := truncateAfterOrEqual(contractOrdering, globalSequence)
-		if traceEnabled {
-			zlog.Debug("truncating contract abi",
-				zap.String("contract", contract),
-				zap.Int("pivot", pivot),
-				zap.Int("preserved_count", len(preservedSet)),
-				zap.Int("cut_count", len(cutSet)),
-			)
-		}
+		// if traceEnabled {
+		zlog.Debug("truncating contract abi",
+			zap.String("contract", contract),
+			zap.Int("pivot", pivot),
+			zap.Int("preserved_count", len(preservedSet)),
+			zap.Int("cut_count", len(cutSet)),
+		)
+		// }
 
 		if len(cutSet) <= 0 {
 			continue

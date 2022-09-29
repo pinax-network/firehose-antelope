@@ -4,12 +4,12 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/EOS-Nation/firehose-antelope/types"
 	"os"
 	"reflect"
 	"strings"
 	"time"
 
-	"github.com/EOS-Nation/firehose-antelope/codec"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
@@ -165,7 +165,7 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 }
 
 func ToBstreamBlock(t testing.T, block *pbantelope.Block) *bstream.Block {
-	blk, err := codec.BlockFromProto(block)
+	blk, err := types.BlockFromProto(block)
 	require.NoError(t, err)
 
 	return blk
