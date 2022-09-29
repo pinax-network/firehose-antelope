@@ -1754,7 +1754,6 @@ func (x *ProducerAuthority) GetBlockSigningAuthority() *BlockSigningAuthority {
 //
 // Know current types (and version they were introduced):
 // - `BlockSigningAuthorityV0` [Type 0] (EOSIO 2.0)
-//
 type BlockSigningAuthority struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
