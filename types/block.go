@@ -16,16 +16,11 @@ func BlockFromProto(b *pbantelope.Block) (*bstream.Block, error) {
 		return nil, fmt.Errorf("unable to marshal to binary form: %s", err)
 	}
 
-	blockTime, err := b.Time()
-	if err != nil {
-		return nil, err
-	}
-
 	blk := &bstream.Block{
 		Id:             b.ID(),
 		Number:         b.Num(),
 		PreviousId:     b.PreviousID(),
-		Timestamp:      blockTime,
+		Timestamp:      b.Time(),
 		LibNum:         b.LIBNum(),
 		PayloadKind:    pbbstream.Protocol_EOS,
 		PayloadVersion: 1,

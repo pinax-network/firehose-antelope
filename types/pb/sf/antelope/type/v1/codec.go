@@ -19,6 +19,7 @@ import (
 	"github.com/streamingfast/bstream"
 	"github.com/tidwall/gjson"
 	"strings"
+	"time"
 )
 
 // TODO: We should probably memoize all fields that requires computation
@@ -34,6 +35,10 @@ func (b *Block) Num() uint64 {
 
 func (b *Block) PreviousID() string {
 	return b.Header.Previous
+}
+
+func (b *Block) Time() time.Time {
+	return b.Header.Timestamp.AsTime()
 }
 
 // todo legacy code should be replaced with timestamppb
