@@ -15,10 +15,10 @@
 package codec
 
 import (
+	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
 	"strings"
 	"testing"
 
-	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -283,22 +283,22 @@ func Test_toFlatTree(t *testing.T) {
 		{"NOTIFY", 12, nil},
 	}}
 
-	assert.Equal(t, eosio.CreationFlatTree{
-		eosio.CreationFlatNode{0, -1, 0},
-		eosio.CreationFlatNode{1, 0, 1},
-		eosio.CreationFlatNode{2, 0, 2},
-		eosio.CreationFlatNode{3, 2, 4},
-		eosio.CreationFlatNode{4, 2, 6},
-		eosio.CreationFlatNode{5, 4, 7},
-		eosio.CreationFlatNode{6, 4, 8},
-		eosio.CreationFlatNode{7, 2, 5},
-		eosio.CreationFlatNode{8, 0, 3},
-		eosio.CreationFlatNode{9, -1, 9},
-		eosio.CreationFlatNode{10, 9, 10},
-		eosio.CreationFlatNode{11, 9, 11},
-		eosio.CreationFlatNode{12, 11, 13},
-		eosio.CreationFlatNode{13, 11, 14},
-		eosio.CreationFlatNode{14, 9, 12},
+	assert.Equal(t, antelope.CreationFlatTree{
+		antelope.CreationFlatNode{0, -1, 0},
+		antelope.CreationFlatNode{1, 0, 1},
+		antelope.CreationFlatNode{2, 0, 2},
+		antelope.CreationFlatNode{3, 2, 4},
+		antelope.CreationFlatNode{4, 2, 6},
+		antelope.CreationFlatNode{5, 4, 7},
+		antelope.CreationFlatNode{6, 4, 8},
+		antelope.CreationFlatNode{7, 2, 5},
+		antelope.CreationFlatNode{8, 0, 3},
+		antelope.CreationFlatNode{9, -1, 9},
+		antelope.CreationFlatNode{10, 9, 10},
+		antelope.CreationFlatNode{11, 9, 11},
+		antelope.CreationFlatNode{12, 11, 13},
+		antelope.CreationFlatNode{13, 11, 14},
+		antelope.CreationFlatNode{14, 9, 12},
 	}, toFlatTree(root1, root2))
 }
 

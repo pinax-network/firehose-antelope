@@ -20,6 +20,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
 	"github.com/EOS-Nation/firehose-antelope/types"
 	"io"
 	"os"
@@ -27,9 +28,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
-	eosio_v2_0 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.0"
-	eosio_v2_1 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.1"
+	antelope_v3_1 "github.com/EOS-Nation/firehose-antelope/codec/antelope/v3.1"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/streamingfast/bstream"
@@ -38,8 +37,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var supportedVersions = []uint64{12, 13}
-var supportedVersionStrings = []string{"12", "13"}
+var supportedVersions = []uint64{13}
+var supportedVersionStrings = []string{"13"}
 
 // ConsoleReader is what reads the `nodeos` output directly. It builds
 // up some LogEntry objects. See `LogReader to read those entries.
@@ -166,9 +165,10 @@ func (s *parsingStats) inc(key string) {
 }
 
 type parseCtx struct {
+	software     string
 	majorVersion uint64
 	minorVersion uint64
-	hydrator     eosio.Hydrator
+	hydrator     antelope.Hydrator
 
 	currentBlock         *pbantelope.Block
 	currentTrace         *pbantelope.TransactionTrace
@@ -178,7 +178,7 @@ type parseCtx struct {
 	activeBlockNum int64
 
 	creationOps       []*creationOp
-	conversionOptions []eosio.ConversionOption
+	conversionOptions []antelope.ConversionOption
 
 	stats       *parsingStats
 	globalStats *consoleReaderStats
@@ -389,7 +389,7 @@ func (c *ConsoleReader) next() (out interface{}, err error) {
 
 		case strings.HasPrefix(line, "DEEP_MIND_VERSION"):
 			ctx.stats.inc("DEEP_MIND_VERSION")
-			ctx.majorVersion, ctx.minorVersion, ctx.hydrator, err = ctx.readDeepmindVersion(line)
+			ctx.software, ctx.majorVersion, ctx.minorVersion, ctx.hydrator, err = ctx.readDeepmindVersion(line)
 
 		default:
 			return nil, fmt.Errorf("unsupported log line: %q", line)
@@ -713,7 +713,7 @@ func (ctx *parseCtx) recordTransaction(trace *pbantelope.TransactionTrace) error
 		return fmt.Errorf("compute creation tree: %s", err)
 	}
 
-	trace.CreationTree = eosio.CreationTreeToDEOS(toFlatTree(creationTreeRoots...))
+	trace.CreationTree = antelope.CreationTreeToDEOS(toFlatTree(creationTreeRoots...))
 	trace.DtrxOps = ctx.currentTrace.DtrxOps
 	trace.DbOps = ctx.currentTrace.DbOps
 	trace.KvOps = ctx.currentTrace.KvOps
@@ -1131,7 +1131,7 @@ func (ctx *parseCtx) readCreateOrCancelDTrxOp(tag string, line string) error {
 		DelayUntil:    chunks[7],
 		ExpirationAt:  chunks[8],
 		TransactionId: chunks[9],
-		Transaction:   eosio.SignedTransactionToDEOS(signedTrx),
+		Transaction:   antelope.SignedTransactionToDEOS(signedTrx),
 	})
 
 	return nil
@@ -1378,51 +1378,41 @@ func normalizeRAMOpAction(input string) string {
 
 // Line format:
 //
-//	Version 12
-//	  DEEP_MIND_VERSION ${major_version}
-//
 //	Version 13
-//	  DEEP_MIND_VERSION ${major_version} ${minor_version}
-func (ctx *parseCtx) readDeepmindVersion(line string) (majorVersion uint64, minorVersion uint64, hydrator eosio.Hydrator, err error) {
-	chunks, err := splitNToM(line, 2, 4)
+//	  DEEP_MIND_VERSION ${software} ${major_version} ${minor_version}
+func (ctx *parseCtx) readDeepmindVersion(line string) (software string, majorVersion uint64, minorVersion uint64, hydrator antelope.Hydrator, err error) {
+
+	chunks := strings.SplitN(line, " ", -1)
+	if len(chunks) != 4 {
+		err = fmt.Errorf("invalid version format given %q, expected 'DEEP_MIND_VERSION ${software} ${major_version} ${minor_version}'", line)
+		return
+	}
+
+	software = chunks[1]
+
+	majorVersion, err = strconv.ParseUint(chunks[2], 10, 64)
 	if err != nil {
-		return 0, 0, nil, err
+		err = fmt.Errorf("invalid major version %q: %w", chunks[2], err)
+		return
 	}
 
-	if len(chunks) < 4 {
-		majorVersion, err = strconv.ParseUint(chunks[1], 10, 64)
-		if err != nil {
-			return majorVersion, minorVersion, nil, fmt.Errorf("invalid major version %q: %w", chunks[1], err)
-		}
-	} else {
-		majorVersion, err = strconv.ParseUint(chunks[2], 10, 64)
-		if err != nil {
-			return majorVersion, minorVersion, nil, fmt.Errorf("invalid major version %q: %w", chunks[1], err)
-		}
-	}
-
-	if len(chunks) == 3 {
-		minorVersion, err = strconv.ParseUint(chunks[2], 10, 64)
-		if err != nil {
-			return majorVersion, minorVersion, nil, fmt.Errorf("invalid minor version %q: %w", chunks[2], err)
-		}
-	} else if len(chunks) == 4 {
-		minorVersion, err = strconv.ParseUint(chunks[3], 10, 64)
-		if err != nil {
-			return majorVersion, minorVersion, nil, fmt.Errorf("invalid minor version %q: %w", chunks[2], err)
-		}
+	minorVersion, err = strconv.ParseUint(chunks[3], 10, 64)
+	if err != nil {
+		err = fmt.Errorf("invalid minor version %q: %w", chunks[3], err)
+		return
 	}
 
 	if !inSupportedVersion(majorVersion) {
-		return majorVersion, minorVersion, nil, fmt.Errorf("deep mind reported version %d, but this reader supports only %s", majorVersion, strings.Join(supportedVersionStrings, ", "))
+		err = fmt.Errorf("deep mind reported version %d, but this reader supports only %s", majorVersion, strings.Join(supportedVersionStrings, ", "))
+		return
 	}
 
 	zlog.Info("read deep mind version", zap.Uint64("major_version", majorVersion))
-	if majorVersion == 13 {
-		return majorVersion, minorVersion, eosio_v2_1.NewHydrator(zlog), nil
-	}
 
-	return majorVersion, minorVersion, eosio_v2_0.NewHydrator(zlog), nil
+	// differentiate future hydrators here if necessary
+	hydrator = antelope_v3_1.NewHydrator(zlog)
+
+	return
 }
 
 func inSupportedVersion(majorVersion uint64) bool {
@@ -1678,7 +1668,7 @@ func (ctx *parseCtx) readTrxOp(line string) error {
 		Operation:     op,
 		Name:          name,  // "onblock" or "onerror"
 		TransactionId: trxID, // the hash of the transaction
-		Transaction:   eosio.SignedTransactionToDEOS(trx),
+		Transaction:   antelope.SignedTransactionToDEOS(trx),
 	})
 
 	return nil

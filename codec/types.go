@@ -15,7 +15,7 @@
 package codec
 
 import (
-	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -58,7 +58,7 @@ func (p *permissionObject) ToProto() *pbantelope.PermissionObject {
 		Owner:       string(p.Owner),
 		Name:        p.Name,
 		LastUpdated: timestamppb.New(p.LastUpdated.Time),
-		Authority:   eosio.AuthoritiesToDEOS(p.Auth),
+		Authority:   antelope.AuthoritiesToDEOS(p.Auth),
 	}
 }
 

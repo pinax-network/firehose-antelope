@@ -1,8 +1,8 @@
-package eosio
+package antelope
 
 import (
 	"fmt"
-	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
+	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
@@ -42,7 +42,7 @@ func PackedTransactionToDEOS(in *PackedTransaction) *pbantelope.PackedTransactio
 	case PrunableDataVariant.TypeID("full_legacy"):
 		fullLegacy := in.PrunableData.Impl.(*PackedTransactionPrunableFullLegacy)
 
-		out.Signatures = eosio.SignaturesToDEOS(fullLegacy.Signatures)
+		out.Signatures = antelope.SignaturesToDEOS(fullLegacy.Signatures)
 		out.PackedContextFreeData = fullLegacy.PackedContextFreeData
 
 	case PrunableDataVariant.TypeID("full"):
@@ -66,7 +66,7 @@ func PackedTransactionToDEOS(in *PackedTransaction) *pbantelope.PackedTransactio
 	return out
 }
 
-func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eosio.ConversionOption) *pbantelope.TransactionTrace {
+func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...antelope.ConversionOption) *pbantelope.TransactionTrace {
 	id := in.ID.String()
 
 	out := &pbantelope.TransactionTrace{
@@ -77,8 +77,8 @@ func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eo
 		Elapsed:         int64(in.Elapsed),
 		NetUsage:        uint64(in.NetUsage),
 		Scheduled:       in.Scheduled,
-		Exception:       eosio.ExceptionToDEOS(in.Except),
-		ErrorCode:       eosio.ErrorCodeToDEOS(in.ErrorCode),
+		Exception:       antelope.ExceptionToDEOS(in.Except),
+		ErrorCode:       antelope.ErrorCodeToDEOS(in.ErrorCode),
 	}
 
 	var someConsoleTruncated bool
@@ -91,13 +91,13 @@ func TransactionTraceToDEOS(logger *zap.Logger, in *TransactionTrace, opts ...eo
 		out.FailedDtrxTrace = TransactionTraceToDEOS(logger, in.FailedDtrxTrace, opts...)
 	}
 	if in.Receipt != nil {
-		out.Receipt = eosio.TransactionReceiptHeaderToDEOS(in.Receipt)
+		out.Receipt = antelope.TransactionReceiptHeaderToDEOS(in.Receipt)
 	}
 
 	return out
 }
 
-func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOption) (out []*pbantelope.ActionTrace, someConsoleTruncated bool) {
+func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...antelope.ConversionOption) (out []*pbantelope.ActionTrace, someConsoleTruncated bool) {
 	if len(actionTraces) <= 0 {
 		return nil, false
 	}
@@ -132,10 +132,10 @@ func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...eosio.ConversionOpt
 	return
 }
 
-func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.ConversionOption) (out *pbantelope.ActionTrace, consoleTruncated bool) {
+func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...antelope.ConversionOption) (out *pbantelope.ActionTrace, consoleTruncated bool) {
 	out = &pbantelope.ActionTrace{
 		Receiver:         string(in.Receiver),
-		Action:           eosio.ActionToDEOS(in.Action),
+		Action:           antelope.ActionToDEOS(in.Action),
 		Elapsed:          int64(in.ElapsedUs),
 		Console:          string(in.Console),
 		TransactionId:    in.TransactionID.String(),
@@ -145,22 +145,22 @@ func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...eosio.Conversi
 		BlockTime:        timestamppb.New(in.BlockTime.Time),
 		AccountRamDeltas: AccountRAMDeltasToDEOS(in.AccountRAMDeltas),
 		// AccountDiskDeltas:    AccountDeltasToDEOS(in.AccountDiskDeltas),
-		Exception:            eosio.ExceptionToDEOS(in.Except),
+		Exception:            antelope.ExceptionToDEOS(in.Except),
 		ActionOrdinal:        uint32(in.ActionOrdinal),
 		CreatorActionOrdinal: uint32(in.CreatorActionOrdinal),
 		ExecutionIndex:       execIndex,
-		ErrorCode:            eosio.ErrorCodeToDEOS(in.ErrorCode),
+		ErrorCode:            antelope.ErrorCodeToDEOS(in.ErrorCode),
 		RawReturnValue:       in.ReturnValue,
 	}
 	out.ClosestUnnotifiedAncestorActionOrdinal = uint32(in.ClosestUnnotifiedAncestorActionOrdinal) // freaking long line, stay away from me
 
 	if in.Receipt != nil {
-		out.Receipt = eosio.ActionTraceReceiptToDEOS(in.Receipt)
+		out.Receipt = antelope.ActionTraceReceiptToDEOS(in.Receipt)
 	}
 
 	initialConsoleLength := len(in.Console)
 	for _, opt := range opts {
-		if v, ok := opt.(eosio.ActionConversionOption); ok {
+		if v, ok := opt.(antelope.ActionConversionOption); ok {
 			v.Apply(out)
 		}
 	}

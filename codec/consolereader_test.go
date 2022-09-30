@@ -19,25 +19,23 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	antelope_v3_1 "github.com/EOS-Nation/firehose-antelope/codec/antelope/v3.1"
 	"github.com/EOS-Nation/firehose-antelope/types"
+	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/andreyvit/diff"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"io"
+	_ "net/http/pprof"
 	"os"
 	"os/exec"
 	"reflect"
 	"strings"
 	"testing"
 	"time"
-
-	_ "net/http/pprof"
-
-	eosio_v2_0 "github.com/EOS-Nation/firehose-antelope/codec/eosio/v2.0"
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/andreyvit/diff"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/proto"
 )
 
 // todo delete legacy benchmark replaced with console_reader_bench_test.go
@@ -178,11 +176,10 @@ func unifiedDiff(t *testing.T, cnt1, cnt2 []byte) string {
 	return string(out)
 }
 
-// todo fix to work with the new console reader
 func TestGeneratePBBlocks(t *testing.T) {
-	t.Skip("generate only when deep-mind.dmlog changes")
+	t.Skip("generate only when deep-mind-3.1.x.dmlog changes")
 
-	cr := testFileConsoleReader(t, "testdata/deep-mind.dmlog")
+	cr := testFileConsoleReader(t, "testdata/deep-mind-3.1.x.dmlog")
 
 	for {
 		out, err := cr.ReadBlock()
@@ -775,53 +772,43 @@ func Test_readDeepMindVersion(t *testing.T) {
 	tests := []struct {
 		name        string
 		line        string
+		software    string
 		major       uint64
 		minor       uint64
 		expectedErr error
 	}{
 		{
-			"version 12",
-			`DEEP_MIND_VERSION 12`,
-			12, 0,
-			nil,
-		},
-		{
 			"version 13",
-			`DEEP_MIND_VERSION 13 0`,
-			13, 0,
-			nil,
-		},
-		{
-			"version 13.1",
-			`DEEP_MIND_VERSION 13 1`,
-			13, 1,
+			`DEEP_MIND_VERSION leap 13 0`,
+			"leap", 13, 0,
 			nil,
 		},
 		{
 			"version 13.1",
 			`DEEP_MIND_VERSION leap 13 1`,
-			13, 1,
+			"leap", 13, 1,
 			nil,
 		},
 		{
-			"version 13.1",
-			`DEEP_MIND_VERSION anythingisallowedhere 13 1`,
-			13, 1,
-			nil,
+			"version 13 old format",
+			`DEEP_MIND_VERSION 13 1`,
+			"", 0, 0,
+			errors.New("invalid version format given \"DEEP_MIND_VERSION 13 1\", expected 'DEEP_MIND_VERSION ${software} ${major_version} ${minor_version}'"),
 		},
 		{
-			"version 13, unsupported",
-			`DEEP_MIND_VERSION 14 0`,
-			14, 0,
-			errors.New("deep mind reported version 14, but this reader supports only 12, 13"),
+			"version 14, unsupported",
+			`DEEP_MIND_VERSION leap 14 0`,
+			"leap", 14, 0,
+			errors.New("deep mind reported version 14, but this reader supports only 13"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			ctx := newParseCtx()
-			major, minor, _, err := ctx.readDeepmindVersion(test.line)
+			software, major, minor, _, err := ctx.readDeepmindVersion(test.line)
 
+			require.Equal(t, test.software, software)
 			require.Equal(t, test.major, major)
 			require.Equal(t, test.minor, minor)
 			require.Equal(t, test.expectedErr, err)
@@ -909,7 +896,7 @@ func blockWithConsole(block *pbantelope.Block) bool {
 
 func newParseCtx() *parseCtx {
 	return &parseCtx{
-		hydrator:     eosio_v2_0.NewHydrator(zlogTest),
+		hydrator:     antelope_v3_1.NewHydrator(zlogTest),
 		abiDecoder:   newABIDecoder(),
 		currentBlock: &pbantelope.Block{},
 		currentTrace: &pbantelope.TransactionTrace{},

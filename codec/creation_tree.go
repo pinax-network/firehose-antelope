@@ -16,9 +16,8 @@ package codec
 
 import (
 	"fmt"
+	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
 	"strings"
-
-	"github.com/EOS-Nation/firehose-antelope/codec/eosio"
 )
 
 type nodes []*node
@@ -132,8 +131,8 @@ func creationOpsToMap(ops []*creationOp) map[int][]string {
 	return mapping
 }
 
-func toFlatTree(roots ...*node) eosio.CreationFlatTree {
-	var tree eosio.CreationFlatTree
+func toFlatTree(roots ...*node) antelope.CreationFlatTree {
+	var tree antelope.CreationFlatTree
 
 	walkIndex := -1
 	for _, root := range roots {
@@ -144,7 +143,7 @@ func toFlatTree(roots ...*node) eosio.CreationFlatTree {
 	return tree
 }
 
-func _toFlatTree(root *node, parentIndex int, walkIndex *int) (tree eosio.CreationFlatTree) {
+func _toFlatTree(root *node, parentIndex int, walkIndex *int) (tree antelope.CreationFlatTree) {
 	tree = append(tree, [3]int{*walkIndex, parentIndex, root.actionIndex})
 	childRootIndex := *walkIndex
 

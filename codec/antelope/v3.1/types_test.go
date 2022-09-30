@@ -1,4 +1,4 @@
-package eosio
+package antelope
 
 import (
 	"encoding/hex"
