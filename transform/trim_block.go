@@ -16,6 +16,11 @@ type BlockTrimmer struct{}
 
 func (b *BlockTrimmer) Transform(readOnlyBlk *bstream.Block, in transform.Input) (transform.Output, error) {
 
+	// todo legacy code, see if we need to reimplement this
+	//if details == pbbstream.BlockDetails_BLOCK_DETAILS_FULL {
+	//	return blk
+	//}
+
 	decodedBlock, err := types.BlockDecoder(readOnlyBlk)
 	if err != nil {
 		return nil, err
