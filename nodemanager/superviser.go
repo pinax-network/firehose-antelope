@@ -26,7 +26,6 @@ import (
 
 	"github.com/ShinyTrinkets/overseer"
 	"github.com/eoscanada/eos-go"
-	"github.com/spf13/viper"
 	nodeManager "github.com/streamingfast/node-manager"
 	logplugin "github.com/streamingfast/node-manager/log_plugin"
 	"github.com/streamingfast/node-manager/metrics"
@@ -139,7 +138,8 @@ func NewSuperviser(debugDeepMind bool, headBlockUpdateFunc nodeManager.HeadBlock
 		logger:              logger,
 	}
 
-	s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
+	// todo check if we need this
+	// s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
 
 	if options.LogToZap {
 		s.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, logger))
@@ -242,41 +242,41 @@ func (s *NodeosSuperviser) ServerID() (string, error) {
 	return os.Hostname()
 }
 
-func (s *NodeosSuperviser) getArguments() []string {
-	s.maybeReloadProducerHostnameFromConfigFile()
-
-	var args []string
-	args = append(args, "--config-dir="+s.options.ConfigDir)
-	args = append(args, "--data-dir="+s.options.DataDir)
-
-	if !s.HasData() && !s.snapshotRestoreOnNextStart {
-		args = append(args, "--genesis-json="+filepath.Join(s.options.ConfigDir, "genesis.json"))
-	}
-
-	if s.snapshotRestoreOnNextStart && s.snapshotRestoreFilename != "" {
-		args = append(args, "--snapshot="+s.snapshotRestoreFilename)
-	}
-
-	if !s.IsActiveProducer() {
-		args = append(args, "--pause-on-startup")
-	}
-
-	if s.options.TrustedProducer != "" {
-		s.Logger.Info("running with trusted-producer mode", zap.String("trusted_producer", s.options.TrustedProducer))
-		args = append(args, "--trusted-producer="+s.options.TrustedProducer)
-	}
-
-	args = append(args, s.options.AdditionalArgs...)
-
-	return args
-}
-
-func (s *NodeosSuperviser) maybeReloadProducerHostnameFromConfigFile() {
-	if !s.options.ProducerHostnameFromViper {
-		return
-	}
-
-	_ = viper.ReadInConfig() // viper.WatchConfig broken on symlinks...
-	s.producerHostname = viper.GetString("producer_hostname")
-	s.Logger.Info("reloaded config", zap.String("hostname", s.options.Hostname), zap.String("producing_hostname", s.producerHostname))
-}
+//func (s *NodeosSuperviser) getArguments() []string {
+//	s.maybeReloadProducerHostnameFromConfigFile()
+//
+//	var args []string
+//	args = append(args, "--config-dir="+s.options.ConfigDir)
+//	args = append(args, "--data-dir="+s.options.DataDir)
+//
+//	if !s.HasData() && !s.snapshotRestoreOnNextStart {
+//		args = append(args, "--genesis-json="+filepath.Join(s.options.ConfigDir, "genesis.json"))
+//	}
+//
+//	if s.snapshotRestoreOnNextStart && s.snapshotRestoreFilename != "" {
+//		args = append(args, "--snapshot="+s.snapshotRestoreFilename)
+//	}
+//
+//	if !s.IsActiveProducer() {
+//		args = append(args, "--pause-on-startup")
+//	}
+//
+//	if s.options.TrustedProducer != "" {
+//		s.Logger.Info("running with trusted-producer mode", zap.String("trusted_producer", s.options.TrustedProducer))
+//		args = append(args, "--trusted-producer="+s.options.TrustedProducer)
+//	}
+//
+//	args = append(args, s.options.AdditionalArgs...)
+//
+//	return args
+//}
+//
+//func (s *NodeosSuperviser) maybeReloadProducerHostnameFromConfigFile() {
+//	if !s.options.ProducerHostnameFromViper {
+//		return
+//	}
+//
+//	_ = viper.ReadInConfig() // viper.WatchConfig broken on symlinks...
+//	s.producerHostname = viper.GetString("producer_hostname")
+//	s.Logger.Info("reloaded config", zap.String("hostname", s.options.Hostname), zap.String("producing_hostname", s.producerHostname))
+//}

@@ -16,9 +16,10 @@ package nodemanager
 
 import (
 	"context"
+	"encoding/hex"
+	"github.com/streamingfast/bstream"
 	"time"
 
-	"github.com/streamingfast/node-manager/metrics"
 	"go.uber.org/zap"
 )
 
@@ -56,18 +57,26 @@ func (s *NodeosSuperviser) Monitor() {
 		lastHeadBlockTime = chainInfo.HeadBlockTime.Time
 
 		if s.headBlockUpdateFunc != nil {
-			s.headBlockUpdateFunc(uint64(chainInfo.HeadBlockNum), chainInfo.HeadBlockID.String(), chainInfo.HeadBlockTime.Time)
+			err := s.headBlockUpdateFunc(&bstream.Block{
+				Id:        hex.EncodeToString(chainInfo.HeadBlockID),
+				Number:    uint64(chainInfo.HeadBlockNum),
+				Timestamp: chainInfo.HeadBlockTime.Time,
+				LibNum:    uint64(chainInfo.LastIrreversibleBlockNum),
+			})
+			if err != nil {
+				s.Logger.Error("failed to update head block", zap.Error(err))
+			}
 		}
 
 		// monitor if BP is producer (should be 1 and only 1)
-		if s.IsActiveProducer() {
-			isProducerPaused, err := s.api.IsProducerPaused(context.Background())
-			if err != nil {
-				s.Logger.Debug("unable to check if producer is paused", zap.Error(err))
-			} else {
-				metrics.SetNodeosIsBlockProducer(isProducerPaused)
-			}
-		}
+		//if s.IsActiveProducer() {
+		//	isProducerPaused, err := s.api.IsProducerPaused(context.Background())
+		//	if err != nil {
+		//		s.Logger.Debug("unable to check if producer is paused", zap.Error(err))
+		//	} else {
+		//		metrics.SetNodeosIsBlockProducer(isProducerPaused)
+		//	}
+		//}
 
 		if lastDbSizeTime.IsZero() || time.Now().Sub(lastDbSizeTime).Seconds() > 30.0 {
 			s.Logger.Debug("first monitoring call or more than 30s has elapsed since last call, querying db size from nodeos")
@@ -79,9 +88,9 @@ func (s *NodeosSuperviser) Monitor() {
 
 			lastDbSizeTime = time.Now()
 
-			metrics.NodeosDBSizeInfo.SetFloat64(float64(dbSize.FreeBytes), "FreeBytes")
-			metrics.NodeosDBSizeInfo.SetFloat64(float64(dbSize.UsedBytes), "UsedBytes")
-			metrics.NodeosDBSizeInfo.SetFloat64(float64(dbSize.Size), "Size")
+			leapDbSizeInfo.SetFloat64(float64(dbSize.FreeBytes), "FreeBytes")
+			leapDbSizeInfo.SetFloat64(float64(dbSize.UsedBytes), "UsedBytes")
+			leapDbSizeInfo.SetFloat64(float64(dbSize.Size), "Size")
 		}
 	}
 }

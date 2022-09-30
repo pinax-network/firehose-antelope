@@ -19,7 +19,6 @@ import (
 	"time"
 
 	"github.com/eoscanada/eos-go"
-	"github.com/streamingfast/node-manager/metrics"
 	"go.uber.org/zap"
 )
 
@@ -75,7 +74,7 @@ func (cw *connectionWatchdog) Start() {
 			continue
 		}
 
-		metrics.NodeosConnectedPeers.SetFloat64(float64(len(connections)))
+		leapConnectedPeers.SetFloat64(float64(len(connections)))
 		for _, cnx := range connections {
 			cw.processConnection(cnx, logger)
 		}
