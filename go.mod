@@ -1,21 +1,27 @@
-module github.com/streamingfast/firehose-acme
+module github.com/EOS-Nation/firehose-antelope
 
 go 1.18
 
 require (
+	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8
 	github.com/ShinyTrinkets/overseer v0.3.0
+	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
+	github.com/eoscanada/eos-go v0.10.2
+	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
+	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.8.1
 	github.com/streamingfast/bstream v0.0.2-0.20220909121429-4647fd1522c9
 	github.com/streamingfast/cli v0.0.4-0.20220113202443-f7bcefa38f7e
 	github.com/streamingfast/dauth v0.0.0-20220404140613-a40f4cd81626
+	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20220526184630-695c21740145
 	github.com/streamingfast/dlauncher v0.0.0-20220909121534-7a9aa91dbb32
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20220811180000-3e513057d17c
 	github.com/streamingfast/dstore v0.1.1-0.20220830184623-b0f0cc804743
 	github.com/streamingfast/firehose v0.1.1-0.20220909121738-2f3bc007ea2b
-	github.com/streamingfast/firehose-acme/types v0.0.0-20220831185201-05ffef22e3a0
+	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20220511154537-ce373d264338
 	github.com/streamingfast/merger v0.0.3-0.20220909122033-9ca15beb25f5
 	github.com/streamingfast/node-manager v0.0.2-0.20220912235129-6c08463b0c01
@@ -24,8 +30,11 @@ require (
 	github.com/streamingfast/sf-tools v0.0.0-20220727183125-3348eaca0e25
 	github.com/streamingfast/substreams v0.0.21-0.20220909123253-9f44d2ecc609
 	github.com/stretchr/testify v1.8.0
+	github.com/tidwall/gjson v1.14.3
+	go.uber.org/atomic v1.9.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.49.0
+	google.golang.org/protobuf v1.28.0
 )
 
 require (
@@ -46,9 +55,11 @@ require (
 	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
 	github.com/abourget/llerrgroup v0.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.37.0 // indirect
+	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bytecodealliance/wasmtime-go v0.39.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
@@ -83,13 +94,13 @@ require (
 	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a // indirect
+	github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/manifoldco/promptui v0.8.0 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/mostynb/go-grpc-compression v1.1.17 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
@@ -101,21 +112,22 @@ require (
 	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/prometheus/common v0.32.1 // indirect
 	github.com/prometheus/procfs v0.7.3 // indirect
+	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.2.3 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
-	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20220909121013-162e9305bbfc // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
-	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20220829120927-5a5d2e0fe525 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
+	github.com/tidwall/match v1.1.1 // indirect
+	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.9.0 // indirect
@@ -130,7 +142,6 @@ require (
 	go.opentelemetry.io/otel/sdk v1.9.0 // indirect
 	go.opentelemetry.io/otel/trace v1.9.0 // indirect
 	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
-	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
@@ -144,7 +155,6 @@ require (
 	google.golang.org/api v0.91.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20220808131553-a91ffa7f803e // indirect
-	google.golang.org/protobuf v1.28.0 // indirect
 	gopkg.in/ini.v1 v1.62.0 // indirect
 	gopkg.in/olivere/elastic.v3 v3.0.75 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -152,3 +162,5 @@ require (
 )
 
 replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
+
+replace github.com/eoscanada/eos-go => github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393

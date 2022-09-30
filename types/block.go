@@ -3,27 +3,28 @@ package types
 import (
 	"fmt"
 
+	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
-	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"google.golang.org/protobuf/proto"
 )
 
-func BlockFromProto(b *pbacme.Block) (*bstream.Block, error) {
+func BlockFromProto(b *pbantelope.Block) (*bstream.Block, error) {
+
 	content, err := proto.Marshal(b)
 	if err != nil {
 		return nil, fmt.Errorf("unable to marshal to binary form: %s", err)
 	}
 
-	block := &bstream.Block{
+	blk := &bstream.Block{
 		Id:             b.ID(),
-		Number:         b.Number(),
+		Number:         b.Num(),
 		PreviousId:     b.PreviousID(),
 		Timestamp:      b.Time(),
-		LibNum:         b.Number() - 1,
-		PayloadKind:    pbbstream.Protocol_UNKNOWN,
+		LibNum:         b.LIBNum(),
+		PayloadKind:    pbbstream.Protocol_EOS,
 		PayloadVersion: 1,
 	}
 
-	return bstream.GetBlockPayloadSetter(block, content)
+	return bstream.GetBlockPayloadSetter(blk, content)
 }

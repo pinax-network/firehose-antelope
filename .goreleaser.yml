@@ -16,9 +16,9 @@ builds:
   - linux_amd64
   - darwin_amd64
   - darwin_arm64
-  main: ./cmd/fireacme
+  main: ./cmd/fireantelope
   ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
-  binary: fireacme
+  binary: fireantelope
   env:
   - CGO_ENABLED=0
 archives:

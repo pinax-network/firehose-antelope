@@ -21,11 +21,11 @@ import (
 	"io"
 	"strconv"
 
+	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dstore"
-	pbacme "github.com/streamingfast/firehose-acme/types/pb/sf/acme/type/v1"
 	"go.uber.org/zap"
 )
 
@@ -115,18 +115,18 @@ func printBlocksE(cmd *cobra.Command, args []string) error {
 
 		seenBlockCount++
 
-		acmeBlock := block.ToProtocol().(*pbacme.Block)
+		antelopeBlock := block.ToProtocol().(*pbantelope.Block)
 
 		fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
 			block.Num(),
 			block.ID()[0:7],
 			block.PreviousID()[0:7],
-			len(acmeBlock.Transactions),
+			len(antelopeBlock.Transactions()),
 		)
 		if printTransactions {
 			fmt.Println("- Transactions: ")
-			for _, t := range acmeBlock.Transactions {
-				fmt.Println("  * ", t.Hash)
+			for _, t := range antelopeBlock.Transactions() {
+				fmt.Println("  * ", t.Id)
 			}
 			fmt.Println()
 		}
@@ -190,18 +190,18 @@ func printBlockE(cmd *cobra.Command, args []string) error {
 			)
 			continue
 		}
-		acmeBlock := block.ToProtocol().(*pbacme.Block)
+		antelopeBlock := block.ToProtocol().(*pbantelope.Block)
 
 		fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
 			block.Num(),
 			block.ID()[0:7],
 			block.PreviousID()[0:7],
-			len(acmeBlock.Transactions),
+			len(antelopeBlock.Transactions()),
 		)
 		if printTransactions {
 			fmt.Println("- Transactions: ")
-			for _, t := range acmeBlock.Transactions {
-				fmt.Printf("  * %s\n", t.Hash)
+			for _, t := range antelopeBlock.Transactions() {
+				fmt.Printf("  * %s\n", t.Id)
 			}
 		}
 		continue
@@ -266,7 +266,7 @@ func printOneBlockE(cmd *cobra.Command, args []string) error {
 }
 
 func printBlock(block *bstream.Block) error {
-	nativeBlock := block.ToProtocol().(*pbacme.Block)
+	nativeBlock := block.ToProtocol().(*pbantelope.Block)
 
 	data, err := json.MarshalIndent(nativeBlock, "", "  ")
 	if err != nil {

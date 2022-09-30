@@ -96,6 +96,10 @@ github.com/Azure/go-autorest/tracing v0.6.0 h1:TYi4+3m5t6K48TGI9AUdb+IzbnSxvnvUM
 github.com/Azure/go-autorest/tracing v0.6.0/go.mod h1:+vhtPC754Xsa23ID7GlGsrdKBpUA79WCAKPPZVC2DeU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
+github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393 h1:aHHxa77ImvnqqlO2u9afe1aCfKDVqPT5m3HNRbbksiY=
+github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393/go.mod h1:vjv+PhinarMNSdUyI9YcNgGIn5VMfCefMMy7ccux5W8=
+github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8 h1:qWYodJBNSLw81kbngGSxvsGOwZmtn2XdYX5j8K8s0/k=
+github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8/go.mod h1:D/uBTHauhuxE22RRkOtNTQXBO2CpWU8sOrS2d9sFvCk=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3 h1:fiyErF/p5fz79DvMCca9ayvYiWYsFP1oJbskt9fjo8I=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3/go.mod h1:s7Gpwj0tk7XnVCm4BQEmx/mbS36SuTCY/vMB2SNxe8o=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.6 h1:TOxk7n3PE2OkdNMgrXDtDr3ju4pIvwhY515tCoH0CpE=
@@ -119,6 +123,8 @@ github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751/go.mod h1:LOuy
 github.com/alecthomas/units v0.0.0-20151022065526-2efee857e7cf/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/alecthomas/units v0.0.0-20190717042225-c3de453c63f4/go.mod h1:ybxpYRFXyAe+OPACYpWeL0wqObRcbAqCMya13uyzqw0=
 github.com/alecthomas/units v0.0.0-20190924025748-f65c72e2690d/go.mod h1:rBZYJk541a8SKzHPHnH3zbiI+7dagKZ0cgpgrD7Fyho=
+github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883 h1:bvNMNQO63//z+xNgfBlViaCIJKLlCJ6/fmUseuG0wVQ=
+github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883/go.mod h1:rCTlJbsFo29Kk6CurOXKm700vrz8f0KW0JNfpkRJY/8=
 github.com/antihax/optional v1.0.0/go.mod h1:uupD/76wgC+ih3iEmQUL+0Ugr19nfwCT1kdvxnR2qWY=
 github.com/armon/circbuf v0.0.0-20150827004946-bbbad097214e/go.mod h1:3U/XgcO3hCbHZ8TKRvWD2dDTCfh9M9ya+I9JpbB7O8o=
 github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da/go.mod h1:Q73ZrmVTwzkszR9V5SSuryQ31EELlFMUz1kKyl939pY=
@@ -144,6 +150,8 @@ github.com/bketelsen/crypt v0.0.3-0.20200106085610-5cbc8cc4026c/go.mod h1:MKsuJm
 github.com/bketelsen/crypt v0.0.4/go.mod h1:aI6NrJ0pMGgvZKL1iVgXLnfIFJtfV+bKCoqOes/6LfM=
 github.com/blendle/zapdriver v1.3.1 h1:C3dydBOWYRiOk+B8X9IVZ5IOe+7cl+tGOexN4QqHfpE=
 github.com/blendle/zapdriver v1.3.1/go.mod h1:mdXfREi6u5MArG4j9fewC+FGnXaBR+T4Ox4J2u4eHCc=
+github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4YnC6+E63dPcxHo2sUxDIu8g3QgEJdRY=
+github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/bytecodealliance/wasmtime-go v0.39.0 h1:35AXy5+py5ZXRSpfoxqh+dWJ7nJnIrW1avjDfaJinxU=
 github.com/bytecodealliance/wasmtime-go v0.39.0/go.mod h1:q320gUxqyI8yB+ZqRuaJOEnGkAnHh6WtJjMaT2CW4wI=
 github.com/cenkalti/backoff/v4 v4.1.3 h1:cFAlzYUlVYDysBEH2T5hyJZMh3+5+WCBvSnK6Q8UtC4=
@@ -443,6 +451,10 @@ github.com/logrusorgru/aurora v2.0.3+incompatible h1:tOpm7WcpBTn4fjmVfgpQq0EfczG
 github.com/logrusorgru/aurora v2.0.3+incompatible/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
 github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a h1:weJVJJRzAJBFRlAiJQROKQs8oC9vOxvm4rZmBBk0ONw=
 github.com/lunixbochs/vtclean v0.0.0-20180621232353-2d01aacdc34a/go.mod h1:pHhQNgMf3btfWnGBVipUOjRYhoOsdGqdm/+2c2E2WMI=
+github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422 h1:Gumiwx9xUqjh54icRYIYIHDUrtDDrU1oI0VHGZ4/FbI=
+github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422/go.mod h1:E8kU8C8dGPj2zMi5ofP4+qGu9FH1tsPdboOTYjUoA0U=
+github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7 h1:cfwDIOg9JIYe7Cw6rXEAg84eU9ofYm16e+0LZSt0sE8=
+github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7/go.mod h1:pQoaXPOjYaumzQC9+0Gug1UeLiWtazaks9kbaFHeFW8=
 github.com/magiconair/properties v1.8.1/go.mod h1:PppfXfuXeibc/6YijjN8zIbojt8czPbwD3XqdrwzmxQ=
 github.com/magiconair/properties v1.8.5 h1:b6kJs+EmPFMYGkow9GiUyCyOvIwYetYJ3fSaWak/Gls=
 github.com/magiconair/properties v1.8.5/go.mod h1:y3VJvCyxH9uVvJTWEGAELF3aiYNyPKd5NZ3oSwXrF60=
@@ -559,6 +571,8 @@ github.com/russross/blackfriday/v2 v2.0.1/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQD
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/ryanuber/columnize v0.0.0-20160712163229-9b3edd62028f/go.mod h1:sm1tb6uqfes/u+d4ooFouqFdy9/2g9QGwK3SQygK0Ts=
 github.com/sean-/seed v0.0.0-20170313163322-e2103e2c3529/go.mod h1:DxrIzT+xaE7yg65j358z/aeFdxmN0P9QXhEzd20vsDc=
+github.com/sergi/go-diff v1.2.0 h1:XU+rvMAioB0UC3q1MFrIQy4Vo5/4VsRDQQXHsEya6xQ=
+github.com/sergi/go-diff v1.2.0/go.mod h1:STckp+ISIX8hZLjrqAeVduY0gWCT9IjLuqbuNXdaHfM=
 github.com/sethvargo/go-retry v0.1.0/go.mod h1:JzIOdZqQDNpPkQDmcqgtteAcxFLtYpNF/zJCM1ysDg8=
 github.com/sethvargo/go-retry v0.2.3 h1:oYlgvIvsju3jNbottWABtbnoLC+GDtLdBHxKWxQm/iU=
 github.com/sethvargo/go-retry v0.2.3/go.mod h1:1afjQuvh7s4gflMObvjLPaWgluLLyhA1wmVZ6KLpICw=
@@ -596,7 +610,6 @@ github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 h1:fGJnUx0shX9Y3
 github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680/go.mod h1:iISPGAstbUsPgyC3auLLi7PYUTi9lHv5z0COam0OPOY=
 github.com/streamingfast/bstream v0.0.2-0.20220629203020-42f6dd770c50/go.mod h1:dMhUgTdaY+3F+weWsiLo5bNkoUxZbAhdwtCauYDLjEQ=
 github.com/streamingfast/bstream v0.0.2-0.20220713194026-e4696dc8aab1/go.mod h1:dMhUgTdaY+3F+weWsiLo5bNkoUxZbAhdwtCauYDLjEQ=
-github.com/streamingfast/bstream v0.0.2-0.20220831142019-0a0b0caa04c3/go.mod h1:dMhUgTdaY+3F+weWsiLo5bNkoUxZbAhdwtCauYDLjEQ=
 github.com/streamingfast/bstream v0.0.2-0.20220909121429-4647fd1522c9 h1:4Gm1CKVrRgI78HfNUURYPBF2RIuqug14b2KaTs398ys=
 github.com/streamingfast/bstream v0.0.2-0.20220909121429-4647fd1522c9/go.mod h1:Njkx972HcZiz0djWBylxqO/eq686eDGr+egQ1lePj3Q=
 github.com/streamingfast/cli v0.0.4-0.20220113202443-f7bcefa38f7e h1:RNQiFMOloBPAMA5PCwShiOoMQ1FeKsVJXcwo9Lq0iHI=
@@ -629,8 +642,6 @@ github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839/go.mod h1:h
 github.com/streamingfast/firehose v0.1.1-0.20220629203325-f7498b95673d/go.mod h1:FR5VZzPMTFS7xeIiP2KyZ3DN859UcQljRbskaTmoLpg=
 github.com/streamingfast/firehose v0.1.1-0.20220909121738-2f3bc007ea2b h1:JaCuiQHc8UcSCoHP8aREaORlPDUVRM4QlZ+zgkerHEs=
 github.com/streamingfast/firehose v0.1.1-0.20220909121738-2f3bc007ea2b/go.mod h1:nHWbl6ULnLfNELooYfkhqIJ44Gg9vlpoDPtZPzGn2rc=
-github.com/streamingfast/firehose-acme/types v0.0.0-20220831185201-05ffef22e3a0 h1:Yw1FJSLGeehKGvBMnWy467i4AM/FRSMiyatv8AkLCe8=
-github.com/streamingfast/firehose-acme/types v0.0.0-20220831185201-05ffef22e3a0/go.mod h1:oPwXV8ojA44Pt6Ds3SUXoTpoOdDRvPXc07iHdYlbzz4=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 h1:g8eEYbFSykyzIyuxNMmHEUGGUvJE0ivmqZagLDK42gw=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0/go.mod h1:cTNObq2Uofb330y05JbbZZ6RwE6QUXw5iVcHk1Fx3fk=
 github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
@@ -680,6 +691,15 @@ github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf h1:Z2X3Os7oRzpdJ7
 github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf/go.mod h1:M8agBzgqHIhgj7wEn9/0hJUZcrvt9VY+Ln+S1I5Mha0=
 github.com/test-go/testify v1.1.4 h1:Tf9lntrKUMHiXQ07qBScBTSA0dhYQlu83hswqelv1iE=
 github.com/test-go/testify v1.1.4/go.mod h1:rH7cfJo/47vWGdi4GPj16x3/t1xGOj2YxzmNQzk2ghU=
+github.com/tidwall/gjson v1.6.5/go.mod h1:zeFuBCIqD4sN/gmqBzZ4j7Jd6UcA2Fc56x7QFsv+8fI=
+github.com/tidwall/gjson v1.14.3 h1:9jvXn7olKEHU1S9vwoMGliaT8jq1vJ7IH/n9zD9Dnlw=
+github.com/tidwall/gjson v1.14.3/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
+github.com/tidwall/match v1.0.3/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
+github.com/tidwall/match v1.1.1 h1:+Ho715JplO36QYgwN9PGYNhgZvoUSc9X2c80KVTi+GA=
+github.com/tidwall/match v1.1.1/go.mod h1:eRSPERbgtNPcGhD8UCthc6PmLEQXEWd3PRB5JTxsfmM=
+github.com/tidwall/pretty v1.0.2/go.mod h1:XNkn88O1ChpSDQmQeStsy+sBenx6DDtFZJxhVysOjyk=
+github.com/tidwall/pretty v1.2.0 h1:RWIZEg2iJ8/g6fDDYzMpobmaoGh5OLl4AXtGUGPcqCs=
+github.com/tidwall/pretty v1.2.0/go.mod h1:ITEVvHYasfjBbM0u2Pg8T2nJnzm8xPwvNhhsoaGGjNU=
 github.com/tmc/grpc-websocket-proxy v0.0.0-20190109142713-0ad062ec5ee5/go.mod h1:ncp9v5uamzpCO7NfCPTXjqaC+bZgJeR0sMTm6dMHP7U=
 github.com/tsenart/deadcode v0.0.0-20160724212837-210d2dc333e9/go.mod h1:q+QjxYvZ+fpjMXqs+XEriussHjSYqeXVnAdSV1tkMYk=
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
@@ -768,6 +788,7 @@ golang.org/x/crypto v0.0.0-20190510104115-cbcb75029529/go.mod h1:yigFU9vqHzYiE8U
 golang.org/x/crypto v0.0.0-20190605123033-f99c8df09eb5/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20190820162420-60c769a6c586/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
 golang.org/x/crypto v0.0.0-20191011191535-87dc89f01550/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=
+golang.org/x/crypto v0.0.0-20200406173513-056763e48d71/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20201002170205-7f63de1d35b0/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
 golang.org/x/crypto v0.0.0-20201112155050-0c6587e931a9/go.mod h1:LzIPMQfyMNhhGPhUkYOs5KpL4U8rLKemX1yGLhDgUto=
@@ -992,6 +1013,7 @@ golang.org/x/sys v0.0.0-20220503163025-988cb79eb6c6/go.mod h1:oPkhp1MJrh7nUepCBc
 golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220624220833-87e55d714810/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/sys v0.0.0-20220627191245-f75cf1eec38b/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f h1:v4INt8xihDGvnrfjMDVXGxw9wrfxYyCjk0KbXjhR55s=
 golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/term v0.0.0-20201126162022-7de9c90e9dd1/go.mod h1:bj7SfCRtBDWHUb9snDiAeCFNEtKQo2Wmx5Cou7ajbmo=
