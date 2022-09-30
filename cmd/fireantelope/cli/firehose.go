@@ -2,6 +2,8 @@ package cli
 
 import (
 	"fmt"
+	antopleTransform "github.com/EOS-Nation/firehose-antelope/transform"
+	"github.com/streamingfast/bstream/transform"
 	"os"
 	"time"
 
@@ -48,7 +50,13 @@ func init() {
 		},
 
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
-			sfDataDir := runtime.AbsDataDir
+			blockstreamAddr := viper.GetString("common-live-blocks-addr")
+
+			// todo legacy code, check if still needed
+			//tracker := runtime.Tracker.Clone()
+			//if blockstreamAddr != "" {
+			//	tracker.AddGetter(bstream.BlockStreamLIBTarget, bstream.StreamLIBBlockRefGetter(blockstreamAddr))
+			//}
 
 			authenticator, err := dauthAuthenticator.New(viper.GetString("common-auth-plugin"))
 			if err != nil {
@@ -61,7 +69,33 @@ func init() {
 			}
 			dmetering.SetDefaultMeter(metering)
 
+			mergedBlocksStoreURL, oneBlocksStoreURL, forkedBlocksStoreURL, err := getCommonStoresURLs(runtime.AbsDataDir)
+			if err != nil {
+				return nil, err
+			}
+			// todo we probably want to add indices as well
+			//indexStore, possibleIndexSizes, err := GetIndexStore(runtime.AbsDataDir)
+			//if err != nil {
+			//	return nil, fmt.Errorf("unable to initialize indexes: %w", err)
+			//}
+
+			sfDataDir := runtime.AbsDataDir
 			var registerServiceExt firehoseApp.RegisterServiceExtensionFunc
+
+			// todo check if we want to implement the traffic director and whether we can use the existing one
+			//rawServiceDiscoveryURL := viper.GetString("firehose-discovery-service-url")
+			//var serviceDiscoveryURL *url.URL
+			//if rawServiceDiscoveryURL != "" {
+			//	serviceDiscoveryURL, err = url.Parse(rawServiceDiscoveryURL)
+			//	if err != nil {
+			//		return nil, fmt.Errorf("unable to parse discovery service url: %w", err)
+			//	}
+			//	err = discoveryservice.Bootstrap(serviceDiscoveryURL)
+			//	if err != nil {
+			//		return nil, fmt.Errorf("unable to bootstrap discovery service: %w", err)
+			//	}
+			//}
+
 			if viper.GetBool("substreams-enabled") {
 				stateStore, err := dstore.NewStore(MustReplaceDataDir(sfDataDir, viper.GetString("substreams-state-store-url")), "", "", true)
 				if err != nil {
@@ -104,16 +138,22 @@ func init() {
 				registerServiceExt = sss.Register
 			}
 
+			registry := transform.NewRegistry()
+			registry.Register(antopleTransform.TrimBlock)
+
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
-				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
-				MergedBlocksStoreURL:    MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
-				BlockStreamAddr:         viper.GetString("common-live-blocks-addr"),
-				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
+				MergedBlocksStoreURL: mergedBlocksStoreURL,
+				OneBlocksStoreURL:    oneBlocksStoreURL,
+				ForkedBlocksStoreURL: forkedBlocksStoreURL,
+				BlockStreamAddr:      blockstreamAddr,
+				GRPCListenAddr:       viper.GetString("firehose-grpc-listen-addr"),
+				// ServiceDiscoveryURL:     serviceDiscoveryURL,
 				GRPCShutdownGracePeriod: 1 * time.Second,
 			}, &firehoseApp.Modules{
 				Authenticator:            authenticator,
 				HeadTimeDriftMetric:      headTimeDriftmetric,
 				HeadBlockNumberMetric:    headBlockNumMetric,
+				TransformRegistry:        registry,
 				RegisterServiceExtension: registerServiceExt,
 			}), nil
 		},
