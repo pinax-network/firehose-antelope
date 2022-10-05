@@ -1,8 +1,7 @@
 syntax = "proto3";
 
 package sf.antelope.type.v1;
-
-option go_package = "github.com/streamingfast/firehose-antelope/types/pb/sf/antelope/type/v1;pbantelope";
+option go_package = "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1;pbantelope";
 
 import "google/protobuf/timestamp.proto";
 

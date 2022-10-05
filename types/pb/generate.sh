@@ -26,6 +26,7 @@ function main() {
   cd "$ROOT/types/pb" &> /dev/null
 
   generate "sf/antelope/type/v1/type.proto"
+  generate "sf/antelope/transform/v1/transforms.proto"
 
   echo "generate.sh - `date` - `whoami`" > ./last_generate.txt
   echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> ./last_generate.txt

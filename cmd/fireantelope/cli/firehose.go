@@ -73,11 +73,10 @@ func init() {
 			if err != nil {
 				return nil, err
 			}
-			// todo we probably want to add indices as well
-			//indexStore, possibleIndexSizes, err := GetIndexStore(runtime.AbsDataDir)
-			//if err != nil {
-			//	return nil, fmt.Errorf("unable to initialize indexes: %w", err)
-			//}
+			indexStore, possibleIndexSizes, err := GetIndexStore(runtime.AbsDataDir)
+			if err != nil {
+				return nil, fmt.Errorf("unable to initialize indexes: %w", err)
+			}
 
 			sfDataDir := runtime.AbsDataDir
 			var registerServiceExt firehoseApp.RegisterServiceExtensionFunc
@@ -139,7 +138,7 @@ func init() {
 			}
 
 			registry := transform.NewRegistry()
-			registry.Register(antopleTransform.TrimBlock)
+			registry.Register(antopleTransform.ActionFilterFactory(indexStore, possibleIndexSizes))
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
 				MergedBlocksStoreURL: mergedBlocksStoreURL,

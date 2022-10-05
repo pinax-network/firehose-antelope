@@ -3,6 +3,7 @@ package transform
 import (
 	"container/heap"
 	"fmt"
+	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/bstream/transform"
 	"go.uber.org/zap"
@@ -89,7 +90,7 @@ func (f *BlockFilter) TransformInPlace(blk *bstream.Block) error {
 
 	systemActions := f.SystemActionsIncludeProgram.choose(blk.Number)
 
-	block := blk.ToNative().(*pbcodec.Block)
+	block := blk.ToNative().(*pbantelope.Block)
 
 	if filterExprContains(block.FilteringIncludeFilterExpr, include.code) {
 		include = includeNOOP
@@ -147,7 +148,7 @@ func (h *KVHeap) Pop() interface{} {
 	return x
 }
 
-func getTop5ActorsForTrx(trx *pbcodec.TransactionTrace) (topActors []string) {
+func getTop5ActorsForTrx(trx *pbantelope.TransactionTrace) (topActors []string) {
 	var actors actorMap
 	actors = make(map[string]int)
 	for _, action := range trx.ActionTraces {
@@ -168,7 +169,7 @@ func getTop5ActorsForTrx(trx *pbcodec.TransactionTrace) (topActors []string) {
 	return
 }
 
-func transformInPlaceV2(block *pbcodec.Block, include, exclude, systemActions *CELFilter) {
+func transformInPlaceV2(block *pbantelope.Block, include, exclude, systemActions *CELFilter) {
 	wasFiltered := block.FilteringApplied
 
 	block.FilteringApplied = true
@@ -178,7 +179,7 @@ func transformInPlaceV2(block *pbcodec.Block, include, exclude, systemActions *C
 	block.FilteringExcludeFilterExpr = combineFilters(block.FilteringExcludeFilterExpr, exclude)
 	block.FilteringSystemActionsIncludeFilterExpr = combineFilters(block.FilteringSystemActionsIncludeFilterExpr, systemActions)
 
-	var filteredTrxTrace []*pbcodec.TransactionTrace
+	var filteredTrxTrace []*pbantelope.TransactionTrace
 	filteredExecutedInputActionCount := uint32(0)
 	filteredExecutedTotalActionCount := uint32(0)
 
@@ -256,8 +257,8 @@ func transformInPlaceV2(block *pbcodec.Block, include, exclude, systemActions *C
 		}
 	}
 
-	var filteredTrx []*pbcodec.TransactionReceipt
-	var filteredImplicitTrxOp []*pbcodec.TrxOp
+	var filteredTrx []*pbantelope.TransactionReceipt
+	var filteredImplicitTrxOp []*pbantelope.TrxOp
 
 	// If there is no exclusion, there is nothing to do, so just run when we have at least one exclusion
 	if len(excludedTransactionIds) > 0 {
@@ -328,7 +329,7 @@ func combineFilters(prev string, next *CELFilter) string {
 	return fmt.Sprintf("%s;;;%s", prev, next.code)
 }
 
-func shouldProcess(trxTrace *MemoizableTrxTrace, actTrace *pbcodec.ActionTrace, include, exclude, systemActions *CELFilter) (pass bool, isSystem bool) {
+func shouldProcess(trxTrace *MemoizableTrxTrace, actTrace *pbantelope.ActionTrace, include, exclude, systemActions *CELFilter) (pass bool, isSystem bool) {
 	activation := NewActionTraceActivation(actTrace, trxTrace, "")
 	// If the include program does not match, there is nothing more to do here
 	if !include.match(activation) {
