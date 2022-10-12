@@ -61,7 +61,13 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 		lines: lines,
 		close: func() {},
 
-		ctx:   &parseCtx{logger: logger, globalStats: globalStats},
+		ctx: &parseCtx{
+			logger:       logger,
+			globalStats:  globalStats,
+			currentBlock: &pbantelope.Block{},
+			currentTrace: &pbantelope.TransactionTrace{},
+			abiDecoder:   newABIDecoder(),
+		},
 		done:  make(chan interface{}),
 		stats: globalStats,
 
