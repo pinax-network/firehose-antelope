@@ -64,4 +64,5 @@ const (
 	BlocksCacheDirectory string = "file://{data-dir}/storage/blocks-cache"
 	MergedBlocksStoreURL string = "file://{data-dir}/storage/merged-blocks"
 	OneBlockStoreURL     string = "file://{data-dir}/storage/one-blocks"
+	ForkedBlocksStoreURL string = "file://{sf-data-dir}/storage/forked-blocks"
 )
