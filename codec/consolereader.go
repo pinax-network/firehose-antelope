@@ -814,6 +814,8 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 		return nil, fmt.Errorf("block_num %d doesn't match the active block num (%d)", blockNum, ctx.activeBlockNum)
 	}
 
+	ctx.stats = newParsingStats(ctx.logger, uint64(blockNum))
+
 	blockStateHex, err := hex.DecodeString(chunks[2])
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
@@ -830,6 +832,12 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 	if err != nil {
 		return nil, fmt.Errorf("abi decoding post-process failed: %w", err)
 	}
+
+	ctx.globalStats.lastBlock = ctx.currentBlock.AsRef()
+	ctx.globalStats.blockRate.Inc()
+	ctx.globalStats.blockAverageParseTime.IncByElapsedTime(ctx.stats.startAt, time.Millisecond)
+	ctx.globalStats.transactionRate.IncBy(int64(len(ctx.currentBlock.TransactionTraces())))
+	ctx.stats.log()
 
 	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
 	ctx.resetBlock()
