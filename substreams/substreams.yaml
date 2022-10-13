@@ -1,15 +1,15 @@
 specVersion: v0.1.0
 package:
-  name: acme
+  name: antelope
   version: v0.0.1
-  url: https://github.com/streamingfast/firehose-acme
+  url: https://github.com/EOS-Nation/firehose-antelope
   doc: |
-    Protobuf definitions for Substreams modules on Acme.
+    Protobuf definitions for Substreams modules on Antelope.
 
     This package does not include any modules.
 
 protobuf:
   files:
-    - sf/acme/type/v1/type.proto
+    - sf/antelope/type/v1/type.proto
   importPaths:
     - ../proto
