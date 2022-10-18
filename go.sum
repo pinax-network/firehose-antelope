@@ -96,8 +96,6 @@ github.com/Azure/go-autorest/tracing v0.6.0 h1:TYi4+3m5t6K48TGI9AUdb+IzbnSxvnvUM
 github.com/Azure/go-autorest/tracing v0.6.0/go.mod h1:+vhtPC754Xsa23ID7GlGsrdKBpUA79WCAKPPZVC2DeU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393 h1:aHHxa77ImvnqqlO2u9afe1aCfKDVqPT5m3HNRbbksiY=
-github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393/go.mod h1:vjv+PhinarMNSdUyI9YcNgGIn5VMfCefMMy7ccux5W8=
 github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8 h1:qWYodJBNSLw81kbngGSxvsGOwZmtn2XdYX5j8K8s0/k=
 github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8/go.mod h1:D/uBTHauhuxE22RRkOtNTQXBO2CpWU8sOrS2d9sFvCk=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3 h1:fiyErF/p5fz79DvMCca9ayvYiWYsFP1oJbskt9fjo8I=
@@ -214,6 +212,8 @@ github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 h1:
 github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1/go.mod h1:KJwIaB5Mv44NWtYuAOFCVOjcI94vtpEz2JU/D2v6IjE=
 github.com/envoyproxy/protoc-gen-validate v0.1.0 h1:EQciDnbrYxy13PgWoY8AqoxGiPrpgBZ1R8UNe3ddc+A=
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
+github.com/eoscanada/eos-go v0.10.3-0.20221005163100-84cbd8eb764c h1:uN8P4x5ltlet0QcM3lJwZsvxa2Ubq2pbl1bBhikyRNQ=
+github.com/eoscanada/eos-go v0.10.3-0.20221005163100-84cbd8eb764c/go.mod h1:vjv+PhinarMNSdUyI9YcNgGIn5VMfCefMMy7ccux5W8=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/form3tech-oss/jwt-go v3.2.2+incompatible h1:TcekIExNqud5crz4xD2pavyTgWiPvpYe4Xau31I0PRk=
@@ -631,8 +631,6 @@ github.com/streamingfast/dmetering v0.0.0-20220301165106-a642bb6a21bd/go.mod h1:
 github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9 h1:dy+xdXeyud8v6Zf3tUaZo57mAgpO33nUHlBxxypYhY0=
 github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9/go.mod h1:JwP515aKdtsbm8v4pRjd20Q+2u7GZ03jqIEpzTrtbMw=
 github.com/streamingfast/dmetrics v0.0.0-20210811180524-8494aeb34447/go.mod h1:VLdQY/FwczmC/flqWkcsBbqXO4BhU4zQDSK7GMrpcjY=
-github.com/streamingfast/dmetrics v0.0.0-20220811180000-3e513057d17c h1:ln4WzAU3kewbxeK2ygZXVx1cyHa9VdCPagasmu8hD1s=
-github.com/streamingfast/dmetrics v0.0.0-20220811180000-3e513057d17c/go.mod h1:fWoyaD76fE7mXZfkfcAfNeU/Hv/y6yJ/RgEcInQLwSw=
 github.com/streamingfast/dmetrics v0.0.0-20221012032216-6cf8338d4429 h1:ll/nzUOxIt7vmJxI5cNJVS1KEsneOSvwkDHt9Vaqq+Q=
 github.com/streamingfast/dmetrics v0.0.0-20221012032216-6cf8338d4429/go.mod h1:fWoyaD76fE7mXZfkfcAfNeU/Hv/y6yJ/RgEcInQLwSw=
 github.com/streamingfast/dstore v0.1.1-0.20220607202639-35118aeaf648/go.mod h1:SHSEIPowGeE1TfNNmGeAUUnlO3dwevmX5kFOSazU60M=

@@ -6,7 +6,7 @@ require (
 	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.2
+	github.com/eoscanada/eos-go v0.10.3-0.20221005163100-84cbd8eb764c
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.4.0
@@ -162,5 +162,3 @@ require (
 )
 
 replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
-
-replace github.com/eoscanada/eos-go => github.com/EOS-Nation/eos-go v0.10.3-0.20220926144621-f7fcbab17393
