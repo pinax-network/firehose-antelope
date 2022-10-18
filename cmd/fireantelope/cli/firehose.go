@@ -91,7 +91,7 @@ func init() {
 
 				sss, err := substreamsService.New(
 					stateStore,
-					"sf.aptos.type.v1.Block",
+					"sf.antelope.type.v2.Block",
 					viper.GetInt("substreams-sub-request-parallel-jobs"),
 					viper.GetInt("substreams-sub-request-block-range-size"),
 					clientConfig,
