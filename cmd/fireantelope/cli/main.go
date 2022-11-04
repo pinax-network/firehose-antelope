@@ -47,7 +47,7 @@ func Main() {
 		'info', 'warn', 'error', 'panic'. Can be used to silence loggers by using 'panic' (well, technically it's not a full
 		silence but almost), or make them more verbose and change it back later.
 	`))
-	RootCmd.PersistentFlags().CountP("log-verbosity", "v", "Enables verbose output (-vvvv for max verbosity)")
+	RootCmd.PersistentFlags().CountP("verbose", "v", "Enables verbose output (-vvvv for max verbosity)")
 
 	RootCmd.PersistentFlags().String("metrics-listen-addr", MetricsListenAddr, "If non-empty, the process will listen on this address to server the Prometheus metrics collected by the components.")
 	RootCmd.PersistentFlags().String("pprof-listen-addr", "localhost:6060", "If non-empty, the process will listen on this address for pprof analysis (see https://golang.org/pkg/net/http/pprof/)")
