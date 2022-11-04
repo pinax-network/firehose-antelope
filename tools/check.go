@@ -78,7 +78,7 @@ func blockPrinter(block *bstream.Block) {
 	dummBlock := block.ToProtocol().(*pbantelope.Block)
 	fmt.Printf("Block %s, Prev: %s: %v timestamp\n",
 		block.AsRef(),
-		block.PreviousRef(),
+		block.PreviousID(),
 		dummBlock.Time(),
 	)
 }
