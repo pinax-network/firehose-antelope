@@ -3,6 +3,7 @@ package tools
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"os"
 	"strconv"
 
@@ -51,8 +52,9 @@ func downloadFromFirehoseE(cmd *cobra.Command, args []string) error {
 	apiToken := os.Getenv(apiTokenEnvVar)
 
 	val, err := cmd.Flags().GetUint32("block-version")
-	if err == nil {
+	if err == nil && val > 0 {
 		blockVersion = val
+		zlog.Info("updating block version", zap.Uint32("block_version", blockVersion))
 	}
 
 	plaintext := mustGetBool(cmd, "plaintext")
