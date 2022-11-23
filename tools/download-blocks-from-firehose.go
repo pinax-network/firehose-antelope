@@ -6,10 +6,10 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/EOS-Nation/firehose-antelope/types"
+	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/streamingfast/bstream"
-	"github.com/streamingfast/firehose-ethereum/types"
-	pbeth "github.com/streamingfast/firehose-ethereum/types/pb/sf/ethereum/type/v2"
 	sftools "github.com/streamingfast/sf-tools"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
@@ -20,7 +20,7 @@ func init() {
 	DownloadFromFirehoseCmd.Flags().StringP("api-token-env-var", "a", "FIREHOSE_API_TOKEN", "Look for a JWT in this environment variable to authenticate against endpoint")
 	DownloadFromFirehoseCmd.Flags().BoolP("plaintext", "p", false, "Use plaintext connection to firehose")
 	DownloadFromFirehoseCmd.Flags().BoolP("insecure", "k", false, "Skip SSL certificate validation when connecting to firehose")
-	DownloadFromFirehoseCmd.Flags().Bool("fix-ordinals", false, "Decode the eth blocks to fix the ordinals in the receipt logs")
+	DownloadFromFirehoseCmd.Flags().Uint32("block-version", 0, "Overwrite the block version. Use this if you want to indicate the blocks have been updated to a new version.")
 }
 
 var DownloadFromFirehoseCmd = &cobra.Command{
@@ -28,8 +28,10 @@ var DownloadFromFirehoseCmd = &cobra.Command{
 	Short:   "download blocks from firehose and save them to merged-blocks",
 	Args:    cobra.ExactArgs(4),
 	RunE:    downloadFromFirehoseE,
-	Example: "fireeth tools download-from-firehose api.streamingfast.io 1000 2000 ./outputdir",
+	Example: "fireantelope tools download-from-firehose eos.firehose.eosnation.io 1000 2000 ./outputdir",
 }
+
+var blockVersion = uint32(0)
 
 func downloadFromFirehoseE(cmd *cobra.Command, args []string) error {
 	ctx := context.Background()
@@ -48,16 +50,14 @@ func downloadFromFirehoseE(cmd *cobra.Command, args []string) error {
 	apiTokenEnvVar := mustGetString(cmd, "api-token-env-var")
 	apiToken := os.Getenv(apiTokenEnvVar)
 
+	val, err := cmd.Flags().GetUint32("block-version")
+	if err == nil {
+		blockVersion = val
+	}
+
 	plaintext := mustGetBool(cmd, "plaintext")
 	insecure := mustGetBool(cmd, "insecure")
 	var fixerFunc func(*bstream.Block) (*bstream.Block, error)
-	if mustGetBool(cmd, "fix-ordinals") {
-		fixerFunc = func(in *bstream.Block) (*bstream.Block, error) {
-			block := in.ToProtocol().(*pbeth.Block)
-			block.NormalizeInPlace()
-			return types.BlockFromProto(block, in.LibNum)
-		}
-	}
 
 	return sftools.DownloadFirehoseBlocks(
 		ctx,
@@ -68,20 +68,21 @@ func downloadFromFirehoseE(cmd *cobra.Command, args []string) error {
 		start,
 		stop,
 		destFolder,
-		decodeAnyPB,
+		decodeAndUpdateBlock,
 		fixerFunc,
 		zlog,
 	)
 }
 
-func decodeAnyPB(in *anypb.Any) (*bstream.Block, error) {
-	block := &pbeth.Block{}
+func decodeAndUpdateBlock(in *anypb.Any) (*bstream.Block, error) {
+	block := &pbantelope.Block{}
 	if err := anypb.UnmarshalTo(in, block, proto.UnmarshalOptions{}); err != nil {
 		return nil, fmt.Errorf("unmarshal anypb: %w", err)
 	}
 
-	// We are downloading only final blocks from the Firehose connection which means the LIB for them
-	// can be set to themself (althought we use `- 1` to ensure problem would occur if codde don't like
-	// `LIBNum == self.BlockNum`).
-	return types.BlockFromProto(block, block.Number-1)
+	if blockVersion > 0 {
+		block.Version = blockVersion
+	}
+
+	return types.BlockFromProto(block)
 }
