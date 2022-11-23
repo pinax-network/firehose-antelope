@@ -23,7 +23,7 @@ func BlockFromProto(b *pbantelope.Block) (*bstream.Block, error) {
 		Timestamp:      b.Time(),
 		LibNum:         b.LIBNum(),
 		PayloadKind:    pbbstream.Protocol_EOS,
-		PayloadVersion: 1,
+		PayloadVersion: int32(b.Version),
 	}
 
 	return bstream.GetBlockPayloadSetter(blk, content)
