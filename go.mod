@@ -166,4 +166,4 @@ replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v
 
 replace github.com/EOS-Nation/firehose-antelope/types => ./types
 
-replace github.com/streamingfast/sf-tools => github.com/EOS-Nation/sf-tools v0.0.0-20221124103823-34bbeae74f24
+replace github.com/streamingfast/sf-tools => github.com/EOS-Nation/sf-tools v0.0.0-20221124110623-b15f0b7d7765

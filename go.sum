@@ -106,6 +106,8 @@ github.com/EOS-Nation/sf-tools v0.0.0-20221124085003-eb76d810cb6c h1:nqzhBU3X73y
 github.com/EOS-Nation/sf-tools v0.0.0-20221124085003-eb76d810cb6c/go.mod h1:NTrKtcP7QPEMEu/rRbThGqwNb3dI7LHLmE5Kn00UyGU=
 github.com/EOS-Nation/sf-tools v0.0.0-20221124103823-34bbeae74f24 h1:7ID6f39KQRTVgR1GDqkrDkgbtm/5vC53asotUaYYnuQ=
 github.com/EOS-Nation/sf-tools v0.0.0-20221124103823-34bbeae74f24/go.mod h1:NTrKtcP7QPEMEu/rRbThGqwNb3dI7LHLmE5Kn00UyGU=
+github.com/EOS-Nation/sf-tools v0.0.0-20221124110623-b15f0b7d7765 h1:ZGAlBwcappxZ3Xih9iNnyYNtz1cQyZqe8R+PltbXezo=
+github.com/EOS-Nation/sf-tools v0.0.0-20221124110623-b15f0b7d7765/go.mod h1:NTrKtcP7QPEMEu/rRbThGqwNb3dI7LHLmE5Kn00UyGU=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3 h1:fiyErF/p5fz79DvMCca9ayvYiWYsFP1oJbskt9fjo8I=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3/go.mod h1:s7Gpwj0tk7XnVCm4BQEmx/mbS36SuTCY/vMB2SNxe8o=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.6 h1:TOxk7n3PE2OkdNMgrXDtDr3ju4pIvwhY515tCoH0CpE=
