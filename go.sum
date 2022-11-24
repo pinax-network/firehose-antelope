@@ -102,6 +102,8 @@ github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
 github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8 h1:qWYodJBNSLw81kbngGSxvsGOwZmtn2XdYX5j8K8s0/k=
 github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8/go.mod h1:D/uBTHauhuxE22RRkOtNTQXBO2CpWU8sOrS2d9sFvCk=
+github.com/EOS-Nation/sf-tools v0.0.0-20221124085003-eb76d810cb6c h1:nqzhBU3X73yvLMOEls0iWS+w/mkBQDIxjnzQIOaEN/4=
+github.com/EOS-Nation/sf-tools v0.0.0-20221124085003-eb76d810cb6c/go.mod h1:NTrKtcP7QPEMEu/rRbThGqwNb3dI7LHLmE5Kn00UyGU=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3 h1:fiyErF/p5fz79DvMCca9ayvYiWYsFP1oJbskt9fjo8I=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3/go.mod h1:s7Gpwj0tk7XnVCm4BQEmx/mbS36SuTCY/vMB2SNxe8o=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.6 h1:TOxk7n3PE2OkdNMgrXDtDr3ju4pIvwhY515tCoH0CpE=

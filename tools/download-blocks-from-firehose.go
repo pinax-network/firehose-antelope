@@ -70,6 +70,7 @@ func downloadFromFirehoseE(cmd *cobra.Command, args []string) error {
 		start,
 		stop,
 		destFolder,
+		true,
 		decodeAndUpdateBlock,
 		fixerFunc,
 		zlog,

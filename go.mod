@@ -165,3 +165,5 @@ require (
 replace github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
 
 replace github.com/EOS-Nation/firehose-antelope/types => ./types
+
+replace github.com/streamingfast/sf-tools => github.com/EOS-Nation/sf-tools v0.0.0-20221124085003-eb76d810cb6c
