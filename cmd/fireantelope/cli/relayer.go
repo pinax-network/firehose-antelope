@@ -26,7 +26,7 @@ func init() {
 
 			return relayerApp.New(&relayerApp.Config{
 				SourcesAddr:      viper.GetStringSlice("relayer-source"),
-				OneBlocksURL:     MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
+				OneBlocksURL:     mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
 				GRPCListenAddr:   viper.GetString("relayer-grpc-listen-addr"),
 				MaxSourceLatency: viper.GetDuration("relayer-max-source-latency"),
 			}), nil

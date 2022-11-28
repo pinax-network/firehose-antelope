@@ -33,7 +33,7 @@ func mustReplaceDataDir(dataDir, in string) string {
 		panic(fmt.Errorf("file path abs: %w", err))
 	}
 
-	in = strings.Replace(in, "{data-dir}", d, -1)
+	in = strings.Replace(in, "{sf-data-dir}", d, -1)
 	return in
 }
 
@@ -51,9 +51,9 @@ func mustGetCommonStoresURLs(dataDir string) (mergedBlocksStoreURL, oneBlocksSto
 }
 
 func getCommonStoresURLs(dataDir string) (mergedBlocksStoreURL, oneBlocksStoreURL, forkedBlocksStoreURL string, err error) {
-	mergedBlocksStoreURL = MustReplaceDataDir(dataDir, viper.GetString("common-merged-blocks-store-url"))
-	oneBlocksStoreURL = MustReplaceDataDir(dataDir, viper.GetString("common-one-block-store-url"))
-	forkedBlocksStoreURL = MustReplaceDataDir(dataDir, viper.GetString("common-forked-blocks-store-url"))
+	mergedBlocksStoreURL = mustReplaceDataDir(dataDir, viper.GetString("common-merged-blocks-store-url"))
+	oneBlocksStoreURL = mustReplaceDataDir(dataDir, viper.GetString("common-one-block-store-url"))
+	forkedBlocksStoreURL = mustReplaceDataDir(dataDir, viper.GetString("common-forked-blocks-store-url"))
 
 	if commonStoresCreated {
 		return
@@ -73,7 +73,7 @@ func getCommonStoresURLs(dataDir string) (mergedBlocksStoreURL, oneBlocksStoreUR
 }
 
 func GetIndexStore(dataDir string) (indexStore dstore.Store, possibleIndexSizes []uint64, err error) {
-	indexStoreURL := MustReplaceDataDir(dataDir, viper.GetString("common-index-store-url"))
+	indexStoreURL := mustReplaceDataDir(dataDir, viper.GetString("common-index-store-url"))
 
 	if indexStoreURL != "" {
 		s, err := dstore.NewStore(indexStoreURL, "", "", false)
@@ -135,17 +135,6 @@ func makeDirs(directories []string) error {
 	}
 
 	return nil
-}
-
-// MustReplaceDataDir is used in sf-ethereum-priv
-func MustReplaceDataDir(dataDir, in string) string {
-	d, err := filepath.Abs(dataDir)
-	if err != nil {
-		panic(fmt.Errorf("file path abs: %w", err))
-	}
-
-	in = strings.Replace(in, "{data-dir}", d, -1)
-	return in
 }
 
 var DefaultLevelInfo = logging.LoggerDefaultLevel(zap.InfoLevel)

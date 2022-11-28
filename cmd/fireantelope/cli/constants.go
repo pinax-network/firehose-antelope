@@ -61,8 +61,8 @@ const (
 	FirehoseGRPCServingAddr  string = ":18015"
 
 	// Data storage default locations
-	BlocksCacheDirectory string = "file://{data-dir}/storage/blocks-cache"
-	MergedBlocksStoreURL string = "file://{data-dir}/storage/merged-blocks"
-	OneBlockStoreURL     string = "file://{data-dir}/storage/one-blocks"
+	BlocksCacheDirectory string = "file://{sf-data-dir}/storage/blocks-cache"
+	MergedBlocksStoreURL string = "file://{sf-data-dir}/storage/merged-blocks"
+	OneBlockStoreURL     string = "file://{sf-data-dir}/storage/one-blocks"
 	ForkedBlocksStoreURL string = "file://{sf-data-dir}/storage/forked-blocks"
 )
