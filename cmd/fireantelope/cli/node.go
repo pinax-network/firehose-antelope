@@ -23,11 +23,11 @@ import (
 	"google.golang.org/grpc"
 )
 
-var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/streamingfast/firehose-acme/node")
-var nodeAcmeChainLogger, _ = logging.PackageLogger("node.acme", "github.com/streamingfast/firehose-acme/node/acme", DefaultLevelInfo)
+var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/EOS-Nation/firehose-antelope/node")
+var nodeAcmeChainLogger, _ = logging.PackageLogger("node.antelope", "github.com/EOS-Nation/firehose-antelope/node/antelope", DefaultLevelInfo)
 
-var readerLogger, readerTracer = logging.PackageLogger("reader", "github.com/streamingfast/firehose-acme/reader")
-var readerAcmeChainLogger, _ = logging.PackageLogger("reader.acme", "github.com/streamingfast/firehose-acme/reader/acme", DefaultLevelInfo)
+var readerLogger, readerTracer = logging.PackageLogger("reader", "github.com/EOS-Nation/firehose-antelope/reader")
+var readerAcmeChainLogger, _ = logging.PackageLogger("reader.antelope", "github.com/EOS-Nation/firehose-antelope/reader/antelope", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
 	cmd.Flags().String(flagPrefix+"path", ChainExecutableName, FlagDescription(`
