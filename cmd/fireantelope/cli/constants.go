@@ -13,7 +13,7 @@ const (
 	// only from block #2).
 	//
 	// This is used in multiple places to determine if we reached the oldest block of the chain.
-	FirstStreamableBlock int = 1
+	FirstStreamableBlock int = 2
 
 	// Should be the number of blocks between two targets before we consider the
 	// first as "near" the second. For example if a chain is at block #215 and another
@@ -38,7 +38,7 @@ const (
 	// sync the chain with the blockchain network. For example on Ethereum where
 	// our standard instrumentation if using the Geth client, value is `geth`, on EOSIO
 	// chain, it's `nodeos`.
-	ChainExecutableName = "dchain"
+	ChainExecutableName = "nodeos"
 
 	//
 	/// Standard Values
