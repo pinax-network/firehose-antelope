@@ -45,7 +45,7 @@ main() {
   sleep 3
 
   if [[ "$force" == "true" ]]; then
-    echo "Pushing to ensure GitHub knowns about the latest commit(s)"
+    echo "Pushing to ensure GitHub knows about the latest commit(s)"
     git push
   fi
 
@@ -66,11 +66,11 @@ main() {
 
 verify_github_token() {
   if [[ ! -f "$HOME/.config/goreleaser/github_token" && "$GITHUB_TOKEN" = "" ]]; then
-    echo "No GitHub token could be found in enviornment variable GITHUB_TOKEN"
+    echo "No GitHub token could be found in environment variable GITHUB_TOKEN"
     echo "nor at ~/.config/goreleaser/github_token."
     echo ""
     echo "You will need to create one on GitHub website and make it available through"
-    echo "one of the accept way mentionned above."
+    echo "one of the accept way mentioned above."
     exit 1
   fi
 }
