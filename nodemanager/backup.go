@@ -14,16 +14,15 @@
 
 package nodemanager
 
-// TODO port this code over if you want to have backups handled by the nodemanager
-//
-//type NodeosBackupInfo struct {
-//	ChainIDStr          string `yaml:"chainIdStr"`
-//	ServerVersion       string `yaml:"serverVersion"`
-//	LastBlockSeen       uint32 `yaml:"lastBlockSeen"`
-//	ServerVersionString string `yaml:"serverVersionString"`
-//}
-//
-//var _ node_manager.BackupableChainSuperviser = (*NodeosSuperviser)(nil)
+type NodeosBackupInfo struct {
+	ChainIDStr          string `yaml:"chainIdStr"`
+	ServerVersion       string `yaml:"serverVersion"`
+	LastBlockSeen       uint32 `yaml:"lastBlockSeen"`
+	ServerVersionString string `yaml:"serverVersionString"`
+}
+
+// todo reimplement backup handling
+// var _ node_manager.BackupableChainSuperviser = (*NodeosSuperviser)(nil)
 //
 //func (s *NodeosSuperviser) TakeBackup(backupTag string, backupStoreURL string) error {
 //	if s.options.NoBlocksLog {
