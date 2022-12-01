@@ -19,7 +19,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var rootLog, _ = logging.RootLogger("fireantelope", "github.com/streamingfast/firehose-acme/cmd/fireantelope/cli")
+var rootLog, _ = logging.RootLogger("fireantelope", "github.com/EOS-Nation/firehose-antelope/cmd/fireantelope/cli")
 
 var RootCmd = &cobra.Command{Use: "fireantelope", Short: "Acme on StreamingFast"}
 var allFlags = make(map[string]bool) // used as global because of async access to cobra init functions
@@ -33,7 +33,7 @@ func Main() {
 	RootCmd.PersistentFlags().StringP("config-file", "c", "./firehose.yaml", "Configuration file to use. No config file loaded if set to an empty string.")
 
 	RootCmd.PersistentFlags().String("log-format", "text", "Format for logging to stdout. Either 'text' or 'stackdriver'")
-	RootCmd.PersistentFlags().Bool("log-to-file", true, "Also write logs to {data-dir}/firehose.log.json ")
+	RootCmd.PersistentFlags().Bool("log-to-file", false, "Also write logs to {sf-data-dir}/firehose.log.json ")
 	RootCmd.PersistentFlags().String("log-level-switcher-listen-addr", "localhost:1065", FlagDescription(`
 		If non-empty, a JSON based HTTP server will listen on this address to let you switch the default logging level
 		of all registered loggers to a different one on the fly. This enables switching to debug level on
@@ -47,7 +47,7 @@ func Main() {
 		'info', 'warn', 'error', 'panic'. Can be used to silence loggers by using 'panic' (well, technically it's not a full
 		silence but almost), or make them more verbose and change it back later.
 	`))
-	RootCmd.PersistentFlags().CountP("log-verbosity", "v", "Enables verbose output (-vvvv for max verbosity)")
+	RootCmd.PersistentFlags().CountP("verbose", "v", "Enables verbose output (-vvvv for max verbosity)")
 
 	RootCmd.PersistentFlags().String("metrics-listen-addr", MetricsListenAddr, "If non-empty, the process will listen on this address to server the Prometheus metrics collected by the components.")
 	RootCmd.PersistentFlags().String("pprof-listen-addr", "localhost:6060", "If non-empty, the process will listen on this address for pprof analysis (see https://golang.org/pkg/net/http/pprof/)")
@@ -78,7 +78,7 @@ func Main() {
 		return nil
 	}
 
-	derr.Check("acme-blockchain", RootCmd.Execute())
+	derr.Check("antelope", RootCmd.Execute())
 }
 
 var startCmdExample = `fireantelope start reader-node`

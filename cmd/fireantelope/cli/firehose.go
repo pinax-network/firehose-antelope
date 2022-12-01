@@ -23,7 +23,7 @@ var headBlockNumMetric = metricset.NewHeadBlockNumber("firehose")
 var headTimeDriftmetric = metricset.NewHeadTimeDrift("firehose")
 
 func init() {
-	appLogger, _ := logging.PackageLogger("firehose", "github.com/streamingfast/firehose-acme/firehose")
+	appLogger, _ := logging.PackageLogger("firehose", "github.com/EOS-Nation/firehose-antelope/firehose")
 
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          "firehose",
@@ -34,7 +34,8 @@ func init() {
 
 			cmd.Flags().Bool("substreams-enabled", false, "Whether to enable substreams")
 			cmd.Flags().Bool("substreams-partial-mode-enabled", false, "Whether to enable partial stores generation support on this instance (usually for internal deployments only)")
-			cmd.Flags().String("substreams-state-store-url", "{data-dir}/localdata", "where substreams state data are stored")
+			cmd.Flags().Bool("substreams-request-stats-enabled", false, "Enables stats per request, like block rate. Should only be enabled in debugging instance not in production")
+			cmd.Flags().String("substreams-state-store-url", "{sf-data-dir}/localdata", "where substreams state data are stored")
 			cmd.Flags().Uint64("substreams-stores-save-interval", uint64(1_000), "Interval in blocks at which to save store snapshots")     // fixme
 			cmd.Flags().Uint64("substreams-output-cache-save-interval", uint64(100), "Interval in blocks at which to save store snapshots") // fixme
 			cmd.Flags().Int("substreams-parallel-subrequest-limit", 4, "number of parallel subrequests substream can make to synchronize its stores")
@@ -50,6 +51,8 @@ func init() {
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
 
+			blockstreamAddr := viper.GetString("common-live-blocks-addr")
+
 			authenticator, err := dauthAuthenticator.New(viper.GetString("common-auth-plugin"))
 			if err != nil {
 				return nil, fmt.Errorf("unable to initialize dauth: %w", err)
@@ -61,9 +64,14 @@ func init() {
 			}
 			dmetering.SetDefaultMeter(metering)
 
+			mergedBlocksStoreURL, oneBlocksStoreURL, forkedBlocksStoreURL, err := getCommonStoresURLs(runtime.AbsDataDir)
+			if err != nil {
+				return nil, err
+			}
+
 			var registerServiceExt firehoseApp.RegisterServiceExtensionFunc
 			if viper.GetBool("substreams-enabled") {
-				stateStore, err := dstore.NewStore(MustReplaceDataDir(sfDataDir, viper.GetString("substreams-state-store-url")), "", "", true)
+				stateStore, err := dstore.NewStore(mustReplaceDataDir(sfDataDir, viper.GetString("substreams-state-store-url")), "", "", true)
 				if err != nil {
 					return nil, fmt.Errorf("setting up state store for data: %w", err)
 				}
@@ -71,6 +79,10 @@ func init() {
 				opts := []substreamsService.Option{
 					substreamsService.WithStoresSaveInterval(viper.GetUint64("substreams-stores-save-interval")),
 					substreamsService.WithOutCacheSaveInterval(viper.GetUint64("substreams-output-cache-save-interval")),
+				}
+
+				if viper.GetBool("substreams-request-stats-enabled") {
+					opts = append(opts, substreamsService.WithRequestStats())
 				}
 
 				if viper.GetBool("substreams-partial-mode-enabled") {
@@ -91,9 +103,9 @@ func init() {
 
 				sss, err := substreamsService.New(
 					stateStore,
-					"sf.aptos.type.v1.Block",
-					viper.GetInt("substreams-sub-request-parallel-jobs"),
-					viper.GetInt("substreams-sub-request-block-range-size"),
+					"sf.antelope.type.v2.Block",
+					viper.GetUint64("substreams-sub-request-parallel-jobs"),
+					viper.GetUint64("substreams-sub-request-block-range-size"),
 					clientConfig,
 					opts...,
 				)
@@ -105,9 +117,10 @@ func init() {
 			}
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
-				OneBlocksStoreURL:       MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
-				MergedBlocksStoreURL:    MustReplaceDataDir(sfDataDir, viper.GetString("common-merged-blocks-store-url")),
-				BlockStreamAddr:         viper.GetString("common-live-blocks-addr"),
+				OneBlocksStoreURL:       oneBlocksStoreURL,
+				MergedBlocksStoreURL:    mergedBlocksStoreURL,
+				ForkedBlocksStoreURL:    forkedBlocksStoreURL,
+				BlockStreamAddr:         blockstreamAddr,
 				GRPCListenAddr:          viper.GetString("firehose-grpc-listen-addr"),
 				GRPCShutdownGracePeriod: 1 * time.Second,
 			}, &firehoseApp.Modules{

@@ -61,7 +61,13 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 		lines: lines,
 		close: func() {},
 
-		ctx:   &parseCtx{logger: logger, globalStats: globalStats},
+		ctx: &parseCtx{
+			logger:       logger,
+			globalStats:  globalStats,
+			currentBlock: &pbantelope.Block{},
+			currentTrace: &pbantelope.TransactionTrace{},
+			abiDecoder:   newABIDecoder(),
+		},
 		done:  make(chan interface{}),
 		stats: globalStats,
 
@@ -83,9 +89,9 @@ func (c *ConsoleReader) Close() {
 
 type consoleReaderStats struct {
 	lastBlock             bstream.BlockRef
-	blockRate             *dmetrics.LocalCounter
-	blockAverageParseTime *dmetrics.LocalCounter
-	transactionRate       *dmetrics.LocalCounter
+	blockRate             *dmetrics.RateCounter
+	blockAverageParseTime *dmetrics.AvgDurationCounter
+	transactionRate       *dmetrics.AvgCounter
 
 	cancelPeriodicLogger context.CancelFunc
 }
@@ -94,8 +100,8 @@ func newConsoleReaderStats() *consoleReaderStats {
 	return &consoleReaderStats{
 		lastBlock:             bstream.BlockRefEmpty,
 		blockRate:             dmetrics.NewPerMinuteLocalRateCounter("blocks"),
-		blockAverageParseTime: dmetrics.NewAvgPerMinuteLocalRateCounter("ms/block"),
-		transactionRate:       dmetrics.NewPerMinuteLocalRateCounter("trxs"),
+		blockAverageParseTime: dmetrics.NewAvgDurationCounter(1*time.Minute, 1*time.Millisecond, "processing block"),
+		transactionRate:       dmetrics.NewAvgCounter(1*time.Minute, "trxs"),
 	}
 }
 
@@ -808,6 +814,8 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 		return nil, fmt.Errorf("block_num %d doesn't match the active block num (%d)", blockNum, ctx.activeBlockNum)
 	}
 
+	ctx.stats = newParsingStats(ctx.logger, uint64(blockNum))
+
 	blockStateHex, err := hex.DecodeString(chunks[2])
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
@@ -824,6 +832,12 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 	if err != nil {
 		return nil, fmt.Errorf("abi decoding post-process failed: %w", err)
 	}
+
+	ctx.globalStats.lastBlock = ctx.currentBlock.AsRef()
+	ctx.globalStats.blockRate.Inc()
+	ctx.globalStats.blockAverageParseTime.AddElapsedTime(ctx.stats.startAt)
+	ctx.globalStats.transactionRate.IncBy(int64(len(ctx.currentBlock.TransactionTraces())))
+	ctx.stats.log()
 
 	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
 	ctx.resetBlock()
