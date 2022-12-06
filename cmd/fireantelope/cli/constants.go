@@ -1,11 +1,6 @@
 package cli
 
 const (
-	//
-	/// *Important* tweak values below until next "Standard Values" section to fit
-	/// your chain. The constants value are important to get correclty for proper
-	/// working of the Firehose stack
-	//
 
 	// This should be the block number of the first block that is streamable using Firehose,
 	// for example on Ethereum it's set to `0`, the genesis block's number while on EOSIO it's
@@ -39,6 +34,9 @@ const (
 	// our standard instrumentation if using the Geth client, value is `geth`, on EOSIO
 	// chain, it's `nodeos`.
 	ChainExecutableName = "nodeos"
+
+	NodeosAPIAddr string = ":8888"
+	SnapshotsURL  string = "file://{sf-data-dir}/storage/snapshots"
 
 	//
 	/// Standard Values

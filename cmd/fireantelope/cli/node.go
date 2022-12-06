@@ -3,24 +3,25 @@ package cli
 import (
 	"fmt"
 	"github.com/EOS-Nation/firehose-antelope/codec"
-	"strings"
-	"time"
-
 	"github.com/EOS-Nation/firehose-antelope/nodemanager"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream/blockstream"
-	"github.com/streamingfast/dlauncher/launcher"
-	"github.com/streamingfast/logging"
-	nodeManager "github.com/streamingfast/node-manager"
 	nodeManagerApp "github.com/streamingfast/node-manager/app/node_manager2"
-	"github.com/streamingfast/node-manager/metrics"
 	reader "github.com/streamingfast/node-manager/mindreader"
 	"github.com/streamingfast/node-manager/operator"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	pbheadinfo "github.com/streamingfast/pbgo/sf/headinfo/v1"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"os"
+	"strings"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/logging"
+	nodeManager "github.com/streamingfast/node-manager"
+	"github.com/streamingfast/node-manager/metrics"
+	"go.uber.org/zap"
 )
 
 var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/EOS-Nation/firehose-antelope/node")
@@ -45,7 +46,35 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	`, flagPrefix+"path"))
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")
-	cmd.Flags().String(flagPrefix+"arguments", "", "If not empty, overrides the list of default node arguments (computed from node type and role). Start with '+' to append to default args instead of replacing. ")
+	cmd.Flags().String(flagPrefix+"arguments", "", "Extra arguments to be passed when executing nodeos binary.")
+
+	// port over dfuse flags from here
+	cmd.Flags().String(flagPrefix+"http-listen-addr", NodeManagerAPIAddr, "The dfuse Node Manager API address")
+	cmd.Flags().String(flagPrefix+"nodeos-api-addr", NodeosAPIAddr, "Target API address to communicate with underlying superviser")
+	cmd.Flags().Bool(flagPrefix+"connection-watchdog", false, "Force-reconnect dead peers automatically")
+	cmd.Flags().String(flagPrefix+"config-dir", "./producer", "Directory for config files")
+	cmd.Flags().String(flagPrefix+"producer-hostname", "", "Hostname that will produce block (other will be paused)")
+	cmd.Flags().String(flagPrefix+"trusted-producer", "", "The EOS account name of the Block Producer we trust all blocks from")
+	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 5*time.Second, "/healthz will return error until nodeos head block time is within that duration to now")
+	cmd.Flags().String(flagPrefix+"bootstrap-data-url", "", "The bootstrap data URL containing specific chain data used to initialized it.")
+	cmd.Flags().String(flagPrefix+"snapshot-store-url", SnapshotsURL, "Storage bucket with path prefix where state snapshots should be done. Ex: gs://example/snapshots")
+	cmd.Flags().Bool(flagPrefix+"debug-deep-mind", false, "Whether to print all Deepming log lines or not")
+	cmd.Flags().String(flagPrefix+"auto-restore-source", "snapshot", "Enables restore from the latest source. Can be either, 'snapshot' or 'backup'. Do not use 'backup' on single block producing node")
+	cmd.Flags().String(flagPrefix+"restore-backup-name", "", "If non-empty, the node will be restored from that backup every time it starts.")
+	cmd.Flags().String(flagPrefix+"restore-snapshot-name", "", "If non-empty, the node will be restored from that snapshot when it starts.")
+	cmd.Flags().Duration(flagPrefix+"shutdown-delay", 0, "Delay before shutting manager when sigterm received")
+	cmd.Flags().String(flagPrefix+"backup-tag", "default", "tag to identify the backup")
+	cmd.Flags().Bool(flagPrefix+"disable-profiler", true, "Disables the node-manager profiler")
+	// cmd.Flags().StringSlice(flagPrefix+"nodeos-args", []string{}, "Extra arguments to be passed when executing nodeos binary")
+	// cmd.Flags().Bool(flagPrefix+"log-to-zap", true, "Enables the deepmind logs to be outputted as debug in the zap logger")
+	cmd.Flags().String(flagPrefix+"auto-backup-hostname-match", "", "If non-empty, auto-backups will only trigger if os.Hostname() return this value")
+	cmd.Flags().String(flagPrefix+"auto-snapshot-hostname-match", "", "If non-empty, auto-snapshots will only trigger if os.Hostname() return this value")
+	cmd.Flags().Int(flagPrefix+"auto-backup-modulo", 0, "If non-zero, a backup will be taken every {auto-backup-modulo} block.")
+	cmd.Flags().Duration(flagPrefix+"auto-backup-period", 0, "If non-zero, a backup will be taken every period of {auto-backup-period}. Specify 1h, 2h...")
+	cmd.Flags().Int(flagPrefix+"auto-snapshot-modulo", 0, "If non-zero, a snapshot will be taken every {auto-snapshot-modulo} block.")
+	cmd.Flags().Duration(flagPrefix+"auto-snapshot-period", 0, "If non-zero, a snapshot will be taken every period of {auto-snapshot-period}. Specify 1h, 2h...")
+	cmd.Flags().Int(flagPrefix+"number-of-snapshots-to-keep", 0, "if non-zero, after a successful snapshot, older snapshots will be deleted to only keep that number of recent snapshots")
+	cmd.Flags().Bool(flagPrefix+"force-production", true, "Forces the production of blocks")
 }
 
 func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) error, managerAPIaddr string) {
@@ -76,23 +105,24 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 	return func(runtime *launcher.Runtime) (launcher.App, error) {
 		var appLogger *zap.Logger
 		var appTracer logging.Tracer
-		var supervisedProcessLogger *zap.Logger
+		// var supervisedProcessLogger *zap.Logger
 
 		switch kind {
 		case "node":
 			appLogger = nodeLogger
 			appTracer = nodeTracer
-			supervisedProcessLogger = nodeAcmeChainLogger
+			// supervisedProcessLogger = nodeAcmeChainLogger
 		case "reader":
 			appLogger = readerLogger
 			appTracer = readerTracer
-			supervisedProcessLogger = readerAcmeChainLogger
+			// supervisedProcessLogger = readerAcmeChainLogger
 		default:
 			panic(fmt.Errorf("unknown node kind %q", kind))
 		}
 
 		sfDataDir := runtime.AbsDataDir
 
+		hostname, _ := os.Hostname()
 		nodePath := viper.GetString(flagPrefix + "path")
 		nodeDataDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
 
@@ -113,41 +143,55 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 		metricsAndReadinessManager := buildMetricsAndReadinessManager(flagPrefix, readinessMaxLatency)
 
-		superviser := nodemanager.NewSuperviser(
-			nodePath,
-			nodeArguments,
-			nodeDataDir,
-			metricsAndReadinessManager.UpdateHeadBlock,
+		supervisor, err := nodemanager.NewSuperviser(
 			debugFirehose,
-			logToZap,
+			metricsAndReadinessManager.UpdateHeadBlock,
+			&nodemanager.SuperviserOptions{
+				LocalNodeEndpoint: viper.GetString(flagPrefix + "nodeos-api-addr"),
+				ConfigDir:         viper.GetString(flagPrefix + "config-dir"),
+				BinPath:           nodePath,
+				DataDir:           nodeDataDir,
+				Hostname:          hostname,
+				ProducerHostname:  viper.GetString(flagPrefix + "producer-hostname"),
+				// todo unused? ProducerHostnameFromViper: false,
+				TrustedProducer: viper.GetString(flagPrefix + "trusted-producer"),
+				ForceProduction: viper.GetBool(flagPrefix + "force-production"),
+				AdditionalArgs:  nodeArguments,
+				// todo unused? NoBlocksLog:               false,
+				LogToZap: logToZap,
+			},
 			appLogger,
-			supervisedProcessLogger,
 		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize supervisor: %w", err)
+		}
 
-		bootstrapper := &bootstrapper{
-			nodeDataDir: nodeDataDir,
+		bootstrapper := &nodemanager.NodeosBootstrapper{
+			Options: nodemanager.BootstrapOptions{
+				BootstrapDataURL:        viper.GetString(flagPrefix + "bootstrap-data-url"),
+				BackupTag:               viper.GetString(flagPrefix + "backup-tag"),
+				BackupStoreURL:          mustReplaceDataDir(sfDataDir, viper.GetString("common-backup-store-url")),
+				AutoRestoreSource:       viper.GetString(flagPrefix + "auto-restore-source"),
+				RestoreBackupName:       viper.GetString(flagPrefix + "restore-backup-name"),
+				RestoreSnapshotName:     viper.GetString(flagPrefix + "restore-snapshot-name"),
+				SnapshotStoreURL:        mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"snapshot-store-url")),
+				NumberOfSnapshotsToKeep: viper.GetInt(flagPrefix + "number-of-snapshots-to-keep"),
+				BlocksDir:               supervisor.GetBlocksDir(),
+			},
+			Logger: appLogger,
 		}
 
 		chainOperator, err := operator.New(
 			appLogger,
-			superviser,
+			supervisor,
 			metricsAndReadinessManager,
 			&operator.Options{
-				ShutdownDelay:              shutdownDelay,
-				EnableSupervisorMonitoring: true,
 				Bootstrapper:               bootstrapper,
+				EnableSupervisorMonitoring: true,
+				ShutdownDelay:              shutdownDelay,
 			})
 		if err != nil {
 			return nil, fmt.Errorf("unable to create chain operator: %w", err)
-		}
-
-		if kind != "reader" {
-			return nodeManagerApp.New(&nodeManagerApp.Config{
-				HTTPAddr: httpAddr,
-			}, &nodeManagerApp.Modules{
-				Operator:                   chainOperator,
-				MetricsAndReadinessManager: metricsAndReadinessManager,
-			}, appLogger), nil
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
@@ -181,7 +225,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("new reader plugin: %w", err)
 		}
 
-		superviser.RegisterLogPlugin(readerPlugin)
+		supervisor.RegisterLogPlugin(readerPlugin)
 
 		return nodeManagerApp.New(&nodeManagerApp.Config{
 			HTTPAddr: httpAddr,
@@ -197,6 +241,83 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 				return nil
 			},
 		}, appLogger), nil
+
+		/*
+			bootstrapper := &bootstrapper{
+				nodeDataDir: nodeDataDir,
+			}
+
+			chainOperator, err := operator.New(
+				appLogger,
+				supervisor,
+				metricsAndReadinessManager,
+				&operator.Options{
+					ShutdownDelay:              shutdownDelay,
+					EnableSupervisorMonitoring: true,
+					Bootstrapper:               bootstrapper,
+				})
+			if err != nil {
+				return nil, fmt.Errorf("unable to create chain operator: %w", err)
+			}
+
+			if kind != "reader" {
+				return nodeManagerApp.New(&nodeManagerApp.Config{
+					HTTPAddr: httpAddr,
+				}, &nodeManagerApp.Modules{
+					Operator:                   chainOperator,
+					MetricsAndReadinessManager: metricsAndReadinessManager,
+				}, appLogger), nil
+			}
+
+			blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
+			oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
+			workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir"))
+			gprcListenAddr := viper.GetString("reader-node-grpc-listen-addr")
+			batchStartBlockNum := viper.GetUint64("reader-node-start-block-num")
+			batchStopBlockNum := viper.GetUint64("reader-node-stop-block-num")
+			oneBlockFileSuffix := viper.GetString("reader-node-one-block-suffix")
+			blocksChanCapacity := viper.GetInt("reader-node-blocks-chan-capacity")
+
+			readerPlugin, err := reader.NewMindReaderPlugin(
+				oneBlocksStoreURL,
+				workingDir,
+				func(lines chan string) (reader.ConsolerReader, error) {
+					return codec.NewConsoleReader(appLogger, lines)
+				},
+				batchStartBlockNum,
+				batchStopBlockNum,
+				blocksChanCapacity,
+				metricsAndReadinessManager.UpdateHeadBlock,
+				func(error) {
+					chainOperator.Shutdown(nil)
+				},
+				oneBlockFileSuffix,
+				blockStreamServer,
+				appLogger,
+				appTracer,
+			)
+			if err != nil {
+				return nil, fmt.Errorf("new reader plugin: %w", err)
+			}
+
+			supervisor.RegisterLogPlugin(readerPlugin)
+
+			return nodeManagerApp.New(&nodeManagerApp.Config{
+				HTTPAddr: httpAddr,
+				GRPCAddr: gprcListenAddr,
+			}, &nodeManagerApp.Modules{
+				Operator:                   chainOperator,
+				MindreaderPlugin:           readerPlugin,
+				MetricsAndReadinessManager: metricsAndReadinessManager,
+				RegisterGRPCService: func(server grpc.ServiceRegistrar) error {
+					pbheadinfo.RegisterHeadInfoServer(server, blockStreamServer)
+					pbbstream.RegisterBlockStreamServer(server, blockStreamServer)
+
+					return nil
+				},
+			}, appLogger), nil
+
+		*/
 	}
 }
 
@@ -212,6 +333,9 @@ func (b *bootstrapper) Bootstrap() error {
 type nodeArgsByRole map[string]string
 
 func buildNodeArguments(nodeDataDir, nodeRole string, args string) ([]string, error) {
+
+	// todo figure out roles here, might be reader, producer, bootstrap, ... ?
+
 	typeRoles := nodeArgsByRole{
 		"reader": "start --store-dir={node-data-dir} {extra-arg}",
 	}

@@ -25,31 +25,69 @@ import (
 	"time"
 )
 
-// todo reimplement?
-// var _ node_manager.BootstrapableChainSuperviser = (*NodeosSuperviser)(nil)
+type BootstrapOptions struct {
 
-func (s *NodeosSuperviser) Bootstrap(bootstrapDataURL string) error {
-	s.Logger.Info("bootstrapping blocks.log from pre-built data", zap.String("bootstrap_data_url", bootstrapDataURL))
+	// todo replace stores with dstores??
+	BackupTag            string
+	BackupStoreURL       string
+	SnapshotStoreURL     string
+	VolumeSnapshotAppVer string
+	Namespace            string //k8s namespace
+	Pod                  string //k8s podname
+	PVCPrefix            string
+	Project              string //gcp project
+
+	BootstrapSnapshotName   string
+	BootstrapDataURL        string
+	AutoRestoreSource       string
+	NumberOfSnapshotsToKeep int
+	RestoreBackupName       string
+	RestoreSnapshotName     string
+	BlocksDir               string
+}
+
+type NodeosBootstrapper struct {
+	Options BootstrapOptions
+	Logger  *zap.Logger
+}
+
+func (b *NodeosBootstrapper) Bootstrap() error {
+	b.Logger.Info("bootstrapping blocks.log from pre-built data", zap.String("bootstrap_data_url", b.Options.BootstrapDataURL))
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
-	reader, _, _, err := dstore.OpenObject(ctx, bootstrapDataURL)
+	reader, _, _, err := dstore.OpenObject(ctx, b.Options.BootstrapDataURL)
 	if err != nil {
 		return fmt.Errorf("cannot get snapshot from data store: %w", err)
 	}
 	defer reader.Close()
 
-	return s.createBlocksLogFile(reader)
+	return b.createBlocksLogFile(reader)
 }
 
-func (s *NodeosSuperviser) createBlocksLogFile(reader io.Reader) error {
-	err := os.MkdirAll(s.blocksDir, os.ModePerm)
+//func (s *NodeosSuperviser) Bootstrap(bootstrapDataURL string) error {
+//	s.Logger.Info("bootstrapping blocks.log from pre-built data", zap.String("bootstrap_data_url", bootstrapDataURL))
+//
+//	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
+//	defer cancel()
+//
+//	reader, _, _, err := dstore.OpenObject(ctx, bootstrapDataURL)
+//	if err != nil {
+//		return fmt.Errorf("cannot get snapshot from data store: %w", err)
+//	}
+//	defer reader.Close()
+//
+//	return s.createBlocksLogFile(reader)
+//}
+
+func (b *NodeosBootstrapper) createBlocksLogFile(reader io.Reader) error {
+	err := os.MkdirAll(b.Options.BlocksDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("unable to create blocks log file: %w", err)
 	}
 
-	file, err := os.Create(filepath.Join(s.blocksDir, "blocks.log"))
+	file, err := os.Create(filepath.Join(b.Options.BlocksDir, "blocks.log"))
 	if err != nil {
 		return fmt.Errorf("unable to create blocks log file: %w", err)
 	}

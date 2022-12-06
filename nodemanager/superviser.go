@@ -101,7 +101,7 @@ type SuperviserOptions struct {
 
 	// AdditionalArgs are parameters you want to pass down to `nodeos`
 	// in addition to the ones `node manager` would add itself.  You're
-	// better off putting long-running parameters in the `config.ini`
+	// better off, putting long-running parameters in the `config.ini`
 	// though.
 	AdditionalArgs []string
 
@@ -138,7 +138,6 @@ func NewSuperviser(debugDeepMind bool, headBlockUpdateFunc nodeManager.HeadBlock
 		logger:              logger,
 	}
 
-	// todo check if we need this
 	s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
 
 	if options.LogToZap {
@@ -152,6 +151,10 @@ func NewSuperviser(debugDeepMind bool, headBlockUpdateFunc nodeManager.HeadBlock
 
 func (s *NodeosSuperviser) GetCommand() string {
 	return s.options.BinPath + " " + strings.Join(s.getArguments(), " ")
+}
+
+func (s *NodeosSuperviser) GetBlocksDir() string {
+	return s.blocksDir
 }
 
 func (s *NodeosSuperviser) HasData() bool {
