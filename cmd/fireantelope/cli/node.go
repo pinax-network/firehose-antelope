@@ -52,10 +52,10 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	cmd.Flags().String(flagPrefix+"http-listen-addr", NodeManagerAPIAddr, "The dfuse Node Manager API address")
 	cmd.Flags().String(flagPrefix+"nodeos-api-addr", NodeosAPIAddr, "Target API address to communicate with underlying superviser")
 	cmd.Flags().Bool(flagPrefix+"connection-watchdog", false, "Force-reconnect dead peers automatically")
-	cmd.Flags().String(flagPrefix+"config-dir", "./producer", "Directory for config files")
+	cmd.Flags().String(flagPrefix+"config-dir", "{sf-data-dir}/{node-role}/config", "Directory for config files")
 	cmd.Flags().String(flagPrefix+"producer-hostname", "", "Hostname that will produce block (other will be paused)")
 	cmd.Flags().String(flagPrefix+"trusted-producer", "", "The EOS account name of the Block Producer we trust all blocks from")
-	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 5*time.Second, "/healthz will return error until nodeos head block time is within that duration to now")
+	// cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 5*time.Second, "/healthz will return error until nodeos head block time is within that duration to now")
 	cmd.Flags().String(flagPrefix+"bootstrap-data-url", "", "The bootstrap data URL containing specific chain data used to initialized it.")
 	cmd.Flags().String(flagPrefix+"snapshot-store-url", SnapshotsURL, "Storage bucket with path prefix where state snapshots should be done. Ex: gs://example/snapshots")
 	cmd.Flags().Bool(flagPrefix+"debug-deep-mind", false, "Whether to print all Deepming log lines or not")
@@ -125,6 +125,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		hostname, _ := os.Hostname()
 		nodePath := viper.GetString(flagPrefix + "path")
 		nodeDataDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
+		nodeConfigDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"config-dir")))
 
 		readinessMaxLatency := viper.GetDuration(flagPrefix + "readiness-max-latency")
 		debugFirehose := viper.GetBool(flagPrefix + "debug-firehose-logs")
@@ -148,7 +149,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			metricsAndReadinessManager.UpdateHeadBlock,
 			&nodemanager.SuperviserOptions{
 				LocalNodeEndpoint: viper.GetString(flagPrefix + "nodeos-api-addr"),
-				ConfigDir:         viper.GetString(flagPrefix + "config-dir"),
+				ConfigDir:         nodeConfigDir,
 				BinPath:           nodePath,
 				DataDir:           nodeDataDir,
 				Hostname:          hostname,
@@ -166,27 +167,27 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("failed to initialize supervisor: %w", err)
 		}
 
-		bootstrapper := &nodemanager.NodeosBootstrapper{
-			Options: nodemanager.BootstrapOptions{
-				BootstrapDataURL:        viper.GetString(flagPrefix + "bootstrap-data-url"),
-				BackupTag:               viper.GetString(flagPrefix + "backup-tag"),
-				BackupStoreURL:          mustReplaceDataDir(sfDataDir, viper.GetString("common-backup-store-url")),
-				AutoRestoreSource:       viper.GetString(flagPrefix + "auto-restore-source"),
-				RestoreBackupName:       viper.GetString(flagPrefix + "restore-backup-name"),
-				RestoreSnapshotName:     viper.GetString(flagPrefix + "restore-snapshot-name"),
-				SnapshotStoreURL:        mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"snapshot-store-url")),
-				NumberOfSnapshotsToKeep: viper.GetInt(flagPrefix + "number-of-snapshots-to-keep"),
-				BlocksDir:               supervisor.GetBlocksDir(),
-			},
-			Logger: appLogger,
-		}
+		//bootstrapper := &nodemanager.NodeosBootstrapper{
+		//	Options: nodemanager.BootstrapOptions{
+		//		BootstrapDataURL:        viper.GetString(flagPrefix + "bootstrap-data-url"),
+		//		BackupTag:               viper.GetString(flagPrefix + "backup-tag"),
+		//		BackupStoreURL:          mustReplaceDataDir(sfDataDir, viper.GetString("common-backup-store-url")),
+		//		AutoRestoreSource:       viper.GetString(flagPrefix + "auto-restore-source"),
+		//		RestoreBackupName:       viper.GetString(flagPrefix + "restore-backup-name"),
+		//		RestoreSnapshotName:     viper.GetString(flagPrefix + "restore-snapshot-name"),
+		//		SnapshotStoreURL:        mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"snapshot-store-url")),
+		//		NumberOfSnapshotsToKeep: viper.GetInt(flagPrefix + "number-of-snapshots-to-keep"),
+		//		BlocksDir:               supervisor.GetBlocksDir(),
+		//	},
+		//	Logger: appLogger,
+		//}
 
 		chainOperator, err := operator.New(
 			appLogger,
 			supervisor,
 			metricsAndReadinessManager,
 			&operator.Options{
-				Bootstrapper:               bootstrapper,
+				// Bootstrapper:               bootstrapper,
 				EnableSupervisorMonitoring: true,
 				ShutdownDelay:              shutdownDelay,
 			})
@@ -337,7 +338,7 @@ func buildNodeArguments(nodeDataDir, nodeRole string, args string) ([]string, er
 	// todo figure out roles here, might be reader, producer, bootstrap, ... ?
 
 	typeRoles := nodeArgsByRole{
-		"reader": "start --store-dir={node-data-dir} {extra-arg}",
+		"reader": "{extra-arg}",
 	}
 
 	argsString, ok := typeRoles[nodeRole]
