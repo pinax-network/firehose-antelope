@@ -11,7 +11,6 @@ import (
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	pbheadinfo "github.com/streamingfast/pbgo/sf/headinfo/v1"
 	"google.golang.org/grpc"
-	"os"
 	"strings"
 	"time"
 
@@ -47,6 +46,14 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")
 	cmd.Flags().String(flagPrefix+"arguments", "", "Extra arguments to be passed when executing nodeos binary.")
+	cmd.Flags().String(flagPrefix+"bootstrap-snapshot-url", "", FlagDescription(`
+		Snapshot file URL to bootstrap nodeos from. If this is set the snapshot will be downloaded to the data directory and 
+		nodeos will be started with the --snapshot flag. This can be used to parallelize processing a chain by setting 
+		up multiple readers starting from different snapshots. 
+
+		The store url accepts all protocols supported by dstore, which currently are file://, s3://, gs:// and az://. 
+		For more infos about supported urls see: https://github.com/streamingfast/dstore
+	`))
 
 	// port over dfuse flags from here
 	cmd.Flags().String(flagPrefix+"http-listen-addr", NodeManagerAPIAddr, "The dfuse Node Manager API address")
@@ -122,7 +129,6 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 
 		sfDataDir := runtime.AbsDataDir
 
-		hostname, _ := os.Hostname()
 		nodePath := viper.GetString(flagPrefix + "path")
 		nodeDataDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
 		nodeConfigDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"config-dir")))
@@ -147,19 +153,13 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		supervisor, err := nodemanager.NewSuperviser(
 			debugFirehose,
 			metricsAndReadinessManager.UpdateHeadBlock,
-			&nodemanager.SuperviserOptions{
+			&nodemanager.NodeosOptions{
 				LocalNodeEndpoint: viper.GetString(flagPrefix + "nodeos-api-addr"),
 				ConfigDir:         nodeConfigDir,
 				BinPath:           nodePath,
 				DataDir:           nodeDataDir,
-				Hostname:          hostname,
-				ProducerHostname:  viper.GetString(flagPrefix + "producer-hostname"),
-				// todo unused? ProducerHostnameFromViper: false,
-				TrustedProducer: viper.GetString(flagPrefix + "trusted-producer"),
-				ForceProduction: viper.GetBool(flagPrefix + "force-production"),
-				AdditionalArgs:  nodeArguments,
-				// todo unused? NoBlocksLog:               false,
-				LogToZap: logToZap,
+				AdditionalArgs:    nodeArguments,
+				LogToZap:          logToZap,
 			},
 			appLogger,
 		)
@@ -167,27 +167,12 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("failed to initialize supervisor: %w", err)
 		}
 
-		//bootstrapper := &nodemanager.NodeosBootstrapper{
-		//	Options: nodemanager.BootstrapOptions{
-		//		BootstrapDataURL:        viper.GetString(flagPrefix + "bootstrap-data-url"),
-		//		BackupTag:               viper.GetString(flagPrefix + "backup-tag"),
-		//		BackupStoreURL:          mustReplaceDataDir(sfDataDir, viper.GetString("common-backup-store-url")),
-		//		AutoRestoreSource:       viper.GetString(flagPrefix + "auto-restore-source"),
-		//		RestoreBackupName:       viper.GetString(flagPrefix + "restore-backup-name"),
-		//		RestoreSnapshotName:     viper.GetString(flagPrefix + "restore-snapshot-name"),
-		//		SnapshotStoreURL:        mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"snapshot-store-url")),
-		//		NumberOfSnapshotsToKeep: viper.GetInt(flagPrefix + "number-of-snapshots-to-keep"),
-		//		BlocksDir:               supervisor.GetBlocksDir(),
-		//	},
-		//	Logger: appLogger,
-		//}
-
 		chainOperator, err := operator.New(
 			appLogger,
 			supervisor,
 			metricsAndReadinessManager,
 			&operator.Options{
-				// Bootstrapper:               bootstrapper,
+				Bootstrapper:               supervisor,
 				EnableSupervisorMonitoring: true,
 				ShutdownDelay:              shutdownDelay,
 			})
@@ -322,14 +307,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 	}
 }
 
-type bootstrapper struct {
-	nodeDataDir string
-}
 
-func (b *bootstrapper) Bootstrap() error {
-	// You can copy coniguration files here into your working data dir to run the node off of
-	return nil
-}
 
 type nodeArgsByRole map[string]string
 
