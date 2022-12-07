@@ -116,7 +116,7 @@ func NewSuperviser(
 		logger:              logger,
 	}
 
-	s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
+	// s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
 
 	if nodeosOptions.LogToZap {
 		s.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, logger))

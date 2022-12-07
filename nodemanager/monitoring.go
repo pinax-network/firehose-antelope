@@ -69,16 +69,16 @@ func (s *NodeosSuperviser) Monitor() {
 		}
 
 		// monitor if BP is producer (should be 1 and only 1)
-		if s.IsActiveProducer() {
-			_, err := s.api.IsProducerPaused(context.Background())
-			// isProducerPaused, err := s.api.IsProducerPaused(context.Background())
-			if err != nil {
-				s.Logger.Debug("unable to check if producer is paused", zap.Error(err))
-			} else {
-				// todo reimplement
-				// metrics.SetNodeosIsBlockProducer(isProducerPaused)
-			}
-		}
+		//if s.IsActiveProducer() {
+		//	_, err := s.api.IsProducerPaused(context.Background())
+		//	// isProducerPaused, err := s.api.IsProducerPaused(context.Background())
+		//	if err != nil {
+		//		s.Logger.Debug("unable to check if producer is paused", zap.Error(err))
+		//	} else {
+		//		// todo reimplement
+		//		// metrics.SetNodeosIsBlockProducer(isProducerPaused)
+		//	}
+		//}
 
 		if lastDbSizeTime.IsZero() || time.Now().Sub(lastDbSizeTime).Seconds() > 30.0 {
 			s.Logger.Debug("first monitoring call or more than 30s has elapsed since last call, querying db size from nodeos")
