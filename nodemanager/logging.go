@@ -26,7 +26,7 @@ import (
 var logLevelRegex = regexp.MustCompile("^(<[0-9]>)?(info|warn|error)")
 
 func newToZapLogPlugin(debugDeepMind bool, logger *zap.Logger) *logplugin.ToZapLogPlugin {
-	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(logLevelExtractor))
+	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(newLogLevelExtractor().extract))
 }
 
 var discardRegex = regexp.MustCompile("(?i)" + "wabt.hpp:.*misaligned reference")
@@ -36,31 +36,47 @@ var toInfoRegex = regexp.MustCompile("(?i)" + "(" +
 		"platform_timer_accurac:.*Checktime timer",
 		"net_plugin.cpp:.*closing connection to:",
 		"net_plugin.cpp:.*connection failed to:",
+		"CHAINBASE:*",
 	}, "|") +
 	")")
 
-func logLevelExtractor(in string) zapcore.Level {
+type logLevelExtractor struct {
+	lastLineLevel zapcore.Level
+}
+
+func newLogLevelExtractor() *logLevelExtractor {
+	return &logLevelExtractor{}
+}
+
+func (l *logLevelExtractor) extract(in string) zapcore.Level {
+
 	if discardRegex.MatchString(in) {
-		return logplugin.NoDisplay
+		l.lastLineLevel = logplugin.NoDisplay
+		return l.lastLineLevel
 	}
 
 	if toInfoRegex.MatchString(in) {
-		return zap.InfoLevel
+		l.lastLineLevel = zap.InfoLevel
+		return l.lastLineLevel
 	}
 
 	groups := logLevelRegex.FindStringSubmatch(in)
 	if len(groups) <= 2 {
-		return zap.DebugLevel
+		// nodeos has multi line logs where only the first line contains the log level. This is likely the case here,
+		// so we return the log level of the last line instead to avoid losing log information.
+		return l.lastLineLevel
 	}
 
 	switch groups[2] {
 	case "info":
-		return zap.InfoLevel
+		l.lastLineLevel = zap.InfoLevel
 	case "warn":
-		return zap.WarnLevel
+		l.lastLineLevel = zap.WarnLevel
 	case "error":
-		return zap.ErrorLevel
+		l.lastLineLevel = zap.ErrorLevel
 	default:
-		return zap.DebugLevel
+		l.lastLineLevel = zap.DebugLevel
 	}
+
+	return l.lastLineLevel
 }

@@ -32,8 +32,8 @@ func (s *NodeosSuperviser) Bootstrap() error {
 		return nil
 	}
 
-	s.Logger.Info("bootstrapping nodeos from snapshot file as node-reader-bootstrap-snapshot-url is set")
-	s.Logger.Info("trying to download snapshot file...", zap.String("node-reader-bootstrap-snapshot-url", s.options.BootstrapSnapshotUrl))
+	s.Logger.Info("bootstrapping nodeos from snapshot file as reader-node-bootstrap-snapshot-url is set")
+	s.Logger.Info("trying to download snapshot file...", zap.String("reader-node-bootstrap-snapshot-url", s.options.BootstrapSnapshotUrl))
 
 	// todo is 30 min an appropriate timeout to download snapshots???
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
@@ -45,18 +45,40 @@ func (s *NodeosSuperviser) Bootstrap() error {
 	}
 	defer reader.Close()
 
-	s.snapshotRestoreFilename = snapshotFilename
+	s.snapshotRestorePath = filepath.Join(s.snapshotsDir, snapshotFilename)
 
-	return storeSnapshotFile(reader, s.snapshotsDir, s.snapshotRestoreFilename)
+	err = storeSnapshotFile(reader, s.snapshotsDir, s.snapshotRestorePath)
+	if err != nil {
+		return err
+	}
+
+	s.Logger.Info("successfully downloaded snapshot", zap.String("snapshot_path", s.snapshotRestorePath))
+
+	err = s.removeState()
+	if err != nil {
+		return err
+	}
+
+	err = s.removeBlocksLog()
+	if err != nil {
+		return err
+	}
+
+	err = s.removeReversibleBlocks()
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-func storeSnapshotFile(reader io.Reader, snapshotsDir, snapshotFilename string) error {
+func storeSnapshotFile(reader io.Reader, snapshotsDir, snapshotPath string) error {
 	err := os.MkdirAll(snapshotsDir, os.ModePerm)
 	if err != nil {
 		return fmt.Errorf("unable to create snapshot directory: %w", err)
 	}
 
-	file, err := os.Create(filepath.Join(snapshotsDir, snapshotFilename))
+	file, err := os.Create(snapshotPath)
 	if err != nil {
 		return fmt.Errorf("unable to create snapshot file: %w", err)
 	}

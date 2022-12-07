@@ -152,14 +152,14 @@ func (s *NodeosSuperviser) RestoreSnapshot(snapshotName string, snapshotStore ds
 
 	if snapshotName == "" {
 		s.Logger.Warn("cannot find latest snapshot, will replay from blocks.log")
-		s.snapshotRestoreFilename = ""
+		s.snapshotRestorePath = ""
 	} else {
 		s.Logger.Info("getting snapshot from store", zap.String("snapshot_name", snapshotName))
 		snapshotPath, err := s.downloadSnapshotFile(snapshotName, snapshotStore)
 		if err != nil {
 			return err
 		}
-		s.snapshotRestoreFilename = snapshotPath
+		s.snapshotRestorePath = snapshotPath
 		s.snapshotRestoreOnNextStart = true
 	}
 

@@ -154,12 +154,13 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			debugFirehose,
 			metricsAndReadinessManager.UpdateHeadBlock,
 			&nodemanager.NodeosOptions{
-				LocalNodeEndpoint: viper.GetString(flagPrefix + "nodeos-api-addr"),
-				ConfigDir:         nodeConfigDir,
-				BinPath:           nodePath,
-				DataDir:           nodeDataDir,
-				AdditionalArgs:    nodeArguments,
-				LogToZap:          logToZap,
+				LocalNodeEndpoint:    viper.GetString(flagPrefix + "nodeos-api-addr"),
+				ConfigDir:            nodeConfigDir,
+				BinPath:              nodePath,
+				DataDir:              nodeDataDir,
+				BootstrapSnapshotUrl: viper.GetString(flagPrefix + "bootstrap-snapshot-url"),
+				AdditionalArgs:       nodeArguments,
+				LogToZap:             logToZap,
 			},
 			appLogger,
 		)
@@ -306,8 +307,6 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		*/
 	}
 }
-
-
 
 type nodeArgsByRole map[string]string
 

@@ -53,7 +53,7 @@ type NodeosSuperviser struct {
 	productionStateLastProduced time.Time
 
 	snapshotRestoreOnNextStart bool
-	snapshotRestoreFilename    string
+	snapshotRestorePath        string
 
 	headBlockUpdateFunc nodeManager.HeadBlockUpdater
 
@@ -191,7 +191,7 @@ func (s *NodeosSuperviser) Start(options ...nodeManager.StartOption) error {
 	//	s.removeReversibleBlocks()
 	//}
 	//s.snapshotRestoreOnNextStart = false
-	//s.snapshotRestoreFilename = ""
+	//s.snapshotRestorePath = ""
 	//if s.options.NoBlocksLog {
 	//	s.removeBlocksLog()
 	//}
@@ -231,8 +231,8 @@ func (s *NodeosSuperviser) getArguments() []string {
 	args = append(args, fmt.Sprintf("--config-dir=%s", s.options.ConfigDir))
 	args = append(args, fmt.Sprintf("--data-dir=%s", s.options.DataDir))
 
-	if s.snapshotRestoreFilename != "" {
-		args = append(args, fmt.Sprintf("--snapshot=%s", s.snapshotRestoreFilename))
+	if s.snapshotRestorePath != "" {
+		args = append(args, fmt.Sprintf("--snapshot=%s", s.snapshotRestorePath))
 	} else {
 		args = append(args, fmt.Sprintf("--genesis-json=%s", filepath.Join(s.options.ConfigDir, "genesis.json")))
 	}
@@ -241,8 +241,8 @@ func (s *NodeosSuperviser) getArguments() []string {
 	//	args = append(args, "--genesis-json="+filepath.Join(s.options.ConfigDir, "genesis.json"))
 	//}
 	//
-	//if s.snapshotRestoreOnNextStart && s.snapshotRestoreFilename != "" {
-	//	args = append(args, "--snapshot="+s.snapshotRestoreFilename)
+	//if s.snapshotRestoreOnNextStart && s.snapshotRestorePath != "" {
+	//	args = append(args, "--snapshot="+s.snapshotRestorePath)
 	//}
 	//
 	//if !s.IsActiveProducer() {
