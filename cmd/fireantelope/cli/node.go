@@ -49,11 +49,25 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	cmd.Flags().String(flagPrefix+"bootstrap-snapshot-url", "", FlagDescription(`
 		Snapshot file URL to bootstrap nodeos from. If this is set the snapshot will be downloaded to the data directory and 
 		nodeos will be started with the --snapshot flag. This can be used to parallelize processing a chain by setting 
-		up multiple readers starting from different snapshots. 
+		up multiple readers starting from different snapshots.
+
+		This flag will be ignored in case there is already a snapshot with the same name available in the data directory,
+		that is to prevent replaying the snapshot multiple times in case the node manager is being restarted.
+
+		Note that restoring from snapshot means your blocks.log will be removed unless reader-node-bootstrap-keep-blocks
+		is set to true.
 
 		The store url accepts all protocols supported by dstore, which currently are file://, s3://, gs:// and az://. 
 		For more infos about supported urls see: https://github.com/streamingfast/dstore
 	`))
+	cmd.Flags().Bool(flagPrefix+"bootstrap-keep-blocks", false, FlagDescription(`
+		If this flag is set the bootstrapping process will not clean the blocks directory before replaying the chain
+		from snapshot. This is only taking affect if reader-node-bootstrap-snapshot-url is set. 
+
+		The recommended nodeos config for reader-nodes is to not create a blocks.log in the first place, which can be 
+		set using 'block-log-retain-blocks = 0' in the config.ini.
+	`))
+
 
 	// port over dfuse flags from here
 	cmd.Flags().String(flagPrefix+"http-listen-addr", NodeManagerAPIAddr, "The dfuse Node Manager API address")

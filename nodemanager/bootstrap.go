@@ -35,7 +35,6 @@ func (s *NodeosSuperviser) Bootstrap() error {
 	s.Logger.Info("bootstrapping nodeos from snapshot file as reader-node-bootstrap-snapshot-url is set")
 	s.Logger.Info("trying to download snapshot file...", zap.String("reader-node-bootstrap-snapshot-url", s.options.BootstrapSnapshotUrl))
 
-	// todo is 30 min an appropriate timeout to download snapshots???
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Minute)
 	defer cancel()
 
@@ -46,6 +45,16 @@ func (s *NodeosSuperviser) Bootstrap() error {
 	defer reader.Close()
 
 	s.snapshotRestorePath = filepath.Join(s.snapshotsDir, snapshotFilename)
+
+	// we check whether we have already downloaded the snapshot before and ignore the reader-node-bootstrap-snapshot-url
+	// if so. This is so the node manager does not replay the snapshot again if it gets restarted.
+	if _, err := os.Stat(s.snapshotRestorePath); err == nil {
+		s.Logger.Warn("a snapshot with this name already has been downloaded before, the reader-node-bootstrap-snapshot-url will be ignored!")
+		s.Logger.Warn("if you want to replay the snapshot again, deleted the local snapshot and restart the node manager", zap.String("snapshot_file", s.snapshotRestorePath))
+		s.snapshotRestorePath = ""
+		return nil
+	}
+
 
 	err = storeSnapshotFile(reader, s.snapshotsDir, s.snapshotRestorePath)
 	if err != nil {
