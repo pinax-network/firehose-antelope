@@ -10,5 +10,3 @@ start:
     # Flags that will be added to the dummy chain process command
     reader-node-arguments: ""
     reader-node-config-dir: "{sf-data-dir}/config/jungle4"
-    reader-node-data-dir: "/var/sf/data"
-    reader-node-bootstrap-snapshot-url: "/home/vagrant/latest"
