@@ -1,9 +1,9 @@
-project_name: firehose-acme
+project_name: firehose-antelope
 
 release:
   github:
     owner: streamingfast
-    name: firehose-acme
+    name: firehose-antelope
   name_template: '{{.Tag}}'
 builds:
 - goos:
@@ -56,14 +56,14 @@ signs:
   artifacts: checksum
 env_files:
   github_token: ~/.config/goreleaser/github_token
-brews:
-  - name: firehose-acme
-    tap:
-      owner: streamingfast
-      name: homebrew-tap
-    commit_author:
-      name: goreleaserbot
-      email: goreleaser@streamingfast.io
-    homepage: "https://github.com/streamingfast/firehose-acme"
-    description: "Firehose on Acme stack"
-    license: "Apache-2.0"
+#brews:
+#  - name: firehose-antelope
+#    tap:
+#      owner: EOS-Nation
+#      name: homebrew-tap
+#    commit_author:
+#      name: goreleaserbot
+#      email: goreleaser@eosnation.io
+#    homepage: "https://github.com/EOS-Nation/firehose-antelope"
+#    description: "Firehose on Antelope stack"
+#    license: "Apache-2.0"

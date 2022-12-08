@@ -23,7 +23,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-var logLevelRegex = regexp.MustCompile("^(<[0-9]>)?(info|warn|error)")
+var logLevelRegex = regexp.MustCompile("^(<[0-9]>)?(debug|info|warn|error)")
 
 func newToZapLogPlugin(debugDeepMind bool, logger *zap.Logger) *logplugin.ToZapLogPlugin {
 	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(newLogLevelExtractor().extract))
@@ -68,6 +68,8 @@ func (l *logLevelExtractor) extract(in string) zapcore.Level {
 	}
 
 	switch groups[2] {
+	case "debug":
+		l.lastLineLevel = zap.DebugLevel
 	case "info":
 		l.lastLineLevel = zap.InfoLevel
 	case "warn":
