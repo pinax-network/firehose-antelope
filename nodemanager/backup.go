@@ -14,15 +14,19 @@
 
 package nodemanager
 
-type NodeosBackupInfo struct {
-	ChainIDStr          string `yaml:"chainIdStr"`
-	ServerVersion       string `yaml:"serverVersion"`
-	LastBlockSeen       uint32 `yaml:"lastBlockSeen"`
-	ServerVersionString string `yaml:"serverVersionString"`
-}
 
-// todo reimplement backup handling
-// var _ node_manager.BackupableChainSuperviser = (*NodeosSuperviser)(nil)
+// todo this could be re-implemented using the backup modules, not sure if this is useful though
+// the blocks.log is not recommended to be stored in the first place for reader nodes so backing this up on larger
+// chains doesn't make sense. Those should use snapshots instead to restore.
+// If you are running local dev chains with only this node as producer feel free to use this code as a inspiration to
+// re-add that functionality.
+
+//type NodeosBackupInfo struct {
+//	ChainIDStr          string `yaml:"chainIdStr"`
+//	ServerVersion       string `yaml:"serverVersion"`
+//	LastBlockSeen       uint32 `yaml:"lastBlockSeen"`
+//	ServerVersionString string `yaml:"serverVersionString"`
+//}
 //
 //func (s *NodeosSuperviser) TakeBackup(backupTag string, backupStoreURL string) error {
 //	if s.options.NoBlocksLog {

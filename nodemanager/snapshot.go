@@ -15,7 +15,9 @@
 package nodemanager
 
 // todo the SnapshotableChainSuperviser has been removed from the node-manager repository
-// we would need to re-add this functionality upstream so we can re-implement this code
+// this could be re-implemented as a snapshot module, however we don't consider this as necessary as of right now.
+// Snapshots for the big chains are widely available (for example from https://snapshots.eosnation.io ) and for local dev
+// or test chains you could still trigger the snapshots calling the nodeos api directly.
 
 //func (s *NodeosSuperviser) TakeSnapshot(snapshotStore dstore.Store, numberOfSnapshotsToKeep int) error {
 //	s.Logger.Info("asking nodeos API to create a snapshot")
@@ -42,8 +44,7 @@ package nodemanager
 //		return fmt.Errorf("cannot write snapshot to store: %s", err)
 //	}
 //
-//	// todo reimplement
-//	// metrics.NodeosSuccessfulSnapshots.Inc()
+//	metrics.NodeosSuccessfulSnapshots.Inc()
 //
 //	if numberOfSnapshotsToKeep > 0 {
 //		err := cleanupSnapshots(snapshotStore, numberOfSnapshotsToKeep)
@@ -160,10 +161,9 @@ package nodemanager
 //		return err
 //	}
 //
-//	// todo check if needed
-//	//if s.HandlePostRestore != nil {
-//	//	s.HandlePostRestore()
-//	//}
+//	if s.HandlePostRestore != nil {
+//		s.HandlePostRestore()
+//	}
 //
 //	return nil
 //}

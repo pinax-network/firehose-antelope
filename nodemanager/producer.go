@@ -14,6 +14,11 @@
 
 package nodemanager
 
+// todo this could be re-implemented to add producer functionality to the node manager
+// as this is probably only relevant for single node dev instances we don't consider this necessary. If you want to
+// run the firehose stack on your local dev machine feel free to use this code as a inspiration to re-add that functionality
+// back to the node manager.
+
 //func (s *NodeosSuperviser) ResumeProduction() error {
 //	s.Logger.Info("sending API call to resume nodeos producer")
 //	err := s.api.ProducerResume(context.Background())

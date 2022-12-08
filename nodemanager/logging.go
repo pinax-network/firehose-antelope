@@ -63,7 +63,7 @@ func (l *logLevelExtractor) extract(in string) zapcore.Level {
 	groups := logLevelRegex.FindStringSubmatch(in)
 	if len(groups) <= 2 {
 		// nodeos has multi line logs where only the first line contains the log level. This is likely the case here,
-		// so we return the log level of the last line instead to avoid losing log information.
+		// so we return the log level of the last line instead to avoid losing log output.
 		return l.lastLineLevel
 	}
 

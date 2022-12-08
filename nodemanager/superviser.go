@@ -16,19 +16,16 @@ package nodemanager
 
 import (
 	"fmt"
-	"os"
-	"path"
-	"path/filepath"
-	"strings"
-	"sync"
-	"time"
-
 	"github.com/ShinyTrinkets/overseer"
 	"github.com/eoscanada/eos-go"
 	nodeManager "github.com/streamingfast/node-manager"
 	logplugin "github.com/streamingfast/node-manager/log_plugin"
 	"github.com/streamingfast/node-manager/superviser"
 	"go.uber.org/zap"
+	"os"
+	"path"
+	"path/filepath"
+	"strings"
 )
 
 type NodeosSuperviser struct {
@@ -43,16 +40,9 @@ type NodeosSuperviser struct {
 	chainID       eos.SHA256Bytes
 	lastBlockSeen uint32
 
-	producerHostname    string
 	serverVersion       string
 	serverVersionString string
-	forceProduction     bool
 
-	productionState             nodeManager.ProductionState
-	productionStateLock         sync.Mutex
-	productionStateLastProduced time.Time
-
-	snapshotRestoreOnNextStart bool
 	snapshotRestorePath        string
 
 	headBlockUpdateFunc nodeManager.HeadBlockUpdater
@@ -116,8 +106,6 @@ func NewSuperviser(
 		headBlockUpdateFunc: headBlockUpdateFunc,
 		logger:              logger,
 	}
-
-	// s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
 
 	if nodeosOptions.LogToZap {
 		s.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, nodeosLogger))
@@ -186,16 +174,6 @@ func (s *NodeosSuperviser) Start(options ...nodeManager.StartOption) error {
 	s.Logger.Info("updating nodeos arguments before starting binary")
 	s.Superviser.Arguments = s.getArguments()
 
-	// Clears transient snapshot arguments now that we've computed binary arguments
-	//if s.snapshotRestoreOnNextStart {
-	//	s.removeState()
-	//	s.removeReversibleBlocks()
-	//}
-	//s.snapshotRestoreOnNextStart = false
-	//s.snapshotRestorePath = ""
-	//if s.options.NoBlocksLog {
-	//	s.removeBlocksLog()
-	//}
 	err := s.Superviser.Start(options...)
 	if err != nil {
 		return err
@@ -207,12 +185,11 @@ func (s *NodeosSuperviser) Start(options ...nodeManager.StartOption) error {
 func (s *NodeosSuperviser) IsRunning() bool {
 	isRunning := s.Superviser.IsRunning()
 
-	// todo reimplement
-	//isRunningMetricsValue := float64(0)
-	//if isRunning {
-	//	isRunningMetricsValue = float64(1)
-	//}
-	//metrics.NodeosCurrentStatus.SetFloat64(isRunningMetricsValue)
+	isRunningMetricsValue := float64(0)
+	if isRunning {
+		isRunningMetricsValue = float64(1)
+	}
+	leapStatus.SetFloat64(isRunningMetricsValue)
 
 	return isRunning
 }
@@ -226,8 +203,6 @@ func (s *NodeosSuperviser) ServerID() (string, error) {
 }
 
 func (s *NodeosSuperviser) getArguments() []string {
-	// s.maybeReloadProducerHostnameFromConfigFile()
-
 	var args []string
 	args = append(args, fmt.Sprintf("--config-dir=%s", s.options.ConfigDir))
 	args = append(args, fmt.Sprintf("--data-dir=%s", s.options.DataDir))
@@ -238,34 +213,7 @@ func (s *NodeosSuperviser) getArguments() []string {
 		args = append(args, fmt.Sprintf("--genesis-json=%s", filepath.Join(s.options.ConfigDir, "genesis.json")))
 	}
 
-	//if !s.HasData() && !s.snapshotRestoreOnNextStart {
-	//	args = append(args, "--genesis-json="+filepath.Join(s.options.ConfigDir, "genesis.json"))
-	//}
-	//
-	//if s.snapshotRestoreOnNextStart && s.snapshotRestorePath != "" {
-	//	args = append(args, "--snapshot="+s.snapshotRestorePath)
-	//}
-	//
-	//if !s.IsActiveProducer() {
-	//	args = append(args, "--pause-on-startup")
-	//}
-	//
-	//if s.options.TrustedProducer != "" {
-	//	s.Logger.Info("running with trusted-producer mode", zap.String("trusted_producer", s.options.TrustedProducer))
-	//	args = append(args, "--trusted-producer="+s.options.TrustedProducer)
-	//}
-
 	args = append(args, s.options.AdditionalArgs...)
 
 	return args
 }
-
-//func (s *NodeosSuperviser) maybeReloadProducerHostnameFromConfigFile() {
-//	if !s.options.ProducerHostnameFromViper {
-//		return
-//	}
-//
-//	_ = viper.ReadInConfig() // viper.WatchConfig broken on symlinks...
-//	s.producerHostname = viper.GetString("producer_hostname")
-//	s.Logger.Info("reloaded config", zap.String("hostname", s.options.Hostname), zap.String("producing_hostname", s.producerHostname))
-//}
