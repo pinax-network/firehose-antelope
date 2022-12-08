@@ -3,38 +3,36 @@ package cli
 import (
 	"fmt"
 	"github.com/EOS-Nation/firehose-antelope/codec"
-	"strings"
-	"time"
-
 	"github.com/EOS-Nation/firehose-antelope/nodemanager"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream/blockstream"
-	"github.com/streamingfast/dlauncher/launcher"
-	"github.com/streamingfast/logging"
-	nodeManager "github.com/streamingfast/node-manager"
 	nodeManagerApp "github.com/streamingfast/node-manager/app/node_manager2"
-	"github.com/streamingfast/node-manager/metrics"
 	reader "github.com/streamingfast/node-manager/mindreader"
 	"github.com/streamingfast/node-manager/operator"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	pbheadinfo "github.com/streamingfast/pbgo/sf/headinfo/v1"
-	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"strings"
+	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/logging"
+	nodeManager "github.com/streamingfast/node-manager"
+	"github.com/streamingfast/node-manager/metrics"
+	"go.uber.org/zap"
 )
 
-var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/EOS-Nation/firehose-antelope/node")
-var nodeAcmeChainLogger, _ = logging.PackageLogger("node.antelope", "github.com/EOS-Nation/firehose-antelope/node/antelope", DefaultLevelInfo)
-
 var readerLogger, readerTracer = logging.PackageLogger("reader", "github.com/EOS-Nation/firehose-antelope/reader")
-var readerAcmeChainLogger, _ = logging.PackageLogger("reader.antelope", "github.com/EOS-Nation/firehose-antelope/reader/antelope", DefaultLevelInfo)
+var readerAcmeChainLogger, _ = logging.PackageLogger("reader.nodeos", "github.com/EOS-Nation/firehose-antelope/reader/antelope", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
 	cmd.Flags().String(flagPrefix+"path", ChainExecutableName, FlagDescription(`
 		Process that will be invoked to sync the chain, can be a full path or just the binary's name, in which case the binary is
 		searched for paths listed by the PATH environment variable (following operating system rules around PATH handling).
 	`))
-	cmd.Flags().String(flagPrefix+"data-dir", "{sf-data-dir}/{node-role}/data", "Directory for node data ({node-role} is either reader, peering or dev-miner)")
+	cmd.Flags().String(flagPrefix+"data-dir", "{sf-data-dir}/{node-role}/data", "nodeos data directory containing the blocks.log and state files")
+	cmd.Flags().String(flagPrefix+"config-dir", "{sf-data-dir}/{node-role}/config", "nodeos config directory containing the config.ini and genesis.json files")
 	cmd.Flags().Bool(flagPrefix+"debug-firehose-logs", false, "[DEV] Prints firehose instrumentation logs to standard output, should be use for debugging purposes only")
 	cmd.Flags().Bool(flagPrefix+"log-to-zap", true, FlagDescription(`
 		When sets to 'true', all standard error output emitted by the invoked process defined via '%s'
@@ -45,7 +43,28 @@ func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAd
 	`, flagPrefix+"path"))
 	cmd.Flags().String(flagPrefix+"manager-api-addr", managerAPIAddr, "Acme node manager API address")
 	cmd.Flags().Duration(flagPrefix+"readiness-max-latency", 30*time.Second, "Determine the maximum head block latency at which the instance will be determined healthy. Some chains have more regular block production than others.")
-	cmd.Flags().String(flagPrefix+"arguments", "", "If not empty, overrides the list of default node arguments (computed from node type and role). Start with '+' to append to default args instead of replacing. ")
+	cmd.Flags().String(flagPrefix+"arguments", "", "Extra arguments to be passed when executing nodeos binary.")
+	cmd.Flags().String(flagPrefix+"bootstrap-snapshot-url", "", FlagDescription(`
+		Snapshot file URL to bootstrap nodeos from. If this is set the snapshot will be downloaded to the data directory and 
+		nodeos will be started with the --snapshot flag. This can be used to parallelize processing a chain by setting 
+		up multiple readers starting from different snapshots.
+
+		This flag will be ignored in case there is already a snapshot with the same name available in the data directory,
+		that is to prevent replaying the snapshot multiple times in case the node manager is being restarted.
+
+		Note that restoring from snapshot means the blocks and state directories are removed before replaying!
+
+		The store url accepts all protocols supported by dstore, which currently are file://, s3://, gs:// and az://. 
+		For more infos about supported urls see: https://github.com/streamingfast/dstore
+	`))
+	//cmd.Flags().Bool(flagPrefix+"bootstrap-keep-blocks", false, FlagDescription(`
+	//	If this flag is set the bootstrapping process will not clean the blocks directory before replaying the chain
+	//	from snapshot. This is only taking affect if reader-node-bootstrap-snapshot-url is set.
+	//
+	//	The recommended nodeos config for reader-nodes is to not create a blocks.log in the first place, which can be
+	//	set using 'block-log-retain-blocks = 0' in the config.ini.
+	//`))
+	cmd.Flags().String(flagPrefix+"nodeos-api-addr", NodeosAPIAddr, "Target API address to communicate with underlying nodeos")
 }
 
 func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) error, managerAPIaddr string) {
@@ -79,10 +98,6 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		var supervisedProcessLogger *zap.Logger
 
 		switch kind {
-		case "node":
-			appLogger = nodeLogger
-			appTracer = nodeTracer
-			supervisedProcessLogger = nodeAcmeChainLogger
 		case "reader":
 			appLogger = readerLogger
 			appTracer = readerTracer
@@ -95,6 +110,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 
 		nodePath := viper.GetString(flagPrefix + "path")
 		nodeDataDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
+		nodeConfigDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"config-dir")))
 
 		readinessMaxLatency := viper.GetDuration(flagPrefix + "readiness-max-latency")
 		debugFirehose := viper.GetBool(flagPrefix + "debug-firehose-logs")
@@ -113,41 +129,36 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 		metricsAndReadinessManager := buildMetricsAndReadinessManager(flagPrefix, readinessMaxLatency)
 
-		superviser := nodemanager.NewSuperviser(
-			nodePath,
-			nodeArguments,
-			nodeDataDir,
-			metricsAndReadinessManager.UpdateHeadBlock,
+		supervisor, err := nodemanager.NewSuperviser(
 			debugFirehose,
-			logToZap,
+			metricsAndReadinessManager.UpdateHeadBlock,
+			&nodemanager.NodeosOptions{
+				LocalNodeEndpoint:    viper.GetString(flagPrefix + "nodeos-api-addr"),
+				ConfigDir:            nodeConfigDir,
+				BinPath:              nodePath,
+				DataDir:              nodeDataDir,
+				BootstrapSnapshotUrl: viper.GetString(flagPrefix + "bootstrap-snapshot-url"),
+				AdditionalArgs:       nodeArguments,
+				LogToZap:             logToZap,
+			},
 			appLogger,
 			supervisedProcessLogger,
 		)
-
-		bootstrapper := &bootstrapper{
-			nodeDataDir: nodeDataDir,
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize supervisor: %w", err)
 		}
 
 		chainOperator, err := operator.New(
 			appLogger,
-			superviser,
+			supervisor,
 			metricsAndReadinessManager,
 			&operator.Options{
-				ShutdownDelay:              shutdownDelay,
+				Bootstrapper:               supervisor,
 				EnableSupervisorMonitoring: true,
-				Bootstrapper:               bootstrapper,
+				ShutdownDelay:              shutdownDelay,
 			})
 		if err != nil {
 			return nil, fmt.Errorf("unable to create chain operator: %w", err)
-		}
-
-		if kind != "reader" {
-			return nodeManagerApp.New(&nodeManagerApp.Config{
-				HTTPAddr: httpAddr,
-			}, &nodeManagerApp.Modules{
-				Operator:                   chainOperator,
-				MetricsAndReadinessManager: metricsAndReadinessManager,
-			}, appLogger), nil
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
@@ -181,7 +192,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 			return nil, fmt.Errorf("new reader plugin: %w", err)
 		}
 
-		superviser.RegisterLogPlugin(readerPlugin)
+		supervisor.RegisterLogPlugin(readerPlugin)
 
 		return nodeManagerApp.New(&nodeManagerApp.Config{
 			HTTPAddr: httpAddr,
@@ -200,20 +211,14 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 	}
 }
 
-type bootstrapper struct {
-	nodeDataDir string
-}
-
-func (b *bootstrapper) Bootstrap() error {
-	// You can copy coniguration files here into your working data dir to run the node off of
-	return nil
-}
-
 type nodeArgsByRole map[string]string
 
 func buildNodeArguments(nodeDataDir, nodeRole string, args string) ([]string, error) {
+
+	// todo figure out roles here, might be reader, producer, bootstrap, ... ?
+
 	typeRoles := nodeArgsByRole{
-		"reader": "start --store-dir={node-data-dir} {extra-arg}",
+		"reader": "{extra-arg}",
 	}
 
 	argsString, ok := typeRoles[nodeRole]

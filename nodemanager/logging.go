@@ -1,53 +1,84 @@
+// Copyright 2019 dfuse Platform Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package nodemanager
 
 import (
 	"regexp"
+	"strings"
 
 	logplugin "github.com/streamingfast/node-manager/log_plugin"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
-// This file configures a logging reader that transforms log lines received from the blockchain process running
-// and then logs them inside the Firehose stack logging system.
-//
-// A simple regex is going to identify the level of the line and turn it into our internal level value.
-//
-// You **must** adapt this line to fit with the log lines of your chain. For example, the dummy blockchain we
-// instrumented in `firehose-acme`, log lines look like:
-//
-//	time="2022-03-04T12:49:34-05:00" level=info msg="initializing node"
-//
-// So our regex look like the one below, extracting the `info` value from a group in the regexp.
-var logLevelRegex = regexp.MustCompile("level=(debug|info|warn|warning|error)")
+var logLevelRegex = regexp.MustCompile("^(<[0-9]>)?(debug|info|warn|error)")
 
-func newToZapLogPlugin(debugFirehose bool, logger *zap.Logger) *logplugin.ToZapLogPlugin {
-	return logplugin.NewToZapLogPlugin(debugFirehose, logger, logplugin.ToZapLogPluginLogLevel(logLevelReader), logplugin.ToZapLogPluginTransformer(stripTimeTransformer))
+func newToZapLogPlugin(debugDeepMind bool, logger *zap.Logger) *logplugin.ToZapLogPlugin {
+	return logplugin.NewToZapLogPlugin(debugDeepMind, logger, logplugin.ToZapLogPluginLogLevel(newLogLevelExtractor().extract))
 }
 
-func logLevelReader(in string) zapcore.Level {
-	// If the regex does not match the line, log to `INFO` so at least we see something by default.
+var discardRegex = regexp.MustCompile("(?i)" + "wabt.hpp:.*misaligned reference")
+var toInfoRegex = regexp.MustCompile("(?i)" + "(" +
+	strings.Join([]string{
+		"controller.cpp:.*(No existing chain state or fork database|Initializing new blockchain with genesis state)",
+		"platform_timer_accurac:.*Checktime timer",
+		"net_plugin.cpp:.*closing connection to:",
+		"net_plugin.cpp:.*connection failed to:",
+		"CHAINBASE:*",
+	}, "|") +
+	")")
+
+type logLevelExtractor struct {
+	lastLineLevel zapcore.Level
+}
+
+func newLogLevelExtractor() *logLevelExtractor {
+	return &logLevelExtractor{}
+}
+
+func (l *logLevelExtractor) extract(in string) zapcore.Level {
+
+	if discardRegex.MatchString(in) {
+		l.lastLineLevel = logplugin.NoDisplay
+		return l.lastLineLevel
+	}
+
+	if toInfoRegex.MatchString(in) {
+		l.lastLineLevel = zap.InfoLevel
+		return l.lastLineLevel
+	}
+
 	groups := logLevelRegex.FindStringSubmatch(in)
-	if len(groups) <= 1 {
-		return zap.InfoLevel
+	if len(groups) <= 2 {
+		// nodeos has multi line logs where only the first line contains the log level. This is likely the case here,
+		// so we return the log level of the last line instead to avoid losing log output.
+		return l.lastLineLevel
 	}
 
-	switch groups[1] {
-	case "debug", "DEBUG":
-		return zap.DebugLevel
-	case "info", "INFO":
-		return zap.InfoLevel
-	case "warn", "warning", "WARN", "WARNING":
-		return zap.WarnLevel
-	case "error", "ERROR":
-		return zap.ErrorLevel
+	switch groups[2] {
+	case "debug":
+		l.lastLineLevel = zap.DebugLevel
+	case "info":
+		l.lastLineLevel = zap.InfoLevel
+	case "warn":
+		l.lastLineLevel = zap.WarnLevel
+	case "error":
+		l.lastLineLevel = zap.ErrorLevel
 	default:
-		return zap.InfoLevel
+		l.lastLineLevel = zap.DebugLevel
 	}
-}
 
-var timeRegex = regexp.MustCompile(`time="[0-9]{4}-[^"]+"\s*`)
-
-func stripTimeTransformer(in string) string {
-	return timeRegex.ReplaceAllString(in, "")
+	return l.lastLineLevel
 }

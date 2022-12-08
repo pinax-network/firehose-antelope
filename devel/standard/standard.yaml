@@ -6,6 +6,7 @@ start:
   - relayer
   flags:
     # Specifies the path to the binary
-    reader-node-path: "dummy-blockchain"
+    reader-node-path: "nodeos"
     # Flags that will be added to the dummy chain process command
-    reader-node-arguments: +--firehose-enabled --block-rate=60
+    reader-node-arguments: ""
+    reader-node-config-dir: "{sf-data-dir}/config/jungle4"
