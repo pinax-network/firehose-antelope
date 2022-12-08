@@ -27,7 +27,7 @@ var nodeLogger, nodeTracer = logging.PackageLogger("node", "github.com/EOS-Natio
 var nodeAcmeChainLogger, _ = logging.PackageLogger("node.antelope", "github.com/EOS-Nation/firehose-antelope/node/antelope", DefaultLevelInfo)
 
 var readerLogger, readerTracer = logging.PackageLogger("reader", "github.com/EOS-Nation/firehose-antelope/reader")
-var readerAcmeChainLogger, _ = logging.PackageLogger("reader.antelope", "github.com/EOS-Nation/firehose-antelope/reader/antelope", DefaultLevelInfo)
+var readerAcmeChainLogger, _ = logging.PackageLogger("reader.nodeos", "github.com/EOS-Nation/firehose-antelope/reader/antelope", DefaultLevelInfo)
 
 func registerCommonNodeFlags(cmd *cobra.Command, flagPrefix string, managerAPIAddr string) {
 	cmd.Flags().String(flagPrefix+"path", ChainExecutableName, FlagDescription(`
@@ -177,6 +177,7 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 				LogToZap:             logToZap,
 			},
 			appLogger,
+			readerAcmeChainLogger,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("failed to initialize supervisor: %w", err)

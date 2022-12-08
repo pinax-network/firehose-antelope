@@ -97,8 +97,9 @@ func NewSuperviser(
 	headBlockUpdateFunc nodeManager.HeadBlockUpdater,
 	nodeosOptions *NodeosOptions,
 	logger *zap.Logger,
+	nodeosLogger *zap.Logger,
 ) (*NodeosSuperviser, error) {
-	// Ensure process manager line buffer is large enough (50 MiB) for our Deep Mind instrumentation outputting lot's of text.
+	// Ensure process manager line buffer is large enough (50 MiB) for our Deep Mind instrumentation outputting lots of text.
 	overseer.DEFAULT_LINE_BUFFER_SIZE = 50 * 1024 * 1024
 
 	if !strings.HasPrefix(nodeosOptions.LocalNodeEndpoint, "http") {
@@ -119,7 +120,7 @@ func NewSuperviser(
 	// s.RegisterLogPlugin(logplugin.LogPluginFunc(s.analyzeLogLineForStateChange))
 
 	if nodeosOptions.LogToZap {
-		s.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, logger))
+		s.RegisterLogPlugin(newToZapLogPlugin(debugDeepMind, nodeosLogger))
 	} else {
 		s.RegisterLogPlugin(logplugin.NewToConsoleLogPlugin(debugDeepMind))
 	}
