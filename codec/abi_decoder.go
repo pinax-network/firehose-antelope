@@ -486,46 +486,6 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 	return nil
 }
 
-func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
-
-	zlog.Debug("decoding table data", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
-
-	abi := d.findABI(dbOp.Code, globalSequence, localCache)
-	if abi == nil {
-		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
-		return nil
-	}
-
-	oldDataJson, err := abi.DecodeTableRow(eos.TableName(dbOp.PrimaryKey), dbOp.OldData)
-	if err != nil {
-		zlog.Debug("skipping old table data since we were not able to decode it against ABI",
-			zap.Uint64("block_num", blockNum),
-			zap.String("trx_id", trxID),
-			zap.String("code", dbOp.Code),
-			zap.Uint64("global_sequence", globalSequence),
-			zap.Error(err),
-		)
-		return nil
-	}
-
-	newDataJson, err := abi.DecodeTableRow(eos.TableName(dbOp.PrimaryKey), dbOp.NewData)
-	if err != nil {
-		zlog.Debug("skipping new table data since we were not able to decode it against ABI",
-			zap.Uint64("block_num", blockNum),
-			zap.String("trx_id", trxID),
-			zap.String("code", dbOp.Code),
-			zap.Uint64("global_sequence", globalSequence),
-			zap.Error(err),
-		)
-		return nil
-	}
-
-	dbOp.OldDataJson = string(oldDataJson)
-	dbOp.NewDataJson = string(newDataJson)
-
-	return nil
-}
-
 func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
 
 	// if traceEnabled {
@@ -563,23 +523,17 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 
 	abi := d.findABI(action.Account, globalSequence, localCache)
 	if abi == nil {
-		// if traceEnabled {
 		zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		// }
 		return nil
 	}
 
 	actionDef := abi.ActionForName(eos.ActionName(action.Name))
 	if actionDef == nil {
-		// if traceEnabled {
 		zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		// }
 		return nil
 	}
 
-	// if traceEnabled {
 	zlog.Debug("found ABI and action definition, performing decoding", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-	// }
 
 	decoder := eos.NewDecoder(action.RawData)
 	jsonData, err := abi.Decode(decoder, actionDef.Type)
@@ -602,6 +556,54 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 	}
 
 	action.JsonData = string(jsonData)
+
+	return nil
+}
+
+func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
+
+	zlog.Debug("decoding table data", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
+
+	abi := d.findABI(dbOp.Code, globalSequence, localCache)
+	if abi == nil {
+		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
+		return nil
+	}
+
+	tableDef := abi.TableForName(eos.TableName(dbOp.TableName))
+	if tableDef == nil {
+		zlog.Debug("skipping table since table was not in ABI", zap.String("primary_key", dbOp.PrimaryKey), zap.Uint64("global_sequence", globalSequence))
+		return nil
+	}
+
+	decoder := eos.NewDecoder(dbOp.OldData)
+	oldDataJson, err := abi.Decode(decoder, tableDef.Type)
+	if err != nil {
+		zlog.Debug("skipping old table data since we were not able to decode it against ABI",
+			zap.Uint64("block_num", blockNum),
+			zap.String("trx_id", trxID),
+			zap.String("code", dbOp.Code),
+			zap.Uint64("global_sequence", globalSequence),
+			zap.Error(err),
+		)
+		return nil
+	}
+
+	decoder = eos.NewDecoder(dbOp.NewData)
+	newDataJson, err := abi.Decode(decoder, tableDef.Type)
+	if err != nil {
+		zlog.Debug("skipping new table data since we were not able to decode it against ABI",
+			zap.Uint64("block_num", blockNum),
+			zap.String("trx_id", trxID),
+			zap.String("code", dbOp.Code),
+			zap.Uint64("global_sequence", globalSequence),
+			zap.Error(err),
+		)
+		return nil
+	}
+
+	dbOp.OldDataJson = string(oldDataJson)
+	dbOp.NewDataJson = string(newDataJson)
 
 	return nil
 }
