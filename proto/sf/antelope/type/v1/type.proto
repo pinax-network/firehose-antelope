@@ -632,6 +632,8 @@ message DBOp {
   string new_payer = 8;
   bytes old_data = 9;
   bytes new_data = 10;
+  string old_data_json = 11;
+  string new_data_json = 12;
 
   enum Operation {
     OPERATION_UNKNOWN = 0;
@@ -658,7 +660,7 @@ message KVOp {
 
   // OldPayer is the previous payer of the Key/Value pair.
   //
-  // - On an `insert` operation, `OldPayer` is unset (emtpy string).
+  // - On an `insert` operation, `OldPayer` is unset (empty string).
   // - On an `update` operation, in stock 2.1.0 version is unset sadly (fix sent)
   // - On a `remove` operation, `OldPayer` is set to the last payer of the Key/Value pair.
   string old_payer = 5;
@@ -667,12 +669,12 @@ message KVOp {
   //
   // - On an `insert` operation, `NewPayer` is set to the initial payer of the Key/Value pair.
   // - On an `update` operation, `NewPayer` is set to the new payer (could be the same as before) of the Key/Value pair.
-  // - On a `remove` operation, `NewPayer` is unset (emtpy string).
+  // - On a `remove` operation, `NewPayer` is unset (empty string).
   string new_payer = 6;
 
   // OldData is the previous value of the Key/Value pair.
   //
-  // - On an `insert` operation, `OldData` is unset (emtpy bytes).
+  // - On an `insert` operation, `OldData` is unset (empty bytes).
   // - On an `update` operation, `OldData` is set to the old value of the Key/Value pair (prior the update).
   // - On a `remove` operation, `OldData` is set to the last value of the Key/Value pair.
   bytes old_data = 7;
@@ -681,7 +683,7 @@ message KVOp {
   //
   // - On an `insert` operation, `NewData` is set to the initial value of the Key/Value pair.
   // - On an `update` operation, `NewData` is set to the new value of the Key/Value pair.
-  // - On a `remove` operation, `NewData` is unset (emtpy bytes).
+  // - On a `remove` operation, `NewData` is unset (empty bytes).
   bytes new_data = 8;
 
   enum Operation {

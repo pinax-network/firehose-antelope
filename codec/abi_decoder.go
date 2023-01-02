@@ -44,27 +44,27 @@ type ABIDecoder struct {
 	pool   *ordpool.OrderedPool
 	poolIn chan<- interface{}
 
-	// The logic of truncation is the following. We assume we will always receives
+	// The logic of truncation is the following. We assume we will always receive
 	// blocks in sequential order, expect when there is a fork, we could go back
 	// in the past or changing the actual block. Assume a single block fork situation,
-	// it means we would received `1a`, then `2b` then `2a` or in a multi blocks
+	// it means we would have received `1a`, then `2b` then `2a` or in a multi blocks
 	// situation like `1a`, then `2b` - `3b` - `4b` then `2a` - `3a` - `4a`.
 	//
 	// The idea at the point is that the decoder received signals when a block starts
-	// and ends. Each time we finish a full block, we record it's block num. When a new
-	// block arrives, it should stricly sequentially follow our last seen block num.
+	// and ends. Each time we finish a full block, we record its block num. When a new
+	// block arrives, it should strictly sequentially follow our last seen block num.
 	// This is never respected in a fork situation, assuming last block is `2b`, when we
 	// received `2a`, it's not following it, if last block was `4b`, same thing.
 	//
-	// Now, we are in a fork situation, this means we must removed any previously defined
+	// Now, we are in a fork situation, this means we must remove any previously defined
 	// ABI. The trick here is to leverage the global sequence number. When we detect the
-	// fork, we flag the decoder that it needs to peform a truncation. On the next transaction
+	// fork, we flag the decoder that it needs to perform a truncation. On the next transaction
 	// that arrive, we extract the first global sequence we can find. This is our truncation
 	// value. Any ABI set after or equal to this value must be truncated, for each and every
 	// account.
 	//
-	// In the event no valid transaction is in the block, the flag remains and we continue
-	// on, until we are actually able to find our first new global sequence value. This is
+	// In the event no valid transaction is in the block, the flag remains, and we continue
+	// on until we are actually able to find our first new global sequence value. This is
 	// ok because the global sequence while there cannot move on if no action is executed.
 	blockDone                    chan doneBlockJob
 	activeBlockNum               uint64
@@ -172,7 +172,7 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) e
 
 	// Optimization: The truncation and ABI addition just below could share the same
 	//               write lock. In the current code form, the lock is acquired/released
-	//               twice. We could make them together but it adds a fair amount of logic
+	//               twice. We could make them together, but it adds a fair amount of logic
 	//               because we don't want to lock if we don't really have to. So maybe later.
 	if c.truncateOnNextGlobalSequence {
 		// It's possible that no sequence number is found. The only case possible is if
@@ -189,7 +189,7 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) e
 		return fmt.Errorf("unable to extract abis: %w", err)
 	}
 
-	// We only commit ABIs if the transaction was recored in the blockchain, failure is handled locally
+	// We only commit ABIs if the transaction was recorded in the blockchain, failure is handled locally
 	if len(abiOperations) > 0 && !trxTrace.HasBeenReverted() {
 		if err := c.commitABIs(trxTrace.Id, abiOperations); err != nil {
 			return fmt.Errorf("unable to commit abis: %w", err)
@@ -240,6 +240,10 @@ func (c *ABIDecoder) processTransaction(trxTrace *pbantelope.TransactionTrace) e
 		for _, action := range dtrxOp.Transaction.Transaction.Actions {
 			decodingJobs = append(decodingJobs, dtrxDecodingJob{action, commonDecodingJob{c.activeBlockNum, trxTrace.Id, globalSequence, localCache}})
 		}
+	}
+
+	for _, dbOp := range trxTrace.DbOps {
+		decodingJobs = append(decodingJobs, dbOpDecodingJob{dbOp, commonDecodingJob{c.activeBlockNum, trxTrace.Id, mostRecentActiveABI, localCache}})
 	}
 
 	zlog.Debug("queuing transaction trace decoding jobs", zap.Uint64("block_num", c.activeBlockNum), zap.String("id", trxTrace.Id), zap.Int("job_count", len(decodingJobs)))
@@ -359,12 +363,15 @@ type decodingJob interface {
 
 func (j actionTraceDecodingJob) blockNum() uint64 { return j.actualblockNum }
 func (j dtrxDecodingJob) blockNum() uint64        { return j.commonDecodingJob.actualblockNum }
+func (j dbOpDecodingJob) blockNum() uint64        { return j.commonDecodingJob.actualblockNum }
 
 func (j actionTraceDecodingJob) trxID() string { return j.actualTrxID }
 func (j dtrxDecodingJob) trxID() string        { return j.commonDecodingJob.actualTrxID }
+func (j dbOpDecodingJob) trxID() string        { return j.commonDecodingJob.actualTrxID }
 
 func (j actionTraceDecodingJob) kind() string { return "action_trace" }
 func (j dtrxDecodingJob) kind() string        { return "dtrx" }
+func (j dbOpDecodingJob) kind() string        { return "db_op" }
 
 type commonDecodingJob struct {
 	actualblockNum uint64
@@ -380,6 +387,11 @@ type actionTraceDecodingJob struct {
 
 type dtrxDecodingJob struct {
 	action *pbantelope.Action
+	commonDecodingJob
+}
+
+type dbOpDecodingJob struct {
+	dbOp *pbantelope.DBOp
 	commonDecodingJob
 }
 
@@ -432,6 +444,8 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 		return []interface{}{job.kind()}, d.decodeActionTrace(v.actionTrace, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
 	case dtrxDecodingJob:
 		return []interface{}{job.kind()}, d.decodeAction(v.action, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
+	case dbOpDecodingJob:
+		return []interface{}{job.kind()}, d.decodeDbOp(v.dbOp, v.globalSequence, job.trxID(), job.blockNum(), v.localCache)
 	default:
 		return nil, fmt.Errorf("unknown decoding job kind %s", job.kind())
 	}
@@ -468,6 +482,46 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 
 		actionTrace.JsonReturnValue = string(res)
 	}
+
+	return nil
+}
+
+func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
+
+	zlog.Debug("decoding table data", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
+
+	abi := d.findABI(dbOp.Code, globalSequence, localCache)
+	if abi == nil {
+		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
+		return nil
+	}
+
+	oldDataJson, err := abi.DecodeTableRow(eos.TableName(dbOp.PrimaryKey), dbOp.OldData)
+	if err != nil {
+		zlog.Debug("skipping old table data since we were not able to decode it against ABI",
+			zap.Uint64("block_num", blockNum),
+			zap.String("trx_id", trxID),
+			zap.String("code", dbOp.Code),
+			zap.Uint64("global_sequence", globalSequence),
+			zap.Error(err),
+		)
+		return nil
+	}
+
+	newDataJson, err := abi.DecodeTableRow(eos.TableName(dbOp.PrimaryKey), dbOp.NewData)
+	if err != nil {
+		zlog.Debug("skipping new table data since we were not able to decode it against ABI",
+			zap.Uint64("block_num", blockNum),
+			zap.String("trx_id", trxID),
+			zap.String("code", dbOp.Code),
+			zap.Uint64("global_sequence", globalSequence),
+			zap.Error(err),
+		)
+		return nil
+	}
+
+	dbOp.OldDataJson = string(oldDataJson)
+	dbOp.NewDataJson = string(newDataJson)
 
 	return nil
 }
