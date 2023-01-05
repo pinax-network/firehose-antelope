@@ -6,6 +6,14 @@ option go_package = "github.com/streamingfast/firehose-antelope/types/pb/sf/ante
 
 import "google/protobuf/timestamp.proto";
 
+message ActionTraces {
+  repeated ActionTrace action_traces = 1;
+}
+
+message DBOps {
+  repeated DBOp db_ops = 1;
+}
+
 message Block {
   string id = 1;
   uint32 number = 2;
