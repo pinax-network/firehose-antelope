@@ -30,8 +30,11 @@ message Block {
   repeated uint32 confirm_count = 15;
   PendingProducerSchedule pending_schedule = 16;
   ActivatedProtocolFeatures activated_protocol_features = 17;
-  // todo did not make it in 3.1, maybe 3.x?
+
+  // EOS 2.1.x feature, did not make it into leap
   // bool validated = 18;
+  reserved 18;
+
   repeated RlimitOp rlimit_ops = 19;
 
   // The unfiltered transactions in this block when NO filtering has been applied,
@@ -455,6 +458,7 @@ message TransactionHeader {
 }
 
 message TransactionTrace {
+
   // SHA-256 (FIPS 180-4) of the FCBUFFER-encoded packed transaction
   string id = 1;
 
@@ -500,6 +504,7 @@ message TransactionTrace {
   //
   // This was added in EOSIO 2.1.x but did not make it into the leap code
   // repeated KVOp kv_ops = 30;
+  reserved 30;
 
   // List of deferred transactions operations this transaction entailed
   repeated DTrxOp dtrx_ops = 18;
@@ -553,10 +558,12 @@ message ActionTrace {
   uint64 block_num = 7;
   string producer_block_id = 8;
   google.protobuf.Timestamp block_time = 9;
-  // AccountDiskDeltas has been added in EOSIO 2.1.x for DISK resource (which is not part of the release oddly)
-  // todo did not make it into 3.1 maybe 3.x?
-  // repeated AccountDelta account_disk_deltas = 40;
   repeated AccountRAMDelta account_ram_deltas = 10;
+
+  // AccountDiskDeltas has been added in EOSIO 2.1.x for DISK resource (which is not part of the release oddly)
+  // this has not (yet) made it into leap
+  // repeated AccountDelta account_disk_deltas = 40;
+  reserved 40;
 
   // ReturnValue has been added in EOSIO 2.1.x as something that can be returned from the execution
   // of an action.
@@ -723,6 +730,7 @@ message RAMOp {
 
     // Added in EOSIO 2.1.x, removed in leap
     // NAMESPACE_KV = 10;
+    reserved 10;
   }
 
   enum Action {
