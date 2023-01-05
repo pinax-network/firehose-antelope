@@ -30,8 +30,11 @@ message Block {
   repeated uint32 confirm_count = 15;
   PendingProducerSchedule pending_schedule = 16;
   ActivatedProtocolFeatures activated_protocol_features = 17;
-  // todo did not make it in 3.1, maybe 3.x?
+
+  // EOS 2.1.x feature, did not make it into leap
   // bool validated = 18;
+  reserved 18;
+
   repeated RlimitOp rlimit_ops = 19;
 
   // The unfiltered transactions in this block when NO filtering has been applied,
@@ -455,6 +458,7 @@ message TransactionHeader {
 }
 
 message TransactionTrace {
+
   // SHA-256 (FIPS 180-4) of the FCBUFFER-encoded packed transaction
   string id = 1;
 
@@ -498,10 +502,9 @@ message TransactionTrace {
 
   // List of KV operations this transaction entailed
   //
-  // This was added in EOSIO 2.1.x and will *not* be populated on older versions.
-  //
-  // See https://github.com/EOSIO/eos/pull/8223
-  repeated KVOp kv_ops = 30;
+  // This was added in EOSIO 2.1.x but did not make it into the leap code
+  // repeated KVOp kv_ops = 30;
+  reserved 30;
 
   // List of deferred transactions operations this transaction entailed
   repeated DTrxOp dtrx_ops = 18;
@@ -555,10 +558,12 @@ message ActionTrace {
   uint64 block_num = 7;
   string producer_block_id = 8;
   google.protobuf.Timestamp block_time = 9;
-  // AccountDiskDeltas has been added in EOSIO 2.1.x for DISK resource (which is not part of the release oddly)
-  // todo did not make it into 3.1 maybe 3.x?
-  // repeated AccountDelta account_disk_deltas = 40;
   repeated AccountRAMDelta account_ram_deltas = 10;
+
+  // AccountDiskDeltas has been added in EOSIO 2.1.x for DISK resource (which is not part of the release oddly)
+  // this has not (yet) made it into leap
+  // repeated AccountDelta account_disk_deltas = 40;
+  reserved 40;
 
   // ReturnValue has been added in EOSIO 2.1.x as something that can be returned from the execution
   // of an action.
@@ -649,58 +654,6 @@ message DBOp {
   }
 }
 
-message KVOp {
-  // Operation represents the operation that was performed for this Key/Value pair, either
-  // an insertion, an update or a removal.
-  Operation operation = 1;
-
-  // ActionIndex is the index of the action in which this operation was performed.
-  uint32 action_index = 2;
-
-  // Code is the EOSIO contract's name that saved perform this Key/Value pair operation.
-  string code = 3;
-
-  // Key is the key part of this Key/Value pair. Unless the contract's used low-level EOSIO
-  // intrinsics, the key will be prefixed with the table name as defined in the contract.
-  bytes key = 4;
-
-  // OldPayer is the previous payer of the Key/Value pair.
-  //
-  // - On an `insert` operation, `OldPayer` is unset (emtpy string).
-  // - On an `update` operation, in stock 2.1.0 version is unset sadly (fix sent)
-  // - On a `remove` operation, `OldPayer` is set to the last payer of the Key/Value pair.
-  string old_payer = 5;
-
-  // NewPayer is the current payer of the Key/Value pair.
-  //
-  // - On an `insert` operation, `NewPayer` is set to the initial payer of the Key/Value pair.
-  // - On an `update` operation, `NewPayer` is set to the new payer (could be the same as before) of the Key/Value pair.
-  // - On a `remove` operation, `NewPayer` is unset (emtpy string).
-  string new_payer = 6;
-
-  // OldData is the previous value of the Key/Value pair.
-  //
-  // - On an `insert` operation, `OldData` is unset (emtpy bytes).
-  // - On an `update` operation, `OldData` is set to the old value of the Key/Value pair (prior the update).
-  // - On a `remove` operation, `OldData` is set to the last value of the Key/Value pair.
-  bytes old_data = 7;
-
-  // NewData is the current value of the Key/Value pair.
-  //
-  // - On an `insert` operation, `NewData` is set to the initial value of the Key/Value pair.
-  // - On an `update` operation, `NewData` is set to the new value of the Key/Value pair.
-  // - On a `remove` operation, `NewData` is unset (emtpy bytes).
-  bytes new_data = 8;
-
-  enum Operation {
-    OPERATION_UNKNOWN = 0;
-    OPERATION_INSERT = 1;
-    OPERATION_UPDATE = 2;
-    OPERATION_REMOVE = 3;
-  }
-}
-
-
 message RAMOp {
   // Operation is the legacy operation tag that we used initially. This is replaced
   // by a combination of `Namespce` and `Action`.
@@ -775,8 +728,9 @@ message RAMOp {
     NAMESPACE_TABLE = 8;
     NAMESPACE_TABLE_ROW = 9;
 
-    // Added in EOSIO 2.1.x
-    NAMESPACE_KV = 10;
+    // Added in EOSIO 2.1.x, removed in leap
+    // NAMESPACE_KV = 10;
+    reserved 10;
   }
 
   enum Action {
