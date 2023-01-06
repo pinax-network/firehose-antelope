@@ -17,14 +17,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"math"
-
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/lytics/ordpool"
 	"github.com/streamingfast/bstream"
 	"go.uber.org/zap"
+	"math"
 )
 
 var mostRecentActiveABI uint64 = math.MaxUint64
@@ -43,6 +42,12 @@ type ABIDecoder struct {
 	cache  *ABICache
 	pool   *ordpool.OrderedPool
 	poolIn chan<- interface{}
+
+	// If set to true the abi decoder will fail on any decoding error regarding action or database operations (instead
+	// of just logging it). This can be helpful for testing to make sure the decoding works if it's supposed to.
+	// Note that action decoding will fail occasionally in real life due to broken contracts, so you should NOT enabled
+	// this when running in production!
+	strictMode bool
 
 	// The logic of truncation is the following. We assume we will always receive
 	// blocks in sequential order, expect when there is a fork, we could go back
@@ -72,12 +77,13 @@ type ABIDecoder struct {
 	truncateOnNextGlobalSequence bool
 }
 
-func newABIDecoder() *ABIDecoder {
+func newABIDecoder(strictMode bool) *ABIDecoder {
 	a := &ABIDecoder{
 		cache:            newABICache(),
 		activeBlockNum:   noActiveBlockNum,
 		lastSeenBlockRef: bstream.BlockRefEmpty,
 		blockDone:        make(chan doneBlockJob),
+		strictMode:       strictMode,
 	}
 
 	numWorkers := 24
@@ -431,9 +437,7 @@ func (d *ABIDecoder) executeDecodingJob(inJob interface{}) (interface{}, error) 
 	}
 
 	job := inJob.(decodingJob)
-	// if traceEnabled {
 	zlog.Debug("executing decoding job", zap.String("kind", job.kind()))
-	// }
 
 	if job.blockNum() != d.activeBlockNum {
 		return nil, fmt.Errorf("trying to decode a job for block num %d while decoding queue block num is %d", job.blockNum(), d.activeBlockNum)

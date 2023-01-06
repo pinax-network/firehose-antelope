@@ -66,7 +66,7 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 			globalStats:  globalStats,
 			currentBlock: &pbantelope.Block{},
 			currentTrace: &pbantelope.TransactionTrace{},
-			abiDecoder:   newABIDecoder(),
+			abiDecoder:   newABIDecoder(false),
 		},
 		done:  make(chan interface{}),
 		stats: globalStats,
@@ -287,9 +287,7 @@ func (c *ConsoleReader) next() (out interface{}, err error) {
 			continue
 		}
 
-		// if traceEnabled {
-		c.logger.Debug("extracing deep mind data from line", zap.String("line", line))
-		// }
+		c.logger.Debug("extracting deep mind data from line", zap.String("line", line))
 
 		// Order of conditions is based (approximately) on those that will appear more often
 		switch {
