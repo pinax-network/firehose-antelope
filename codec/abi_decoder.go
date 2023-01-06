@@ -404,9 +404,7 @@ type dbOpDecodingJob struct {
 func (d *ABIDecoder) addJobs(jobs []decodingJob) error {
 
 	for _, job := range jobs {
-		// if traceEnabled {
 		zlog.Debug("adding decoding job to queue", zap.String("kind", job.kind()))
-		// }
 
 		d.poolIn <- job //FIXME catch shutdown or smth
 		//		select {
@@ -468,15 +466,24 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 
 		abi := d.findABI(action.Account, globalSequence, localCache)
 		if abi == nil {
-			zlog.Debug("skipping action result since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 			if d.strictMode {
-				return fmt.Errorf("failed to decode action trace, no ABI found")
+				zlog.Fatal("skipping action result since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 			}
+			zlog.Debug("skipping action result since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 			return nil
 		}
 
 		res, err := abi.DecodeActionResult(actionTrace.RawReturnValue, eos.ActionName(actionTrace.Action.Name))
 		if err != nil {
+			if d.strictMode {
+				zlog.Fatal("skipping action result since we were not able to decode it against ABI",
+					zap.Uint64("block_num", blockNum),
+					zap.String("trx_id", trxID),
+					zap.String("action", action.SimpleName()),
+					zap.Uint64("global_sequence", globalSequence),
+					zap.Error(err),
+				)
+			}
 			zlog.Debug("skipping action result since we were not able to decode it against ABI",
 				zap.Uint64("block_num", blockNum),
 				zap.String("trx_id", trxID),
@@ -484,9 +491,6 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
-			if d.strictMode {
-				return fmt.Errorf("failed to decode action trace")
-			}
 			return nil
 		}
 
@@ -512,6 +516,15 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 		var err error
 		action.JsonData, err = decodeTransfer(action.RawData)
 		if err != nil {
+			if d.strictMode {
+				zlog.Fatal("skipping transfer action since we were not able to decode it against ABI",
+					zap.Uint64("block_num", blockNum),
+					zap.String("trx_id", trxID),
+					zap.String("action", action.SimpleName()),
+					zap.Uint64("global_sequence", globalSequence),
+					zap.Error(err),
+				)
+			}
 			zlog.Error("skipping transfer action since we were not able to decode it against ABI",
 				zap.Uint64("block_num", blockNum),
 				zap.String("trx_id", trxID),
@@ -519,9 +532,6 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
-			if d.strictMode {
-				return fmt.Errorf("failed to decode transfer action")
-			}
 			return nil
 		}
 
@@ -530,19 +540,19 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 
 	abi := d.findABI(action.Account, globalSequence, localCache)
 	if abi == nil {
-		zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		if d.strictMode {
-			return fmt.Errorf("failed to decode action, no ABI found")
+		if d.strictMode && action.Account != "eosio.null" {
+			zlog.Fatal("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 		}
+		zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 		return nil
 	}
 
 	actionDef := abi.ActionForName(eos.ActionName(action.Name))
 	if actionDef == nil {
-		zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		if d.strictMode {
-			return fmt.Errorf("failed to decode action, action name not in ABI")
+		if d.strictMode && action.Name != "onblock" {
+			zlog.Fatal("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence), zap.Any("abi", abi))
 		}
+		zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
 		return nil
 	}
 
@@ -558,6 +568,15 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 		//
 		// FIXME: Probably that logging an error is too much, it's being done like this for now while we
 		//        tweak. Will probably move to INFO (depending on occurrences) or DEBUG.
+		if d.strictMode {
+			zlog.Fatal("skipping action since we were not able to decode it against ABI",
+				zap.Uint64("block_num", blockNum),
+				zap.String("trx_id", trxID),
+				zap.String("action", action.SimpleName()),
+				zap.Uint64("global_sequence", globalSequence),
+				zap.Error(err),
+			)
+		}
 		zlog.Debug("skipping action since we were not able to decode it against ABI",
 			zap.Uint64("block_num", blockNum),
 			zap.String("trx_id", trxID),
@@ -565,9 +584,6 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 			zap.Uint64("global_sequence", globalSequence),
 			zap.Error(err),
 		)
-		if d.strictMode {
-			return fmt.Errorf("failed to decode action")
-		}
 		return nil
 	}
 
@@ -578,60 +594,82 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 
 func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
 
+	// neither new_data or old_data exists, we can skip this database operation
+	if len(dbOp.NewData) <= 0 && len(dbOp.OldData) <= 0 {
+		return nil
+	}
+
 	zlog.Debug("decoding table data", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
 
 	abi := d.findABI(dbOp.Code, globalSequence, localCache)
 	if abi == nil {
-		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
 		if d.strictMode {
-			return fmt.Errorf("failed to decode database operation, no ABI found")
+			zlog.Fatal("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
 		}
+		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
 		return nil
 	}
 
 	tableDef := abi.TableForName(eos.TableName(dbOp.TableName))
 	if tableDef == nil {
+		if d.strictMode {
+			zlog.Fatal("skipping table since table was not in ABI", zap.String("table_name", dbOp.TableName), zap.Uint64("global_sequence", globalSequence))
+		}
 		zlog.Debug("skipping table since table was not in ABI", zap.String("table_name", dbOp.TableName), zap.Uint64("global_sequence", globalSequence))
-		if d.strictMode {
-			return fmt.Errorf("failed to decode database operation, table not found in ABI")
-		}
 		return nil
 	}
 
-	decoder := eos.NewDecoder(dbOp.OldData)
-	oldDataJson, err := abi.Decode(decoder, tableDef.Type)
-	if err != nil {
-		zlog.Debug("skipping old table data since we were not able to decode it against ABI",
-			zap.Uint64("block_num", blockNum),
-			zap.String("trx_id", trxID),
-			zap.String("code", dbOp.Code),
-			zap.Uint64("global_sequence", globalSequence),
-			zap.Error(err),
-		)
-		if d.strictMode {
-			return fmt.Errorf("failed to decode old_data operation")
+	if len(dbOp.OldData) > 0 {
+		decoder := eos.NewDecoder(dbOp.OldData)
+		oldDataJson, err := abi.Decode(decoder, tableDef.Type)
+		if err != nil {
+			if d.strictMode {
+				zlog.Fatal("skipping old table data since we were not able to decode it against ABI",
+					zap.Uint64("block_num", blockNum),
+					zap.String("trx_id", trxID),
+					zap.String("code", dbOp.Code),
+					zap.Uint64("global_sequence", globalSequence),
+					zap.Error(err),
+				)
+			}
+			zlog.Debug("skipping old table data since we were not able to decode it against ABI",
+				zap.Uint64("block_num", blockNum),
+				zap.String("trx_id", trxID),
+				zap.String("code", dbOp.Code),
+				zap.Uint64("global_sequence", globalSequence),
+				zap.Error(err),
+			)
+			return nil
 		}
-		return nil
+
+		dbOp.OldDataJson = string(oldDataJson)
 	}
 
-	decoder = eos.NewDecoder(dbOp.NewData)
-	newDataJson, err := abi.Decode(decoder, tableDef.Type)
-	if err != nil {
-		zlog.Debug("skipping new table data since we were not able to decode it against ABI",
-			zap.Uint64("block_num", blockNum),
-			zap.String("trx_id", trxID),
-			zap.String("code", dbOp.Code),
-			zap.Uint64("global_sequence", globalSequence),
-			zap.Error(err),
-		)
-		if d.strictMode {
-			return fmt.Errorf("failed to decode new_data operation")
+	if len(dbOp.NewData) > 0 {
+		decoder := eos.NewDecoder(dbOp.NewData)
+		newDataJson, err := abi.Decode(decoder, tableDef.Type)
+		if err != nil {
+			if d.strictMode {
+				zlog.Fatal("skipping new table data since we were not able to decode it against ABI",
+					zap.Uint64("block_num", blockNum),
+					zap.String("trx_id", trxID),
+					zap.String("code", dbOp.Code),
+					zap.Uint64("global_sequence", globalSequence),
+					zap.Error(err),
+				)
+			}
+			zlog.Debug("skipping new table data since we were not able to decode it against ABI",
+				zap.Uint64("block_num", blockNum),
+				zap.String("trx_id", trxID),
+				zap.String("code", dbOp.Code),
+				zap.Uint64("global_sequence", globalSequence),
+				zap.Error(err),
+			)
+			return nil
 		}
-		return nil
-	}
 
-	dbOp.OldDataJson = string(oldDataJson)
-	dbOp.NewDataJson = string(newDataJson)
+		dbOp.NewDataJson = string(newDataJson)
+	}
 
 	return nil
 }
