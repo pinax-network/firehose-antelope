@@ -469,6 +469,9 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 		abi := d.findABI(action.Account, globalSequence, localCache)
 		if abi == nil {
 			zlog.Debug("skipping action result since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+			if d.strictMode {
+				return fmt.Errorf("failed to decode action trace, no ABI found")
+			}
 			return nil
 		}
 
@@ -481,6 +484,9 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
+			if d.strictMode {
+				return fmt.Errorf("failed to decode action trace")
+			}
 			return nil
 		}
 
@@ -492,22 +498,16 @@ func (d *ABIDecoder) decodeActionTrace(actionTrace *pbantelope.ActionTrace, glob
 
 func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
 
-	// if traceEnabled {
 	zlog.Debug("decoding action", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-	//}
 
 	if len(action.RawData) <= 0 {
-		// if traceEnabled {
 		zlog.Debug("skipping action since no hex data found", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		// }
 		return nil
 	}
 
 	// Transfer raw data min length is 8 bytes for `from`, 8 bytes for `to`, 16 bytes for `quantity` and `1 byte` for memo length
 	if action.Account == "eosio.token" && action.Name == "transfer" && len(action.RawData) >= 33 {
-		// if traceEnabled {
 		zlog.Debug("decoding action using pre-built eosio.token:transfer decoder", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
-		// }
 
 		var err error
 		action.JsonData, err = decodeTransfer(action.RawData)
@@ -519,6 +519,9 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
+			if d.strictMode {
+				return fmt.Errorf("failed to decode transfer action")
+			}
 			return nil
 		}
 
@@ -528,12 +531,18 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 	abi := d.findABI(action.Account, globalSequence, localCache)
 	if abi == nil {
 		zlog.Debug("skipping action since no ABI found for it", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		if d.strictMode {
+			return fmt.Errorf("failed to decode action, no ABI found")
+		}
 		return nil
 	}
 
 	actionDef := abi.ActionForName(eos.ActionName(action.Name))
 	if actionDef == nil {
 		zlog.Debug("skipping action since action was not in ABI", zap.String("action", action.SimpleName()), zap.Uint64("global_sequence", globalSequence))
+		if d.strictMode {
+			return fmt.Errorf("failed to decode action, action name not in ABI")
+		}
 		return nil
 	}
 
@@ -556,6 +565,9 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 			zap.Uint64("global_sequence", globalSequence),
 			zap.Error(err),
 		)
+		if d.strictMode {
+			return fmt.Errorf("failed to decode action")
+		}
 		return nil
 	}
 
@@ -571,12 +583,18 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 	abi := d.findABI(dbOp.Code, globalSequence, localCache)
 	if abi == nil {
 		zlog.Debug("skipping table since no ABI found for it", zap.String("code", dbOp.Code), zap.Uint64("global_sequence", globalSequence))
+		if d.strictMode {
+			return fmt.Errorf("failed to decode database operation, no ABI found")
+		}
 		return nil
 	}
 
 	tableDef := abi.TableForName(eos.TableName(dbOp.TableName))
 	if tableDef == nil {
-		zlog.Debug("skipping table since table was not in ABI", zap.String("primary_key", dbOp.PrimaryKey), zap.Uint64("global_sequence", globalSequence))
+		zlog.Debug("skipping table since table was not in ABI", zap.String("table_name", dbOp.TableName), zap.Uint64("global_sequence", globalSequence))
+		if d.strictMode {
+			return fmt.Errorf("failed to decode database operation, table not found in ABI")
+		}
 		return nil
 	}
 
@@ -590,6 +608,9 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 			zap.Uint64("global_sequence", globalSequence),
 			zap.Error(err),
 		)
+		if d.strictMode {
+			return fmt.Errorf("failed to decode old_data operation")
+		}
 		return nil
 	}
 
@@ -603,6 +624,9 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 			zap.Uint64("global_sequence", globalSequence),
 			zap.Error(err),
 		)
+		if d.strictMode {
+			return fmt.Errorf("failed to decode new_data operation")
+		}
 		return nil
 	}
 
