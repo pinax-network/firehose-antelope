@@ -10,6 +10,10 @@ message ActionTraces {
   repeated ActionTrace action_traces = 1;
 }
 
+message TransactionTraces {
+  repeated TransactionTrace transaction_traces = 1;
+}
+
 message DBOps {
   repeated DBOp db_ops = 1;
 }
