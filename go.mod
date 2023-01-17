@@ -19,7 +19,7 @@ require (
 	github.com/streamingfast/dlauncher v0.0.0-20220909121534-7a9aa91dbb32
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
-	github.com/streamingfast/dstore v0.1.1-0.20221206141230-6d7bdda8687f
+	github.com/streamingfast/dstore v0.1.1-0.20230117140537-2c870a0d4523
 	github.com/streamingfast/firehose v0.1.1-0.20221017171248-8fd3adbe7b4d
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20220813175024-b4fbb0e893df
@@ -28,7 +28,7 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20221129171534-a0708b599ce5
-	github.com/streamingfast/substreams v0.1.1-0.20230116151816-73bb921885e8
+	github.com/streamingfast/substreams v0.1.1-0.20230117153304-29f6854686e5
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
