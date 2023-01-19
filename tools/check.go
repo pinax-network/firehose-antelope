@@ -48,6 +48,8 @@ func init() {
 	CheckCmd.AddCommand(checkMergedBlocksCmd)
 
 	CheckCmd.PersistentFlags().StringP("range", "r", "", "Block range to use for the check")
+	CheckCmd.PersistentFlags().IntP("workers", "w", 1, "Number of workers")
+	CheckCmd.PersistentFlags().IntP("batch", "b", 25000, "batch size")
 
 	checkMergedBlocksCmd.Flags().BoolP("print-stats", "s", false, "Natively decode each block in the segment and print statistics about it, ensuring it contains the required blocks")
 	checkMergedBlocksCmd.Flags().BoolP("print-full", "f", false, "Natively decode each block and print the full JSON representation of the block, should be used with a small range only if you don't want to be overwhelmed")
@@ -71,7 +73,14 @@ func checkMergedBlocksE(cmd *cobra.Command, args []string) error {
 		printDetails = sftools.PrintFull
 	}
 
-	return sftools.CheckMergedBlocks(cmd.Context(), zlog, storeURL, fileBlockSize, blockRange, blockPrinter, printDetails)
+	batchSize := viper.GetInt("batch")
+	workers := viper.GetInt("workers")
+
+	if workers == 1 {
+		return sftools.CheckMergedBlocks(cmd.Context(), zlog, storeURL, fileBlockSize, blockRange, blockPrinter, printDetails)
+	} else {
+		return sftools.CheckMergedBlocksBatch(cmd.Context(), zlog, storeURL, fileBlockSize, blockRange, blockPrinter, printDetails, batchSize, workers)
+	}
 }
 
 func blockPrinter(block *bstream.Block) {
