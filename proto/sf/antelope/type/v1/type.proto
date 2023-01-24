@@ -1029,7 +1029,22 @@ message AccountCreationRef {
 // WARN: this is a client-side optimization pattern and should be moved in the
 // consuming code.
 message HeaderOnlyBlock {
-  BlockHeader header = 5;
+  // id is the block's hash.
+  string id = 1;
+
+  // Number is the block's height at which this block was mined.
+  uint32 number = 2;
+
+  // Header contain's the block's header information like its parent hash, the merkel root hash
+  // and all other information the form a block.
+  BlockHeader header = 4;
+
+  // A blockroot Merkle tree is a data structure that uses hash functions to organize and 
+  // verify the integrity of data blocks in a blockchain.
+  // Each leaf node contains a hash of a data block, while each non-leaf node contains the hash of its child nodes.
+  // The root node contains a single hash that represents all the data in the tree,
+  // allowing for efficient verification of data integrity by only checking the root hash.
+  BlockRootMerkle blockroot_merkle = 11;
 }
 
 message TransactionTraceWithBlockRef {
