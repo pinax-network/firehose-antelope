@@ -3,16 +3,16 @@ module github.com/EOS-Nation/firehose-antelope
 go 1.18
 
 require (
-	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20220929143722-79603ee4aaa8
+	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20221005163100-84cbd8eb764c
+	github.com/eoscanada/eos-go v0.10.3-0.20221212213122-580014f81265
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.4.0
-	github.com/spf13/viper v1.8.1
-	github.com/streamingfast/bstream v0.0.2-0.20221209144659-0fb1074db0f3
-	github.com/streamingfast/cli v0.0.4-0.20220630165922-bc58c6666fc8
+	github.com/spf13/viper v1.10.1
+	github.com/streamingfast/bstream v0.0.2-0.20230120170832-6389e61e9d54
+	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
 	github.com/streamingfast/dauth v0.0.0-20221027185237-b209f25fa3ff
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20221125175206-82e01d420d45
@@ -22,13 +22,13 @@ require (
 	github.com/streamingfast/dstore v0.1.1-0.20230117140537-2c870a0d4523
 	github.com/streamingfast/firehose v0.1.1-0.20221017171248-8fd3adbe7b4d
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
-	github.com/streamingfast/logging v0.0.0-20220813175024-b4fbb0e893df
+	github.com/streamingfast/logging v0.0.0-20221209193439-bff11742bf4c
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
 	github.com/streamingfast/node-manager v0.0.2-0.20221115101723-d9823ffd7ad5
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
-	github.com/streamingfast/sf-tools v0.0.0-20221129171534-a0708b599ce5
-	github.com/streamingfast/substreams v0.1.1-0.20230117153304-29f6854686e5
+	github.com/streamingfast/sf-tools v0.0.0-20230116200621-b84f19a2e142
+	github.com/streamingfast/substreams v0.1.1-0.20230125161710-f9b1fc1068fd
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
@@ -39,7 +39,8 @@ require (
 
 replace (
 	github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
-	github.com/bytecodealliance/wasmtime-go => github.com/streamingfast/wasmtime-go v0.0.0-20221110162800-03b0c10e9b6a
+	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem
+	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 => github.com/streamingfast/graph v0.0.0-20220329181048-a5710712d873
 )
 
 require (
@@ -66,18 +67,18 @@ require (
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
-	github.com/bytecodealliance/wasmtime-go v0.39.0 // indirect
+	github.com/bytecodealliance/wasmtime-go/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/cncf/udpa/go v0.0.0-20210930031921-04548b0d99d4 // indirect
-	github.com/cncf/xds/go v0.0.0-20211011173535-cb28da3451f1 // indirect
+	github.com/cncf/xds/go v0.0.0-20211130200136-a8f946100490 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.0 // indirect
 	github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1 // indirect
-	github.com/envoyproxy/protoc-gen-validate v0.1.0 // indirect
-	github.com/fsnotify/fsnotify v1.4.9 // indirect
+	github.com/envoyproxy/protoc-gen-validate v0.6.2 // indirect
+	github.com/fsnotify/fsnotify v1.5.1 // indirect
 	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
@@ -107,12 +108,12 @@ require (
 	github.com/mattn/go-ieproxy v0.0.1 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
-	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/mitchellh/mapstructure v1.4.3 // indirect
 	github.com/mostynb/go-grpc-compression v1.1.17 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/openzipkin/zipkin-go v0.4.0 // indirect
 	github.com/paulbellamy/ratecounter v0.2.0 // indirect
-	github.com/pelletier/go-toml v1.9.3 // indirect
+	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect
 	github.com/prometheus/client_model v0.2.0 // indirect
@@ -122,7 +123,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sethvargo/go-retry v0.2.3 // indirect
 	github.com/spf13/afero v1.6.0 // indirect
-	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/cast v1.4.1 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
@@ -162,7 +163,7 @@ require (
 	google.golang.org/api v0.99.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto v0.0.0-20221014173430-6e2ab493f96b // indirect
-	gopkg.in/ini.v1 v1.62.0 // indirect
+	gopkg.in/ini.v1 v1.66.2 // indirect
 	gopkg.in/olivere/elastic.v3 v3.0.75 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
