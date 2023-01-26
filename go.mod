@@ -19,7 +19,7 @@ require (
 	github.com/streamingfast/dlauncher v0.0.0-20220909121534-7a9aa91dbb32
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
-	github.com/streamingfast/dstore v0.1.1-0.20230117140537-2c870a0d4523
+	github.com/streamingfast/dstore v0.1.1-0.20230126133209-44cda2076cfe
 	github.com/streamingfast/firehose v0.1.1-0.20221017171248-8fd3adbe7b4d
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20221209193439-bff11742bf4c
@@ -28,7 +28,7 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230116200621-b84f19a2e142
-	github.com/streamingfast/substreams v0.1.1-0.20230125161710-f9b1fc1068fd
+	github.com/streamingfast/substreams v0.1.1-0.20230126133549-40c1fdfb960f
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
@@ -61,7 +61,7 @@ require (
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
 	github.com/abourget/llerrgroup v0.2.0 // indirect
-	github.com/aws/aws-sdk-go v1.37.0 // indirect
+	github.com/aws/aws-sdk-go v1.44.187 // indirect
 	github.com/benbjohnson/clock v1.1.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
@@ -153,12 +153,12 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220427172511-eb4f295cb31f // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
-	golang.org/x/net v0.0.0-20221012135044-0b7e1fb9d458 // indirect
+	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20221006150949-b44042a4b9c1 // indirect
 	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0 // indirect
-	golang.org/x/sys v0.0.0-20220728004956-3c1f35247d10 // indirect
-	golang.org/x/term v0.0.0-20220411215600-e5f449aeb171 // indirect
-	golang.org/x/text v0.3.7 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/term v0.1.0 // indirect
+	golang.org/x/text v0.4.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.99.0 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
