@@ -19,10 +19,15 @@ message DBOps {
 }
 
 message Block {
+  // id is the block's hash.
   string id = 1;
+
+  // Number is the block's height at which this block was mined.
   uint32 number = 2;
   uint32 version = 3;
 
+  // Header contain's the block's header information like its parent hash, the merkel root hash
+  // and all other information the form a block.
   BlockHeader header = 4;
   string producer_signature = 5;
   repeated Extension block_extensions = 7;
@@ -1015,4 +1020,39 @@ message AccountCreationRef {
   string block_id = 4;
   google.protobuf.Timestamp block_time = 5;
   string transaction_id = 6;
+}
+
+// HeaderOnlyBlock is used to optimally unpack the [Block] structure (note the
+// corresponding message number for the `header` field) while consuming less
+// memory, when only the `header` is desired.
+//
+// WARN: this is a client-side optimization pattern and should be moved in the
+// consuming code.
+message HeaderOnlyBlock {
+  // id is the block's hash.
+  string id = 1;
+
+  // Number is the block's height at which this block was mined.
+  uint32 number = 2;
+
+  // Header contain's the block's header information like its parent hash, the merkel root hash
+  // and all other information the form a block.
+  BlockHeader header = 4;
+
+  // A blockroot Merkle tree is a data structure that uses hash functions to organize and 
+  // verify the integrity of data blocks in a blockchain.
+  // Each leaf node contains a hash of a data block, while each non-leaf node contains the hash of its child nodes.
+  // The root node contains a single hash that represents all the data in the tree,
+  // allowing for efficient verification of data integrity by only checking the root hash.
+  BlockRootMerkle blockroot_merkle = 11;
+}
+
+message TransactionTraceWithBlockRef {
+  TransactionTrace trace = 1;
+  BlockRef block_ref = 2;
+}
+
+message BlockRef {
+  bytes hash = 1;
+  uint64 number = 2;
 }
