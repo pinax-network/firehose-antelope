@@ -11,7 +11,7 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.10.1
-	github.com/streamingfast/bstream v0.0.2-0.20230120170832-6389e61e9d54
+	github.com/streamingfast/bstream v0.0.2-0.20230127184431-34ba0238ed00
 	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
 	github.com/streamingfast/dauth v0.0.0-20221027185237-b209f25fa3ff
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
@@ -28,7 +28,7 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230116200621-b84f19a2e142
-	github.com/streamingfast/substreams v0.1.1-0.20230126133549-40c1fdfb960f
+	github.com/streamingfast/substreams v0.2.0
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
