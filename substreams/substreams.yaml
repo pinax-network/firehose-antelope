@@ -1,8 +1,8 @@
 specVersion: v0.1.0
 package:
   name: antelope
-  version: v0.0.2
-  url: https://github.com/EOS-Nation/firehose-antelope
+  version: v0.0.4
+  url: https://github.com/pinax-network/firehose-antelope
   doc: |
     Protobuf definitions for Substreams modules on Antelope.
 
