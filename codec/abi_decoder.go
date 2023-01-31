@@ -594,7 +594,7 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 
 func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
 
-	// neither new_data or old_data exists, we can skip this database operation
+	// neither new_data nor old_data exists, we can skip this database operation
 	if len(dbOp.NewData) <= 0 && len(dbOp.OldData) <= 0 {
 		return nil
 	}
@@ -628,8 +628,11 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 					zap.Uint64("block_num", blockNum),
 					zap.String("trx_id", trxID),
 					zap.String("code", dbOp.Code),
+					zap.String("table", dbOp.TableName),
 					zap.Uint64("global_sequence", globalSequence),
 					zap.Error(err),
+					zap.Any("abi", abi),
+					zap.Any("table_def", tableDef),
 				)
 			}
 			zlog.Debug("skipping old table data since we were not able to decode it against ABI",
