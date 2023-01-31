@@ -18,7 +18,6 @@ jobs:
         go-version: [ 1.18.x, 1.19.x ]
         os: [ ubuntu-latest ]
     steps:
-      -
       - name: Check out code
         uses: actions/checkout@v3
 
