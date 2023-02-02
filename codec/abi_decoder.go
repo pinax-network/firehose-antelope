@@ -646,6 +646,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 		}
 
 		dbOp.OldDataJson = string(oldDataJson)
+		zlog.Debug("decoded old data", zap.String("old_json_data", dbOp.OldDataJson))
 	}
 
 	if len(dbOp.NewData) > 0 {
@@ -675,6 +676,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 		}
 
 		dbOp.NewDataJson = string(newDataJson)
+		zlog.Debug("decoded new data", zap.String("new_json_data", dbOp.NewDataJson))
 	}
 
 	return nil
