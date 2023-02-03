@@ -639,6 +639,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 				zap.Uint64("block_num", blockNum),
 				zap.String("trx_id", trxID),
 				zap.String("code", dbOp.Code),
+				zap.String("table", dbOp.TableName),
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
@@ -669,6 +670,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 				zap.Uint64("block_num", blockNum),
 				zap.String("trx_id", trxID),
 				zap.String("code", dbOp.Code),
+				zap.String("table", dbOp.TableName),
 				zap.Uint64("global_sequence", globalSequence),
 				zap.Error(err),
 			)
