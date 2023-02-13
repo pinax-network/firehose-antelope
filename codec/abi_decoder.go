@@ -623,7 +623,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 		decoder := eos.NewDecoder(dbOp.OldData)
 		oldDataJson, err := abi.Decode(decoder, tableDef.Type)
 		if err != nil {
-			if d.strictMode && tableDef.Type != "variant_row" {
+			if d.strictMode {
 				zlog.Fatal("skipping old table data since we were not able to decode it against ABI",
 					zap.Uint64("block_num", blockNum),
 					zap.String("trx_id", trxID),
@@ -654,7 +654,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 		decoder := eos.NewDecoder(dbOp.NewData)
 		newDataJson, err := abi.Decode(decoder, tableDef.Type)
 		if err != nil {
-			if d.strictMode && tableDef.Type != "variant_row" {
+			if d.strictMode {
 				zlog.Fatal("skipping new table data since we were not able to decode it against ABI",
 					zap.Uint64("block_num", blockNum),
 					zap.String("trx_id", trxID),
