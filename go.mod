@@ -6,7 +6,7 @@ require (
 	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20221212213122-580014f81265
+	github.com/eoscanada/eos-go v0.10.3-0.20230203144053-29cae92cfde1
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.6.1
