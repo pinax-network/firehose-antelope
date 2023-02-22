@@ -2,15 +2,18 @@ package antelope
 
 import (
 	"fmt"
+	"math"
+	"sort"
+
 	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"math"
-	"sort"
 )
+
+const consoleTextLimit = 10000
 
 func TransactionReceiptToDEOS(txReceipt *TransactionReceipt) *pbantelope.TransactionReceipt {
 	receipt := &pbantelope.TransactionReceipt{
@@ -137,7 +140,7 @@ func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...antelope.Conve
 		Receiver:         string(in.Receiver),
 		Action:           antelope.ActionToDEOS(in.Action),
 		Elapsed:          int64(in.ElapsedUs),
-		Console:          string(in.Console),
+		Console:          string(in.Console)[0:consoleTextLimit],
 		TransactionId:    in.TransactionID.String(),
 		ContextFree:      in.ContextFree,
 		ProducerBlockId:  in.ProducerBlockID.String(),
