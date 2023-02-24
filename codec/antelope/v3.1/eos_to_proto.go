@@ -136,11 +136,20 @@ func ActionTracesToDEOS(actionTraces []*ActionTrace, opts ...antelope.Conversion
 }
 
 func ActionTraceToDEOS(in *ActionTrace, execIndex uint32, opts ...antelope.ConversionOption) (out *pbantelope.ActionTrace, consoleTruncated bool) {
+
+	consoleText := in.Console
+	var sliceLimit int
+	if len(consoleText) < consoleTextLimit {
+		sliceLimit = len(consoleText)
+	} else {
+		sliceLimit = consoleTextLimit
+	}
+
 	out = &pbantelope.ActionTrace{
 		Receiver:         string(in.Receiver),
 		Action:           antelope.ActionToDEOS(in.Action),
 		Elapsed:          int64(in.ElapsedUs),
-		Console:          string(in.Console)[0:consoleTextLimit],
+		Console:          string(in.Console)[0:sliceLimit],
 		TransactionId:    in.TransactionID.String(),
 		ContextFree:      in.ContextFree,
 		ProducerBlockId:  in.ProducerBlockID.String(),
