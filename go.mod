@@ -1,6 +1,6 @@
 module github.com/EOS-Nation/firehose-antelope
 
-go 1.18
+go 1.19
 
 require (
 	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d
