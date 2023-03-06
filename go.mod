@@ -181,4 +181,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/eoscanada/eos-go => ../eos-go
+// replace github.com/eoscanada/eos-go => ../eos-go

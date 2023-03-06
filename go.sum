@@ -100,8 +100,6 @@ github.com/Azure/go-autorest/tracing v0.6.0 h1:TYi4+3m5t6K48TGI9AUdb+IzbnSxvnvUM
 github.com/Azure/go-autorest/tracing v0.6.0/go.mod h1:+vhtPC754Xsa23ID7GlGsrdKBpUA79WCAKPPZVC2DeU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/xgb v0.0.0-20160522181843-27f122750802/go.mod h1:IVnqGOEym/WlBOVXweHU+Q+/VP0lqqI8lqeDx9IjBqo=
-github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d h1:9YTUXKJCBDxLO3xaa9zJ3GU44WtGc/e9I6BHFnbCgNQ=
-github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d/go.mod h1:D/uBTHauhuxE22RRkOtNTQXBO2CpWU8sOrS2d9sFvCk=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3 h1:fiyErF/p5fz79DvMCca9ayvYiWYsFP1oJbskt9fjo8I=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/detectors/gcp v0.32.3/go.mod h1:s7Gpwj0tk7XnVCm4BQEmx/mbS36SuTCY/vMB2SNxe8o=
 github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace v1.8.6 h1:TOxk7n3PE2OkdNMgrXDtDr3ju4pIvwhY515tCoH0CpE=
@@ -229,8 +227,8 @@ github.com/envoyproxy/go-control-plane v0.10.2-0.20220325020618-49ff273808a1/go.
 github.com/envoyproxy/protoc-gen-validate v0.1.0/go.mod h1:iSmxcyjqTsJpI2R4NaDN7+kN2VEUnK/pcBlmesArF7c=
 github.com/envoyproxy/protoc-gen-validate v0.6.2 h1:JiO+kJTpmYGjEodY7O1Zk8oZcNz1+f30UtwtXoFUPzE=
 github.com/envoyproxy/protoc-gen-validate v0.6.2/go.mod h1:2t7qjJNvHPx8IjnBOzl9E9/baC+qXE/TeeyBRzgJDws=
-github.com/eoscanada/eos-go v0.10.3-0.20221212213122-580014f81265 h1:aNGxgw7zpo4l2Xa7bCPnWTN6YzzX6CvlYpshUb5egJc=
-github.com/eoscanada/eos-go v0.10.3-0.20221212213122-580014f81265/go.mod h1:b4Ap5A8TsnnclF5gmhJLrporTmQmaNxBj8QTMGPneE0=
+github.com/eoscanada/eos-go v0.10.3-0.20230203144053-29cae92cfde1 h1:nbSIUYKNG8trHJLgvrm2xAnjim6oG6CIQigHrwEXGOo=
+github.com/eoscanada/eos-go v0.10.3-0.20230203144053-29cae92cfde1/go.mod h1:b4Ap5A8TsnnclF5gmhJLrporTmQmaNxBj8QTMGPneE0=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=
 github.com/felixge/httpsnoop v1.0.3 h1:s/nj+GCswXYzN5v2DpNMuMQYe+0DDwt5WVCU6CWBdXk=
 github.com/felixge/httpsnoop v1.0.3/go.mod h1:m8KPJKqk1gH5J9DgRY2ASl2lWCfGKXixSwevea8zH2U=
