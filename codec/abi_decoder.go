@@ -15,6 +15,7 @@ package codec
 
 import (
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
@@ -664,6 +665,7 @@ func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, tr
 					zap.Error(err),
 					zap.Any("abi", abi),
 					zap.Any("table_def", tableDef),
+					zap.Any("new_table_data", hex.EncodeToString(dbOp.NewData)),
 				)
 			}
 			zlog.Debug("skipping new table data since we were not able to decode it against ABI",
