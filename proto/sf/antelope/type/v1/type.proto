@@ -562,7 +562,7 @@ message ActionTrace {
   Action action = 2;
   bool context_free = 3;
   int64 elapsed = 4;
-  string console = 5;
+  string console = 5; // limited to 10000 characters
   string transaction_id = 6;
   uint64 block_num = 7;
   string producer_block_id = 8;
