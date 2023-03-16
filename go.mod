@@ -27,8 +27,8 @@ require (
 	github.com/streamingfast/node-manager v0.0.2-0.20221115101723-d9823ffd7ad5
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
-	github.com/streamingfast/sf-tools v0.0.0-20230116200621-b84f19a2e142
-	github.com/streamingfast/substreams v0.2.1-0.20230301190247-04e14183d833
+	github.com/streamingfast/sf-tools v0.0.0-20230310203226-5fe04b74a5f6
+	github.com/streamingfast/substreams v1.0.1-0.20230313163604-1a17468a2893
 	github.com/stretchr/testify v1.8.0
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
