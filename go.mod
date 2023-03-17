@@ -5,10 +5,10 @@ go 1.19
 require (
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20230203144053-29cae92cfde1
+	github.com/eoscanada/eos-go v0.10.3-0.20230317142940-6dd3b0587955
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
-	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317145158-1b52c3c1b98e
+	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317150217-417f23cbea8d
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/bstream v0.0.2-0.20230228213106-2b6a3160e01e
@@ -39,8 +39,8 @@ require (
 
 replace (
 	github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
-	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem
-	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 => github.com/streamingfast/graph v0.0.0-20220329181048-a5710712d873
+	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem3
+	github.com/graph-gophers/graphql-go => github.com/streamingfast/graphql-go v0.0.0-20210204202750-0e485a040a3c
 )
 
 replace github.com/pinax-network/firehose-antelope/types => ./types
