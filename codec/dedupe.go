@@ -1,7 +1,7 @@
 package codec
 
 import (
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 )
 
 func DeduplicateTransactionTrace(trx *pbantelope.TransactionTrace) {

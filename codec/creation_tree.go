@@ -16,7 +16,7 @@ package codec
 
 import (
 	"fmt"
-	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
+	"github.com/pinax-network/firehose-antelope/codec/antelope"
 	"strings"
 )
 

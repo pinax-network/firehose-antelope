@@ -21,7 +21,7 @@ import (
 	"io"
 	"strconv"
 
-	pbantelope "github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"

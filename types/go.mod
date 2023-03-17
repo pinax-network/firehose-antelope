@@ -1,4 +1,4 @@
-module github.com/EOS-Nation/firehose-antelope/types
+module github.com/pinax-network/firehose-antelope/types
 
 go 1.19
 

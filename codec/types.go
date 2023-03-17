@@ -15,8 +15,8 @@
 package codec
 
 import (
-	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/pinax-network/firehose-antelope/codec/antelope"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

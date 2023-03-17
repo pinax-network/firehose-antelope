@@ -14,7 +14,7 @@
 
 package cli
 
-import "github.com/EOS-Nation/firehose-antelope/tools"
+import "github.com/pinax-network/firehose-antelope/tools"
 
 func init() {
 	RootCmd.AddCommand(tools.Cmd)

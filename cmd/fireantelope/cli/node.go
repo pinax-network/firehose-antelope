@@ -2,8 +2,8 @@ package cli
 
 import (
 	"fmt"
-	"github.com/EOS-Nation/firehose-antelope/codec"
-	"github.com/EOS-Nation/firehose-antelope/nodemanager"
+	"github.com/pinax-network/firehose-antelope/codec"
+	"github.com/pinax-network/firehose-antelope/nodemanager"
 	"github.com/streamingfast/bstream/blockstream"
 	nodeManagerApp "github.com/streamingfast/node-manager/app/node_manager2"
 	reader "github.com/streamingfast/node-manager/mindreader"

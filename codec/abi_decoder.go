@@ -18,7 +18,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/lytics/ordpool"
