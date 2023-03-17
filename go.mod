@@ -3,12 +3,12 @@ module github.com/pinax-network/firehose-antelope
 go 1.19
 
 require (
-	github.com/EOS-Nation/firehose-antelope/types v0.0.0-20230105012655-2d37e8ec511d
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/eoscanada/eos-go v0.10.3-0.20230203144053-29cae92cfde1
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
+	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317145158-1b52c3c1b98e
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/bstream v0.0.2-0.20230228213106-2b6a3160e01e
@@ -43,7 +43,7 @@ replace (
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 => github.com/streamingfast/graph v0.0.0-20220329181048-a5710712d873
 )
 
-replace github.com/EOS-Nation/firehose-antelope/types => ./types
+replace github.com/pinax-network/firehose-antelope/types => ./types
 
 require (
 	cloud.google.com/go v0.104.0 // indirect
