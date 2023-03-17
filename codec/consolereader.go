@@ -66,7 +66,7 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 			globalStats:  globalStats,
 			currentBlock: &pbantelope.Block{},
 			currentTrace: &pbantelope.TransactionTrace{},
-			abiDecoder:   newABIDecoder(false),
+			abiDecoder:   newABIDecoder(),
 		},
 		done:  make(chan interface{}),
 		stats: globalStats,

@@ -236,7 +236,7 @@ func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()
 			globalStats:  newConsoleReaderStats(),
 			currentBlock: &pbantelope.Block{},
 			currentTrace: &pbantelope.TransactionTrace{},
-			abiDecoder:   newABIDecoder(true),
+			abiDecoder:   newABIDecoderInStrictMode(),
 		},
 		logger: zlogTest,
 	}
@@ -724,7 +724,7 @@ func blockWithConsole(block *pbantelope.Block) bool {
 func newParseCtx() *parseCtx {
 	return &parseCtx{
 		hydrator:     antelope_v3_1.NewHydrator(zlogTest),
-		abiDecoder:   newABIDecoder(false),
+		abiDecoder:   newABIDecoder(),
 		currentBlock: &pbantelope.Block{},
 		currentTrace: &pbantelope.TransactionTrace{},
 	}

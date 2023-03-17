@@ -46,7 +46,7 @@ type ABIDecoder struct {
 
 	// If set to true the abi decoder will fail on any decoding error regarding action or database operations (instead
 	// of just logging it). This can be helpful for testing to make sure the decoding works if it's supposed to.
-	// Note that action decoding will fail occasionally in real life due to broken contracts, so you should NOT enabled
+	// Note that action decoding will fail occasionally in real life due to broken contracts, so you should NOT enable
 	// this when running in production!
 	strictMode bool
 
@@ -78,13 +78,13 @@ type ABIDecoder struct {
 	truncateOnNextGlobalSequence bool
 }
 
-func newABIDecoder(strictMode bool) *ABIDecoder {
+func newABIDecoder() *ABIDecoder {
 	a := &ABIDecoder{
 		cache:            newABICache(),
 		activeBlockNum:   noActiveBlockNum,
 		lastSeenBlockRef: bstream.BlockRefEmpty,
 		blockDone:        make(chan doneBlockJob),
-		strictMode:       strictMode,
+		strictMode:       false,
 	}
 
 	numWorkers := 24
@@ -103,6 +103,15 @@ func newABIDecoder(strictMode bool) *ABIDecoder {
 			}
 		}
 	}()
+	return a
+}
+
+// newABIDecoderInStrictMode returns an ABI decoder in strict mode. See ABIDecoder.strictMode for more information about
+// this flag. Never use this in production, always use newABIDecoder instead!
+func newABIDecoderInStrictMode() *ABIDecoder {
+	a := newABIDecoder()
+	a.strictMode = true
+
 	return a
 }
 
