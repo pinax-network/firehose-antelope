@@ -180,5 +180,3 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/eoscanada/eos-go => github.com/EOS-Nation/eos-go v0.10.3-0.20230309115047-cbc3424f0329
