@@ -422,8 +422,7 @@ func TestABIDecoder(t *testing.T) {
 				abiBinary, err := eos.MarshalBinary(abi)
 				require.NoError(t, err)
 
-				err = decoder.addInitialABI(contract, base64.RawStdEncoding.EncodeToString(abiBinary))
-				require.NoError(t, err)
+				decoder.addInitialABI(contract, base64.RawStdEncoding.EncodeToString(abiBinary))
 			}
 
 			for _, block := range test.blocks {
