@@ -59,11 +59,11 @@ env_files:
 #brews:
 #  - name: firehose-antelope
 #    tap:
-#      owner: EOS-Nation
+#      owner: Pinax
 #      name: homebrew-tap
 #    commit_author:
 #      name: goreleaserbot
 #      email: goreleaser@eosnation.io
-#    homepage: "https://github.com/EOS-Nation/firehose-antelope"
+#    homepage: "https://github.com/pinax-network/firehose-antelope"
 #    description: "Firehose on Antelope stack"
 #    license: "Apache-2.0"

@@ -16,7 +16,7 @@ package cli
 
 import (
 	"fmt"
-	"github.com/EOS-Nation/firehose-antelope/codec"
+	"github.com/pinax-network/firehose-antelope/codec"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/dlauncher/launcher"
@@ -28,7 +28,7 @@ import (
 )
 
 func init() {
-	appLogger, appTracer := logging.PackageLogger("reader-node-stdin", "github.com/EOS-Nation/firehose-antelope/fireantelope/cli/reader-node-stdin")
+	appLogger, appTracer := logging.PackageLogger("reader-node-stdin", "github.com/pinax-network/firehose-antelope/fireantelope/cli/reader-node-stdin")
 
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:            "reader-node-stdin",

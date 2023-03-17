@@ -23,7 +23,7 @@ var headBlockNumMetric = metricset.NewHeadBlockNumber("firehose")
 var headTimeDriftmetric = metricset.NewHeadTimeDrift("firehose")
 
 func init() {
-	appLogger, _ := logging.PackageLogger("firehose", "github.com/EOS-Nation/firehose-antelope/firehose")
+	appLogger, _ := logging.PackageLogger("firehose", "github.com/pinax-network/firehose-antelope/firehose")
 
 	launcher.RegisterApp(rootLog, &launcher.AppDef{
 		ID:          "firehose",

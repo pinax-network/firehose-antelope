@@ -3,7 +3,7 @@ package antelope
 import (
 	"unicode/utf8"
 
-	"github.com/EOS-Nation/firehose-antelope/types/pb/sf/antelope/type/v1"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 )
 

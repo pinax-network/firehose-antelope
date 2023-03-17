@@ -15,7 +15,7 @@
 package codec
 
 import (
-	"github.com/EOS-Nation/firehose-antelope/codec/antelope"
+	"github.com/pinax-network/firehose-antelope/codec/antelope"
 	"strings"
 	"testing"
 
