@@ -6,7 +6,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-var zlogTest, _ = logging.PackageLogger("fireantelope", "github.com/EOS-Nation/firehose-antelope/codec.tests")
+var zlogTest, _ = logging.PackageLogger("fireantelope", "github.com/pinax-network/firehose-antelope/codec.tests")
 
 func init() {
 	logging.InstantiateLoggers()

@@ -22,5 +22,5 @@ import (
 var zlog *zap.Logger
 
 func init() {
-	zlog, _ = logging.PackageLogger("codec", "github.com/EOS-Nation/firehose-antelope/codec")
+	zlog, _ = logging.PackageLogger("codec", "github.com/pinax-network/firehose-antelope/codec")
 }
