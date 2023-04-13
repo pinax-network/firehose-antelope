@@ -83,10 +83,6 @@ func init() {
 					opts = append(opts, substreamsService.WithRequestStats())
 				}
 
-				if viper.GetBool("substreams-partial-mode-enabled") {
-					opts = append(opts, substreamsService.WithPartialMode())
-				}
-
 				clientEndpoint := viper.GetString("substreams-client-endpoint")
 				if clientEndpoint == "" {
 					clientEndpoint = viper.GetString("firehose-grpc-listen-addr")
@@ -99,19 +95,29 @@ func init() {
 					viper.GetBool("substreams-client-plaintext"),
 				)
 
-				sss, err := substreamsService.New(
-					stateStore,
-					"sf.antelope.type.v1.Block",
-					viper.GetUint64("substreams-sub-request-parallel-jobs"),
-					viper.GetUint64("substreams-sub-request-block-range-size"),
-					clientConfig,
-					opts...,
-				)
-				if err != nil {
-					return nil, fmt.Errorf("create substreams service: %w", err)
-				}
+				if viper.GetBool("substreams-partial-mode-enabled") {
+					tier2 := substreamsService.NewTier2(
+						stateStore,
+						"sf.antelope.type.v1.Block",
+						opts...,
+					)
 
-				registerServiceExt = sss.Register
+					registerServiceExt = tier2.Register
+				} else {
+					sss, err := substreamsService.NewTier1(
+						stateStore,
+						"sf.antelope.type.v1.Block",
+						viper.GetUint64("substreams-sub-request-parallel-jobs"),
+						viper.GetUint64("substreams-sub-request-block-range-size"),
+						clientConfig,
+						opts...,
+					)
+					if err != nil {
+						return nil, fmt.Errorf("create substreams service: %w", err)
+					}
+
+					registerServiceExt = sss.Register
+				}
 			}
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
