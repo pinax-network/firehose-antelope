@@ -83,6 +83,10 @@ func init() {
 					opts = append(opts, substreamsService.WithRequestStats())
 				}
 
+				if viper.GetBool("substreams-partial-mode-enabled") {
+					opts = append(opts, substreamsService.WithPartialMode())
+				}
+
 				clientEndpoint := viper.GetString("substreams-client-endpoint")
 				if clientEndpoint == "" {
 					clientEndpoint = viper.GetString("firehose-grpc-listen-addr")
