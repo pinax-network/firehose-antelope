@@ -2,6 +2,7 @@ package cli
 
 import (
 	"fmt"
+	"github.com/streamingfast/substreams/client"
 	"os"
 	"time"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/streamingfast/dstore"
 	firehoseApp "github.com/streamingfast/firehose/app/firehose"
 	"github.com/streamingfast/logging"
-	substreamsClient "github.com/streamingfast/substreams/client"
 	substreamsService "github.com/streamingfast/substreams/service"
 )
 
@@ -37,13 +37,14 @@ func init() {
 			cmd.Flags().Bool("substreams-request-stats-enabled", false, "Enables stats per request, like block rate. Should only be enabled in debugging instance not in production")
 			cmd.Flags().String("substreams-state-store-url", "{sf-data-dir}/localdata", "where substreams state data are stored")
 			cmd.Flags().Uint64("substreams-cache-save-interval", uint64(1_000), "Interval in blocks at which to save store snapshots and output caches")
+			cmd.Flags().Uint64("substreams-max-fuel-per-block-module", uint64(5_000_000_000_000), "Hard limit for the number of instructions within the execution of a single wasmtime module for a single block")
 			cmd.Flags().Int("substreams-parallel-subrequest-limit", 4, "number of parallel subrequests substream can make to synchronize its stores")
-			cmd.Flags().String("substreams-client-endpoint", "", "Firehose endpoint for substreams client, if left empty, will default to this current local firehose.")
+			cmd.Flags().String("substreams-client-endpoint", FirehoseGRPCServingAddr, "firehose endpoint for substreams client.")
 			cmd.Flags().String("substreams-client-jwt", "", "JWT for substreams client authentication")
-			cmd.Flags().Bool("substreams-client-insecure", false, "Substreams client in insecure mode")
-			cmd.Flags().Bool("substreams-client-plaintext", true, "Substreams client in plaintext mode")
-			cmd.Flags().Int("substreams-sub-request-parallel-jobs", 5, "Substreams subrequest parallel jobs for the scheduler")
-			cmd.Flags().Int("substreams-sub-request-block-range-size", 1000, "Substreams subrequest block range size value for the scheduler")
+			cmd.Flags().Bool("substreams-client-insecure", false, "substreams client in insecure mode")
+			cmd.Flags().Bool("substreams-client-plaintext", true, "substreams client in plaintext mode")
+			cmd.Flags().Uint64("substreams-sub-request-parallel-jobs", 5, "substreams subrequest parallel jobs for the scheduler")
+			cmd.Flags().Uint64("substreams-sub-request-block-range-size", 10000, "substreams subrequest block range size value for the scheduler")
 			return nil
 		},
 
@@ -77,41 +78,43 @@ func init() {
 
 				opts := []substreamsService.Option{
 					substreamsService.WithCacheSaveInterval(viper.GetUint64("substreams-cache-save-interval")),
+					substreamsService.WithMaxWasmFuelPerBlockModule(viper.GetUint64("substreams-max-fuel-per-block-module")),
 				}
 
 				if viper.GetBool("substreams-request-stats-enabled") {
 					opts = append(opts, substreamsService.WithRequestStats())
 				}
 
-				if viper.GetBool("substreams-partial-mode-enabled") {
-					opts = append(opts, substreamsService.WithPartialMode())
-				}
-
-				clientEndpoint := viper.GetString("substreams-client-endpoint")
-				if clientEndpoint == "" {
-					clientEndpoint = viper.GetString("firehose-grpc-listen-addr")
-				}
-
-				clientConfig := substreamsClient.NewSubstreamsClientConfig(
-					clientEndpoint,
+				substreamsClientConfig := client.NewSubstreamsClientConfig(
+					viper.GetString("substreams-client-endpoint"),
 					os.ExpandEnv(viper.GetString("substreams-client-jwt")),
 					viper.GetBool("substreams-client-insecure"),
 					viper.GetBool("substreams-client-plaintext"),
 				)
 
-				sss, err := substreamsService.New(
-					stateStore,
-					"sf.antelope.type.v1.Block",
-					viper.GetUint64("substreams-sub-request-parallel-jobs"),
-					viper.GetUint64("substreams-sub-request-block-range-size"),
-					clientConfig,
-					opts...,
-				)
-				if err != nil {
-					return nil, fmt.Errorf("create substreams service: %w", err)
-				}
+				if viper.GetBool("substreams-partial-mode-enabled") {
+					tier2 := substreamsService.NewTier2(
+						stateStore,
+						"sf.ethereum.type.v2.Block",
+						opts...,
+					)
 
-				registerServiceExt = sss.Register
+					registerServiceExt = tier2.Register
+				} else {
+					sss, err := substreamsService.NewTier1(
+						stateStore,
+						"sf.ethereum.type.v2.Block",
+						viper.GetUint64("substreams-sub-request-parallel-jobs"),
+						viper.GetUint64("substreams-sub-request-block-range-size"),
+						substreamsClientConfig,
+						opts...,
+					)
+
+					if err != nil {
+						return nil, fmt.Errorf("creating substreams service: %w", err)
+					}
+					registerServiceExt = sss.Register
+				}
 			}
 
 			return firehoseApp.New(appLogger, &firehoseApp.Config{
