@@ -95,7 +95,7 @@ func init() {
 				if viper.GetBool("substreams-partial-mode-enabled") {
 					tier2 := substreamsService.NewTier2(
 						stateStore,
-						"sf.ethereum.type.v2.Block",
+						"sf.antelope.type.v1.Block",
 						opts...,
 					)
 
@@ -103,7 +103,7 @@ func init() {
 				} else {
 					sss, err := substreamsService.NewTier1(
 						stateStore,
-						"sf.ethereum.type.v2.Block",
+						"sf.antelope.type.v1.Block",
 						viper.GetUint64("substreams-sub-request-parallel-jobs"),
 						viper.GetUint64("substreams-sub-request-block-range-size"),
 						substreamsClientConfig,
