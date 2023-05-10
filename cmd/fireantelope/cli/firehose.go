@@ -33,7 +33,7 @@ func init() {
 			cmd.Flags().String("firehose-grpc-listen-addr", FirehoseGRPCServingAddr, "Address on which the firehose will listen")
 
 			cmd.Flags().Bool("substreams-enabled", false, "Whether to enable substreams")
-			cmd.Flags().Bool("substreams-partial-mode-enabled", false, "Whether to enable partial stores generation support on this instance (usually for internal deployments only)")
+			cmd.Flags().Bool("substreams-tier2", false, "Whether this endpoint is serving tier2 requests (non-public-facing)")
 			cmd.Flags().Bool("substreams-request-stats-enabled", false, "Enables stats per request, like block rate. Should only be enabled in debugging instance not in production")
 			cmd.Flags().String("substreams-state-store-url", "{sf-data-dir}/localdata", "where substreams state data are stored")
 			cmd.Flags().Uint64("substreams-cache-save-interval", uint64(1_000), "Interval in blocks at which to save store snapshots and output caches")
@@ -92,7 +92,7 @@ func init() {
 					viper.GetBool("substreams-client-plaintext"),
 				)
 
-				if viper.GetBool("substreams-partial-mode-enabled") {
+				if viper.GetBool("substreams-tier2") {
 					tier2 := substreamsService.NewTier2(
 						stateStore,
 						"sf.antelope.type.v1.Block",
