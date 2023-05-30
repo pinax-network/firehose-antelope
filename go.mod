@@ -19,8 +19,8 @@ require (
 	github.com/streamingfast/dlauncher v0.0.0-20230201165548-2d1aa7607b13
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
-	github.com/streamingfast/dstore v0.1.1-0.20230511202333-4f4ccf11a05f
-	github.com/streamingfast/firehose v0.1.1-0.20230323160111-a466e158021b
+	github.com/streamingfast/dstore v0.1.1-0.20230512204716-ca0e4973e4f4
+	github.com/streamingfast/firehose v0.1.1-0.20230524202003-dd29afad190a
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20221209193439-bff11742bf4c
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
