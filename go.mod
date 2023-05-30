@@ -19,8 +19,8 @@ require (
 	github.com/streamingfast/dlauncher v0.0.0-20230201165548-2d1aa7607b13
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
 	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
-	github.com/streamingfast/dstore v0.1.1-0.20230511202333-4f4ccf11a05f
-	github.com/streamingfast/firehose v0.1.1-0.20230323160111-a466e158021b
+	github.com/streamingfast/dstore v0.1.1-0.20230512204716-ca0e4973e4f4
+	github.com/streamingfast/firehose v0.1.1-0.20230524202003-dd29afad190a
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20221209193439-bff11742bf4c
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
@@ -28,13 +28,13 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230424204011-b7f1751a98ca
-	github.com/streamingfast/substreams v1.1.3
-	github.com/stretchr/testify v1.8.1
+	github.com/streamingfast/substreams v1.1.4
+	github.com/stretchr/testify v1.8.2
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
 	go.uber.org/zap v1.21.0
 	google.golang.org/grpc v1.54.0
-	google.golang.org/protobuf v1.29.1
+	google.golang.org/protobuf v1.30.0
 )
 
 replace (
@@ -72,7 +72,7 @@ require (
 	github.com/blendle/zapdriver v1.3.1 // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bytecodealliance/wasmtime-go/v4 v4.0.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.1.3 // indirect
+	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
@@ -87,7 +87,7 @@ require (
 	github.com/envoyproxy/go-control-plane v0.10.3 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.9.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/logr v1.2.3 // indirect
+	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/godbus/dbus/v5 v5.0.4 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -105,7 +105,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jhump/protoreflect v1.12.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
-	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/lithammer/dedent v1.1.0 // indirect
 	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422 // indirect
@@ -117,7 +117,7 @@ require (
 	github.com/mostynb/go-grpc-compression v1.1.17 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/opencontainers/runtime-spec v1.0.2 // indirect
-	github.com/openzipkin/zipkin-go v0.4.0 // indirect
+	github.com/openzipkin/zipkin-go v0.4.1 // indirect
 	github.com/paulbellamy/ratecounter v0.2.0 // indirect
 	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -138,7 +138,7 @@ require (
 	github.com/streamingfast/dgrpc v0.0.0-20230417152409-2ee737f143dd // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
-	github.com/streamingfast/sf-tracing v0.0.0-20221104190152-7f721cb9b60c // indirect
+	github.com/streamingfast/sf-tracing v0.0.0-20230519113358-f3dc5e582d12 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
@@ -148,16 +148,16 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.9.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.36.4 // indirect
-	go.opentelemetry.io/otel v1.11.1 // indirect
-	go.opentelemetry.io/otel/exporters/jaeger v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.9.0 // indirect
-	go.opentelemetry.io/otel/exporters/zipkin v1.9.0 // indirect
-	go.opentelemetry.io/otel/sdk v1.9.0 // indirect
-	go.opentelemetry.io/otel/trace v1.11.1 // indirect
-	go.opentelemetry.io/proto/otlp v0.18.0 // indirect
+	go.opentelemetry.io/otel v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/jaeger v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/internal/retry v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/stdout/stdouttrace v1.15.1 // indirect
+	go.opentelemetry.io/otel/exporters/zipkin v1.15.1 // indirect
+	go.opentelemetry.io/otel/sdk v1.15.1 // indirect
+	go.opentelemetry.io/otel/trace v1.15.1 // indirect
+	go.opentelemetry.io/proto/otlp v0.19.0 // indirect
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.1.0 // indirect
@@ -165,7 +165,7 @@ require (
 	golang.org/x/net v0.8.0 // indirect
 	golang.org/x/oauth2 v0.6.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
-	golang.org/x/sys v0.6.0 // indirect
+	golang.org/x/sys v0.7.0 // indirect
 	golang.org/x/term v0.6.0 // indirect
 	golang.org/x/text v0.8.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
