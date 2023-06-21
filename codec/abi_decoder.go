@@ -21,6 +21,7 @@ import (
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/lytics/ordpool"
+	"github.com/pinax-network/firehose-antelope/flags"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"go.uber.org/zap"
@@ -595,6 +596,15 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 			zap.Error(err),
 		)
 		return nil
+	}
+
+	if flags.HasFeatureEnabled(flags.FeatureUltra) {
+		if action.Name == "inject" {
+			jsonData, err = DecodeTableInject(jsonData, abi)
+			if err != nil {
+				zlog.Debug("skipping the table inject with error: ", zap.Error(err))
+			}
+		}
 	}
 
 	action.JsonData = string(jsonData)
