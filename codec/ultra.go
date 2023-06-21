@@ -1,5 +1,3 @@
-//go:build ultra
-
 package codec
 
 import (
