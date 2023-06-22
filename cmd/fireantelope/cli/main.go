@@ -6,8 +6,8 @@ import (
 	"time"
 
 	// Needs to be in this file which is the main entry of wrapper binary
-	_ "github.com/streamingfast/dauth/grpc"  // auth secret/hard-coded plugin
-	_ "github.com/streamingfast/dauth/trust" // auth null plugin
+	_ "github.com/streamingfast/dauth/grpc"
+	_ "github.com/streamingfast/dauth/trust"
 	"github.com/streamingfast/logging"
 
 	"github.com/spf13/cobra"
