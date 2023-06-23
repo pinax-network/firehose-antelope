@@ -28,7 +28,7 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230424204011-b7f1751a98ca
-	github.com/streamingfast/substreams v1.1.6
+	github.com/streamingfast/substreams v1.1.7
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
