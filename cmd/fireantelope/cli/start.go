@@ -22,8 +22,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	"github.com/streamingfast/bstream"
+	dauthgrpc "github.com/streamingfast/dauth/grpc"
+	dauthtrust "github.com/streamingfast/dauth/trust"
 	"github.com/streamingfast/derr"
 	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/dmetering"
 	"go.uber.org/zap"
 )
 
@@ -31,6 +34,9 @@ var StartCmd = &cobra.Command{Use: "start", Short: "Starts `fireantelope` servic
 
 func init() {
 	RootCmd.AddCommand(StartCmd)
+	dauthgrpc.Register()
+	dauthtrust.Register()
+	dmetering.RegisterDefault()
 }
 
 func firehoseCmdStartE(cmd *cobra.Command, args []string) (err error) {
