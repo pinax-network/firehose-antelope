@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	launcher.RegisterApp(rootLog, &launcher.AppDef{
+	launcher.RegisterApp(zlog, &launcher.AppDef{
 		ID:          "merger",
 		Title:       "Merger",
 		Description: "Produces merged block files from single-block files",

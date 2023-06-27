@@ -30,7 +30,7 @@ import (
 func init() {
 	appLogger, appTracer := logging.PackageLogger("reader-node-stdin", "github.com/pinax-network/firehose-antelope/fireantelope/cli/reader-node-stdin")
 
-	launcher.RegisterApp(rootLog, &launcher.AppDef{
+	launcher.RegisterApp(zlog, &launcher.AppDef{
 		ID:            "reader-node-stdin",
 		Title:         "Reader Node (stdin)",
 		Description:   "Blocks reading node, unmanaged, reads Firehose logs from standard input and transform them into Firehose for Acme blocks",

@@ -99,7 +99,7 @@ func GetIndexStore(dataDir string) (indexStore dstore.Store, possibleIndexSizes 
 }
 
 func mkdirStorePathIfLocal(storeURL string) (err error) {
-	rootLog.Debug("creating directory and its parent(s)", zap.String("directory", storeURL))
+	zlog.Debug("creating directory and its parent(s)", zap.String("directory", storeURL))
 	if dirs := getDirsToMake(storeURL); len(dirs) > 0 {
 		err = makeDirs(dirs)
 	}

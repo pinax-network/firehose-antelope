@@ -55,7 +55,7 @@ func setupCmd(cmd *cobra.Command) error {
 		}
 	}
 
-	launcher.SetupLogger(rootLog, &launcher.LoggingOptions{
+	launcher.SetupLogger(zlog, &launcher.LoggingOptions{
 		WorkingDir: viper.GetString("global-data-dir"),
 		// We add +1 so our default verbosity is to show all packages in INFO mode
 		Verbosity:     viper.GetInt("global-verbose") + 1,
@@ -65,7 +65,7 @@ func setupCmd(cmd *cobra.Command) error {
 		LogToStderr:   true,
 	})
 	launcher.SetupTracing("fireantelope")
-	launcher.SetupAnalyticsMetrics(rootLog, viper.GetString("global-metrics-listen-addr"), viper.GetString("global-pprof-listen-addr"))
+	launcher.SetupAnalyticsMetrics(zlog, viper.GetString("global-metrics-listen-addr"), viper.GetString("global-pprof-listen-addr"))
 
 	return nil
 }
