@@ -5,20 +5,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	// Needs to be in this file which is the main entry of wrapper binary
 	_ "github.com/streamingfast/dauth/grpc"
 	_ "github.com/streamingfast/dauth/trust"
-	"github.com/streamingfast/logging"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	"github.com/streamingfast/derr"
 	"github.com/streamingfast/dlauncher/flags"
 	"github.com/streamingfast/dlauncher/launcher"
 	"go.uber.org/zap"
 )
-
-var rootLog, _ = logging.RootLogger("fireantelope", "github.com/pinax-network/firehose-antelope/cmd/fireantelope/cli")
 
 var RootCmd = &cobra.Command{Use: "fireantelope", Short: "Antelope on StreamingFast"}
 var allFlags = make(map[string]bool) // used as global because of async access to cobra init functions
@@ -56,7 +52,7 @@ func Main() {
 		a persistent disks of its content before starting, cleary cached content to try to resolve bugs, etc.
 	`))
 
-	derr.Check("registering application flags", launcher.RegisterFlags(rootLog, StartCmd))
+	derr.Check("registering application flags", launcher.RegisterFlags(zlog, StartCmd))
 
 	var availableCmds []string
 	for app := range launcher.AppRegistry {
@@ -71,7 +67,7 @@ func Main() {
 		}
 		startupDelay := viper.GetDuration("global-startup-delay")
 		if startupDelay.Microseconds() > 0 {
-			rootLog.Info("sleeping before starting apps", zap.Duration("delay", startupDelay))
+			zlog.Info("sleeping before starting apps", zap.Duration("delay", startupDelay))
 			time.Sleep(startupDelay)
 		}
 		return nil
