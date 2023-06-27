@@ -52,7 +52,7 @@ func init() {
 		cmd.Flags().Int("common-first-streamable-block", FirstStreamableBlock, "[COMMON] First streamable block of the chain, ")
 
 		// Authentication, metering and rate limiter plugins
-		cmd.Flags().String("common-auth-plugin", "null://", "[COMMON] Auth plugin URI, see streamingfast/dauth repository")
+		cmd.Flags().String("common-auth-plugin", "trust://", "[COMMON] Auth plugin URI, see streamingfast/dauth repository")
 		cmd.Flags().String("common-metering-plugin", "null://", "[COMMON] Metering plugin URI, see streamingfast/dmetering repository")
 
 		// System Behavior
