@@ -1,6 +1,6 @@
 module github.com/pinax-network/firehose-antelope/types
 
-go 1.19
+go 1.20
 
 require (
 	github.com/streamingfast/bstream v0.0.2-0.20230510131449-6b591d74130d

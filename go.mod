@@ -1,6 +1,6 @@
 module github.com/pinax-network/firehose-antelope
 
-go 1.19
+go 1.20
 
 require (
 	github.com/ShinyTrinkets/overseer v0.3.0
