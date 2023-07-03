@@ -17,7 +17,11 @@ require (
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dlauncher v0.0.0-20230201165548-2d1aa7607b13
+<<<<<<< Updated upstream
 	github.com/streamingfast/dmetering v0.0.0-20220307162406-37261b4b3de9
+=======
+	github.com/streamingfast/dmetering v0.0.0-20230620155208-31b97a817964
+>>>>>>> Stashed changes
 	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
 	github.com/streamingfast/dstore v0.1.1-0.20230512204716-ca0e4973e4f4
 	github.com/streamingfast/firehose v0.1.1-0.20230524202003-dd29afad190a
@@ -157,7 +161,10 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
+<<<<<<< Updated upstream
 	github.com/streamingfast/dgrpc v0.0.0-20230417152409-2ee737f143dd // indirect
+=======
+>>>>>>> Stashed changes
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20230519113358-f3dc5e582d12 // indirect
