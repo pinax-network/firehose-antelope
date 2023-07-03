@@ -51,12 +51,14 @@ const (
 	// The current prefix is the one you should use for your chain. Once you have copied
 	// this whole repository, you should open a PR on firehose-acme to bump it again
 	// so the next team supporting Firehose will use 18XXX and so forth.
-	ReaderNodeGRPCAddr       string = ":18010"
-	ReaderNodeManagerAPIAddr string = ":18011"
-	MergerServingAddr        string = ":18012"
-	NodeManagerAPIAddr       string = ":18013"
-	RelayerServingAddr       string = ":18014"
-	FirehoseGRPCServingAddr  string = ":18015"
+	ReaderNodeGRPCAddr             string = ":18010"
+	ReaderNodeManagerAPIAddr       string = ":18011"
+	MergerServingAddr              string = ":18012"
+	NodeManagerAPIAddr             string = ":18013"
+	RelayerServingAddr             string = ":18014"
+	FirehoseGRPCServingAddr        string = ":18015"
+	SubstreamsTier1GRPCServingAddr string = ":18044"
+	SubstreamsTier2GRPCServingAddr string = ":18045"
 
 	// Data storage default locations
 	BlocksCacheDirectory string = "file://{sf-data-dir}/storage/blocks-cache"

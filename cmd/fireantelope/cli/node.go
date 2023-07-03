@@ -75,7 +75,7 @@ func registerNode(kind string, extraFlagRegistration func(cmd *cobra.Command) er
 	app := fmt.Sprintf("%s-node", kind)
 	flagPrefix := fmt.Sprintf("%s-", app)
 
-	launcher.RegisterApp(rootLog, &launcher.AppDef{
+	launcher.RegisterApp(zlog, &launcher.AppDef{
 		ID:          app,
 		Title:       fmt.Sprintf("Acme Node (%s)", kind),
 		Description: fmt.Sprintf("Acme %s node with built-in operational manager", kind),
