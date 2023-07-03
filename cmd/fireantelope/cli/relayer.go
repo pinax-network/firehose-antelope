@@ -11,7 +11,7 @@ import (
 
 func init() {
 	// Relayer
-	launcher.RegisterApp(rootLog, &launcher.AppDef{
+	launcher.RegisterApp(zlog, &launcher.AppDef{
 		ID:          "relayer",
 		Title:       "Relayer",
 		Description: "Serves blocks as a stream, with a buffer",
