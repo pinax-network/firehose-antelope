@@ -68,8 +68,7 @@ func init() {
 
 	printCmd.PersistentFlags().Uint64("transactions-for-block", 0, "Include transaction IDs in output")
 	printCmd.PersistentFlags().Bool("transactions", false, "Include transaction IDs in output")
-	printCmd.PersistentFlags().Bool("calls", false, "Include transaction's Call data in output")
-	printCmd.PersistentFlags().Bool("instructions", false, "Include instruction output")
+	printCmd.PersistentFlags().Bool("full-block", false, "Print the full block instead of block stats to the output")
 	printCmd.PersistentFlags().String("store", "", "block store")
 }
 
@@ -135,11 +134,12 @@ func printBlocksE(cmd *cobra.Command, args []string) error {
 
 func printBlockE(cmd *cobra.Command, args []string) error {
 	printTransactions := viper.GetBool("transactions")
-	transactionFilter := viper.GetString("transaction")
+	printFullBlock := viper.GetBool("full-block")
+	// transactionFilter := viper.GetString("transaction")
 
 	zlog.Info("printing block",
 		zap.Bool("print_transactions", printTransactions),
-		zap.String("transaction_filter", transactionFilter),
+		// zap.String("transaction_filter", transactionFilter),
 	)
 
 	blockNum, err := strconv.ParseUint(args[0], 10, 64)
@@ -192,16 +192,22 @@ func printBlockE(cmd *cobra.Command, args []string) error {
 		}
 		antelopeBlock := block.ToProtocol().(*pbantelope.Block)
 
-		fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
-			block.Num(),
-			block.ID()[0:7],
-			block.PreviousID()[0:7],
-			len(antelopeBlock.Transactions()),
-		)
-		if printTransactions {
-			fmt.Println("- Transactions: ")
-			for _, t := range antelopeBlock.Transactions() {
-				fmt.Printf("  * %s\n", t.Id)
+		if printFullBlock {
+			if err = printBlock(block); err != nil {
+				return err
+			}
+		} else {
+			fmt.Printf("Block #%d (%s) (prev: %s): %d transactions\n",
+				block.Num(),
+				block.ID()[0:7],
+				block.PreviousID()[0:7],
+				len(antelopeBlock.Transactions()),
+			)
+			if printTransactions {
+				fmt.Println("- Transactions: ")
+				for _, t := range antelopeBlock.Transactions() {
+					fmt.Printf("  * %s\n", t.Id)
+				}
 			}
 		}
 		continue

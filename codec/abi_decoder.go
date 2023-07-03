@@ -605,7 +605,7 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 func (d *ABIDecoder) decodeDbOp(dbOp *pbantelope.DBOp, globalSequence uint64, trxID string, blockNum uint64, localCache *ABICache) error {
 
 	// neither new_data nor old_data exists, we can skip this database operation
-	if len(dbOp.NewData) <= 0 && len(dbOp.OldData) <= 0 {
+	if len(dbOp.NewData) == 0 && len(dbOp.OldData) == 0 {
 		return nil
 	}
 
