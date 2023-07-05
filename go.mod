@@ -11,24 +11,25 @@ require (
 	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317150217-417f23cbea8d
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.10.1
-	github.com/streamingfast/bstream v0.0.2-0.20230510131449-6b591d74130d
+	github.com/streamingfast/bstream v0.0.2-0.20230619183735-f8325d186119
 	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
 	github.com/streamingfast/dauth v0.0.0-20230623185831-a19552895431
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f
 	github.com/streamingfast/dlauncher v0.0.0-20230201165548-2d1aa7607b13
-	github.com/streamingfast/dmetrics v0.0.0-20221129121022-a1733eca1981
+	github.com/streamingfast/dmetering v0.0.0-20230620155208-31b97a817964
+	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
 	github.com/streamingfast/firehose v0.1.1-0.20230621155445-6ae2361eb2f9
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
-	github.com/streamingfast/logging v0.0.0-20221209193439-bff11742bf4c
+	github.com/streamingfast/logging v0.0.0-20230606032957-27cce5be41f0
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
 	github.com/streamingfast/node-manager v0.0.2-0.20221115101723-d9823ffd7ad5
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
-	github.com/streamingfast/sf-tools v0.0.0-20230424204011-b7f1751a98ca
-	github.com/streamingfast/substreams v1.1.8-0.20230626191348-1661d4b5abfe
+	github.com/streamingfast/sf-tools v0.0.0-20230607184109-6fff9dd0c7df
+	github.com/streamingfast/substreams v1.1.8-0.20230623152509-6e80640f0874
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
@@ -161,7 +162,6 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
-	github.com/streamingfast/dmetering v0.0.0-20230620155208-31b97a817964 // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9 // indirect
