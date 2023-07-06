@@ -21,7 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	dauthAuthenticator "github.com/streamingfast/dauth"
+	"github.com/streamingfast/dauth"
 	"github.com/streamingfast/derr"
 	discoveryservice "github.com/streamingfast/dgrpc/server/discovery-service"
 	"github.com/streamingfast/dlauncher/launcher"
@@ -54,13 +54,10 @@ func init() {
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			blockstreamAddr := viper.GetString("common-live-blocks-addr")
 
-			authenticator, err := dauthAuthenticator.New(viper.GetString("common-auth-plugin"))
+			authenticator, err := dauth.New(viper.GetString("common-auth-plugin"))
 			if err != nil {
 				return nil, fmt.Errorf("unable to initialize authenticator: %w", err)
 			}
-			// FIXME: we cannot call this here.. it does not last the lifetime of the dauth.
-			//defer authenticator.Close()
-
 			mergedBlocksStoreURL, oneBlocksStoreURL, forkedBlocksStoreURL, err := getCommonStoresURLs(runtime.AbsDataDir)
 			if err != nil {
 				return nil, err
@@ -101,7 +98,7 @@ func init() {
 				Authenticator:         authenticator,
 				HeadTimeDriftMetric:   headTimeDriftmetric,
 				HeadBlockNumberMetric: headBlockNumMetric,
-				//RegisterServiceExtension: registerServiceExt,
+				// TransformRegistry:     registry,
 				CheckPendingShutdown: func() bool {
 					return derr.IsShuttingDown()
 				},

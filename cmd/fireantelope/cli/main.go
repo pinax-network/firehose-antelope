@@ -1,58 +1,69 @@
+// Copyright 2021 dfuse Platform Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package cli
 
 import (
 	"fmt"
+	"runtime/debug"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	// Needs to be in this file which is the main entry of wrapper binary
-	_ "github.com/streamingfast/dauth/grpc"
-	_ "github.com/streamingfast/dauth/trust"
 	"github.com/streamingfast/derr"
 	"github.com/streamingfast/dlauncher/flags"
 	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/node-manager/operator"
 	"go.uber.org/zap"
 )
 
 var RootCmd = &cobra.Command{Use: "fireantelope", Short: "Antelope on StreamingFast"}
-var allFlags = make(map[string]bool) // used as global because of async access to cobra init functions
 
-func Main() {
+var allFlags = make(map[string]bool) // used as global because of async access to cobra init functions
+var registerCommonModulesCallback func(runtime *launcher.Runtime) error
+
+func Main(
+	registerCommonFlags func(logger *zap.Logger, cmd *cobra.Command) error,
+	registerCommonModules func(runtime *launcher.Runtime) error,
+	backupModuleFactories map[string]operator.BackupModuleFactory,
+) {
 	cobra.OnInitialize(func() {
-		allFlags = flags.AutoBind(RootCmd, "fireantelope")
+		allFlags = flags.AutoBind(RootCmd, "FIREANTELOPE")
 	})
 
-	RootCmd.PersistentFlags().StringP("data-dir", "d", "./firehose-data", "Path to data storage for all components of the Firehose stack")
-	RootCmd.PersistentFlags().StringP("config-file", "c", "./firehose.yaml", "Configuration file to use. No config file loaded if set to an empty string.")
-
-	RootCmd.PersistentFlags().String("log-format", "text", "Format for logging to stdout. Either 'text' or 'stackdriver'")
-	RootCmd.PersistentFlags().Bool("log-to-file", false, "Also write logs to {sf-data-dir}/firehose.log.json ")
-	RootCmd.PersistentFlags().String("log-level-switcher-listen-addr", "localhost:1065", FlagDescription(`
-		If non-empty, a JSON based HTTP server will listen on this address to let you switch the default logging level
-		of all registered loggers to a different one on the fly. This enables switching to debug level on
-		a live running production instance. Use 'curl -XPUT -d '{"level":"debug","inputs":"*"} http://localhost:1065' to
-		switch the level for all loggers. Each logger (even in transitive dependencies, at least those part of the core
-		StreamingFast's Firehose) are registered using two identifiers, the overarching component usually all loggers in a
-		library uses the same component name like 'bstream' or 'merger', and a fully qualified ID which is usually the Go
-		package fully qualified name in which the logger is defined. The 'inputs' can be either one or many component's name
-		like 'bstream|merger|firehose' or a regex that is matched against the fully qualified name. If there is a match for a
-		given logger, it will change its level to the one specified in 'level' field. The valid levels are 'trace', 'debug',
-		'info', 'warn', 'error', 'panic'. Can be used to silence loggers by using 'panic' (well, technically it's not a full
-		silence but almost), or make them more verbose and change it back later.
-	`))
+	RootCmd.PersistentFlags().StringP("data-dir", "d", "./sf-data", "Path to data storage for all components of the stack")
+	RootCmd.PersistentFlags().StringP("config-file", "c", "", "Configuration file to use. No config file loaded if set to an empty string (hence using flags to configure the whole stack).")
+	RootCmd.PersistentFlags().String("log-format", "text", "Format for logging to stdout. Either 'text' or 'stackdriver'. When 'text', if the standard output is detected to be interactive, colored text is output, otherwise non-colored text.")
+	RootCmd.PersistentFlags().Bool("log-to-file", false, "Also write logs to {data-dir}/sf.log.json ")
 	RootCmd.PersistentFlags().CountP("verbose", "v", "Enables verbose output (-vvvv for max verbosity)")
 
-	RootCmd.PersistentFlags().String("metrics-listen-addr", MetricsListenAddr, "If non-empty, the process will listen on this address to server the Prometheus metrics collected by the components.")
+	RootCmd.PersistentFlags().String("log-level-switcher-listen-addr", "localhost:1065", "If non-empty, the process will listen on this address for json-formatted requests to change different logger levels (see DEBUG.md for more info)")
+	RootCmd.PersistentFlags().String("metrics-listen-addr", MetricsListenAddr, "If non-empty, the process will listen on this address to server Prometheus metrics")
 	RootCmd.PersistentFlags().String("pprof-listen-addr", "localhost:6060", "If non-empty, the process will listen on this address for pprof analysis (see https://golang.org/pkg/net/http/pprof/)")
-	RootCmd.PersistentFlags().Duration("startup-delay", 0, FlagDescription(`
-		Delay before launching the components defined in config file or via the command line arguments. This can be used to perform
-		maintenance operations on a running container or pod prior it will actually start processing. Useful for example to clear
-		a persistent disks of its content before starting, cleary cached content to try to resolve bugs, etc.
-	`))
+	RootCmd.PersistentFlags().Duration("startup-delay", 0, "[DEV] Delay with units (like 10s or 1m) before launching actual application(s), useful to leave some time to perform maintenance operations, on persistent disks for example.")
 
+	// TODO not sure if we need those, we currently only use the reader-node-stdin
+	// Those must come before `launcher.RegisterFlags` call because they register themselves some flags that are checked by `launcher.RegisterFlags`
+	//registerNodeApp(backupModuleFactories)
+	//registerReaderNodeApp(backupModuleFactories)
+
+	// FIXME Should actually be a dependency on `launcher.RegisterFlags` directly!
+	launcher.RegisterCommonFlags = registerCommonFlags
 	derr.Check("registering application flags", launcher.RegisterFlags(zlog, StartCmd))
+
+	registerCommonModulesCallback = registerCommonModules
 
 	var availableCmds []string
 	for app := range launcher.AppRegistry {
@@ -67,16 +78,51 @@ func Main() {
 		}
 		startupDelay := viper.GetDuration("global-startup-delay")
 		if startupDelay.Microseconds() > 0 {
-			zlog.Info("sleeping before starting apps", zap.Duration("delay", startupDelay))
+			zlog.Info("sleeping before starting application(s)", zap.Duration("delay", startupDelay))
 			time.Sleep(startupDelay)
 		}
 		return nil
 	}
 
-	derr.Check("antelope", RootCmd.Execute())
+	derr.Check("dfuse", RootCmd.Execute())
 }
 
-var startCmdExample = `fireantelope start reader-node`
+func Version(version string) string {
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		panic("we should have been able to retrieve info from 'runtime/debug#ReadBuildInfo'")
+	}
+
+	commit := findSetting("vcs.revision", info.Settings)
+	date := findSetting("vcs.time", info.Settings)
+
+	var labels []string
+	if len(commit) >= 7 {
+		labels = append(labels, fmt.Sprintf("Commit %s", commit[0:7]))
+	}
+
+	if date != "" {
+		labels = append(labels, fmt.Sprintf("Built %s", date))
+	}
+
+	if len(labels) == 0 {
+		return version
+	}
+
+	return fmt.Sprintf("%s (%s)", version, strings.Join(labels, ", "))
+}
+
+func findSetting(key string, settings []debug.BuildSetting) (value string) {
+	for _, setting := range settings {
+		if setting.Key == key {
+			return setting.Value
+		}
+	}
+
+	return ""
+}
+
+var startCmdExample = `fireantelope start -c config.yaml`
 var startCmdHelpTemplate = `Usage:{{if .Runnable}}
   {{.UseLine}}{{end}} [all|command1 [command2...]]{{if gt (len .Aliases) 0}}
 

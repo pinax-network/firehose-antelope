@@ -16,19 +16,20 @@ package cli
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	dauthAuthenticator "github.com/streamingfast/dauth"
-	discoveryservice "github.com/streamingfast/dgrpc/server/discovery-service"
-	"github.com/streamingfast/dlauncher/launcher"
-	"github.com/streamingfast/logging"
-	"github.com/streamingfast/substreams/app"
-	"github.com/streamingfast/substreams/pipeline"
-	"github.com/streamingfast/substreams/wasm"
 	"net/url"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/streamingfast/dauth"
+	discoveryservice "github.com/streamingfast/dgrpc/server/discovery-service"
+	"github.com/streamingfast/dlauncher/launcher"
+	"github.com/streamingfast/logging"
+	app "github.com/streamingfast/substreams/app"
+	"github.com/streamingfast/substreams/pipeline"
+	"github.com/streamingfast/substreams/wasm"
 )
 
 var ss1HeadBlockNumMetric = metricset.NewHeadBlockNumber("substreams-tier1")
@@ -51,7 +52,7 @@ func init() {
 		Title:       "Substreams tier1 server",
 		Description: "Provides a substreams grpc endpoint",
 		RegisterFlags: func(cmd *cobra.Command) error {
-			cmd.Flags().String("substreams-tier1-grpc-listen-addr", SubstreamsTier1GRPCServingAddr, "Address on which the substreams tier1 will listen. Default is plain-text, appending a '*' to the end to jkkkj")
+			cmd.Flags().String("substreams-tier1-grpc-listen-addr", SubstreamsTier1GRPCServingAddr, "Address on which the substreams tier1 will listen. Default is plain-text, appending a '*' to the end")
 			cmd.Flags().String("substreams-tier1-subrequests-endpoint", SubstreamsTier2GRPCServingAddr, "Address on which the tier1 can reach the tier2")
 
 			// communication with tier2
@@ -60,8 +61,7 @@ func init() {
 			cmd.Flags().Bool("substreams-tier1-subrequests-plaintext", true, "Connect to tier2 without client in plaintext mode")
 			cmd.Flags().Int("substreams-tier1-max-subrequests", 4, "number of parallel subrequests that the tier1 can make to the tier2 per request")
 			cmd.Flags().Uint64("substreams-tier1-subrequests-size", 10000, "substreams subrequest block range size value for the scheduler")
-
-			cmd.Flags().Bool("substreams-tier1-debug-request-stats", false, "Enables stats per request, like block rate. Should only be enabled in debugging instance, not in production")
+			cmd.Flags().Bool("substreams-tier1-request-stats", false, "Enables stats logging per request")
 
 			// all substreams
 			registerCommonSubstreamsFlags(cmd)
@@ -71,7 +71,7 @@ func init() {
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			blockstreamAddr := viper.GetString("common-live-blocks-addr")
 
-			authenticator, err := dauthAuthenticator.New(viper.GetString("common-auth-plugin"))
+			authenticator, err := dauth.New(viper.GetString("common-auth-plugin"))
 			if err != nil {
 				return nil, fmt.Errorf("unable to initialize dauth: %w", err)
 			}
@@ -86,7 +86,7 @@ func init() {
 			rawServiceDiscoveryURL := viper.GetString("substreams-tier1-discovery-service-url")
 			grpcListenAddr := viper.GetString("substreams-tier1-grpc-listen-addr")
 
-			stateStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("substreams-state-store-url"))
+			stateStoreURL := MustReplaceDataDir(sfDataDir, viper.GetString("substreams-state-store-url"))
 			stateBundleSize := viper.GetUint64("substreams-state-bundle-size")
 
 			subrequestsEndpoint := viper.GetString("substreams-tier1-subrequests-endpoint")
@@ -95,7 +95,7 @@ func init() {
 			maxSubrequests := viper.GetUint64("substreams-tier1-max-subrequests")
 			subrequestsSize := viper.GetUint64("substreams-tier1-subrequests-size")
 
-			debugRequestsStates := viper.GetBool("substreams-tier1-debug-request-stats")
+			substreamsRequestsStats := viper.GetBool("substreams-tier1-request-stats")
 
 			tracing := os.Getenv("SUBSTREAMS_TRACING") == "modules_exec"
 
@@ -130,8 +130,8 @@ func init() {
 					WASMExtensions:  []wasm.WASMExtensioner{},
 					PipelineOptions: []pipeline.PipelineOptioner{},
 
-					DebugRequestsStates: debugRequestsStates,
-					Tracing:             tracing,
+					RequestStats: substreamsRequestsStats,
+					Tracing:      tracing,
 
 					GRPCListenAddr:          grpcListenAddr,
 					GRPCShutdownGracePeriod: time.Second,

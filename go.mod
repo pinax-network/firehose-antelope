@@ -6,6 +6,8 @@ require (
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/eoscanada/eos-go v0.10.3-0.20230403130542-2a31f6a393a2
+	github.com/lithammer/dedent v1.1.0
+	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317150217-417f23cbea8d
@@ -13,7 +15,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/bstream v0.0.2-0.20230619183735-f8325d186119
 	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
-	github.com/streamingfast/dauth v0.0.0-20230623185831-a19552895431
+	github.com/streamingfast/dauth v0.0.0-20230630134904-f19ce9a5b859
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f
@@ -21,7 +23,7 @@ require (
 	github.com/streamingfast/dmetering v0.0.0-20230620155208-31b97a817964
 	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
-	github.com/streamingfast/firehose v0.1.1-0.20230621155445-6ae2361eb2f9
+	github.com/streamingfast/firehose v0.1.1-0.20230630134959-2f996e99f2e4
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230606032957-27cce5be41f0
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
@@ -29,7 +31,8 @@ require (
 	github.com/streamingfast/pbgo v0.0.6-0.20221020131607-255008258d28
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230607184109-6fff9dd0c7df
-	github.com/streamingfast/substreams v1.1.8-0.20230623152509-6e80640f0874
+	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9
+	github.com/streamingfast/substreams v1.1.8-0.20230704200109-a97666e153d7
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
@@ -120,8 +123,6 @@ require (
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-flow-metrics v0.1.0 // indirect
 	github.com/libp2p/go-libp2p v0.26.3 // indirect
-	github.com/lithammer/dedent v1.1.0 // indirect
-	github.com/logrusorgru/aurora v2.0.3+incompatible // indirect
 	github.com/lytics/lifecycle v0.0.0-20130117214539-7b4c4028d422 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
@@ -164,7 +165,6 @@ require (
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
-	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect

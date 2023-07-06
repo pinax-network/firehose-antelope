@@ -23,7 +23,7 @@ func init() {
 }
 
 func registerReaderNodeFlags(cmd *cobra.Command) error {
-	cmd.Flags().String("reader-node-grpc-listen-addr", ReaderNodeGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
+	cmd.Flags().String("reader-node-grpc-listen-addr", ReaderGRPCAddr, "The gRPC listening address to use for serving real-time blocks")
 	cmd.Flags().Bool("reader-node-discard-after-stop-num", false, "Ignore remaining blocks being processed after stop num (only useful if we discard the reader data after reprocessing a chunk of blocks)")
 	cmd.Flags().String("reader-node-working-dir", "{sf-data-dir}/reader/work", "Path where reader will stores its files")
 	cmd.Flags().Uint("reader-node-start-block-num", 0, "Blocks that were produced with smaller block number then the given block num are skipped")
