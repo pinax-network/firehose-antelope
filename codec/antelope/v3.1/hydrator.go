@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/codec/antelope"
 
-	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"go.uber.org/zap"
 )
 

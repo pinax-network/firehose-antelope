@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/streamingfast/node-manager/operator"
 	"strings"
 	"time"
 
@@ -22,7 +23,7 @@ func init() {
 }
 
 func main() {
-	cli.Main()
+	cli.Main(cli.RegisterCommonFlags, nil, map[string]operator.BackupModuleFactory{})
 }
 
 func versionString() string {

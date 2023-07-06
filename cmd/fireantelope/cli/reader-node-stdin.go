@@ -37,7 +37,7 @@ func init() {
 		RegisterFlags: func(cmd *cobra.Command) error { return nil },
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
 			sfDataDir := runtime.AbsDataDir
-			archiveStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
+			archiveStoreURL := MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
 
 			consoleReaderFactory := func(lines chan string) (mindreader.ConsolerReader, error) {
 				r, err := codec.NewConsoleReader(appLogger, lines)
@@ -60,7 +60,7 @@ func init() {
 				MindReadBlocksChanCapacity: viper.GetInt("reader-node-blocks-chan-capacity"),
 				StartBlockNum:              viper.GetUint64("reader-node-start-block-num"),
 				StopBlockNum:               viper.GetUint64("reader-node-stop-block-num"),
-				WorkingDir:                 mustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir")),
+				WorkingDir:                 MustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir")),
 				OneBlockSuffix:             viper.GetString("reader-node-one-block-suffix"),
 			}, &nodeReaderStdinApp.Modules{
 				ConsoleReaderFactory:       consoleReaderFactory,

@@ -14,7 +14,6 @@
 
 package nodemanager
 
-
 // todo this could be re-implemented using the backup modules, not sure if this is useful though
 // the blocks.log is not recommended to be stored in the first place for reader nodes so backing this up on larger
 // chains doesn't make sense. Those should use snapshots instead to restore.

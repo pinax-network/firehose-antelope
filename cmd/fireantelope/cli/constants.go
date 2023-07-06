@@ -1,20 +1,45 @@
 package cli
 
+import pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
+
 const (
+	Protocol = pbbstream.Protocol_EOS
 
-	// This should be the block number of the first block that is streamable using Firehose,
-	// for example on Ethereum it's set to `0`, the genesis block's number while on EOSIO it's
-	// set to 2 (genesis block is 1 there but our instrumentation on this chain instruments
-	// only from block #2).
-	//
-	// This is used in multiple places to determine if we reached the oldest block of the chain.
-	FirstStreamableBlock int = 2
+	DefaultChainID      uint32 = 123
+	DefaultNetworkID    uint32 = 123
+	DefaultDeploymentID string = "antelope-local"
 
-	// Should be the number of blocks between two targets before we consider the
-	// first as "near" the second. For example if a chain is at block #215 and another
-	// source is at block #225, then there is a difference of 10 blocks which is <=
-	// than `BlockDifferenceThresholdConsideredNear` which would mean it's "near".
-	BlockDifferenceThresholdConsideredNear = 15
+	OneBlockStoreURL     string = "file://{sf-data-dir}/storage/one-blocks"
+	ForkedBlocksStoreURL string = "file://{sf-data-dir}/storage/forked-blocks"
+	MergedBlocksStoreURL string = "file://{sf-data-dir}/storage/merged-blocks"
+	IndexStoreURL        string = "file://{sf-data-dir}/storage/index"
+	SnapshotsURL         string = "file://{sf-data-dir}/storage/snapshots"
+	StateDBDSN           string = "badger://{sf-data-dir}/storage/statedb"
+
+	MetricsListenAddr string = ":9102"
+
+	BlocksCacheDirectory           string = "{sf-data-dir}/blocks-cache"
+	BlockstreamGRPCServingAddr     string = ":18039"
+	BlockstreamHTTPServingAddr     string = ":18040"
+	EVMExecutorGRPCServingAddr     string = ":18036"
+	FirehoseGRPCServingAddr        string = ":18042"
+	SubstreamsTier1GRPCServingAddr string = ":18044"
+	SubstreamsTier2GRPCServingAddr string = ":18045"
+	FirehoseGRPCHealthServingAddr  string = ":18043"
+	MergerServingAddr              string = ":18012"
+	IndexBuilderServiceAddr        string = ":18043"
+	ReaderNodeManagerAPIAddr       string = ":18009"
+	ReaderGRPCAddr                 string = ":18010"
+	NodeManagerAPIAddr             string = ":18041"
+	RelayerServingAddr             string = ":18011"
+	TokenMetaServingAddr           string = ":18039"
+	TraderServingAddr              string = ":18038"
+	StateDBServingAddr             string = ":18029"
+	StateDBGRPCServingAddr         string = ":18035"
+
+	CommonAutoMaxProcsFlag              string = "common-auto-max-procs"
+	CommonAutoMemLimitFlag              string = "common-auto-mem-limit-percent"
+	CommonSystemShutdownSignalDelayFlag string = "common-system-shutdown-signal-delay"
 
 	// Those should be the port the native node is using for P2P and RPC respectively
 	// and importantly, they should be different than the `node` ones below. Each chain
@@ -36,33 +61,4 @@ const (
 	ChainExecutableName = "nodeos"
 
 	NodeosAPIAddr string = ":8888"
-	SnapshotsURL  string = "file://{sf-data-dir}/storage/snapshots"
-
-	//
-	/// Standard Values
-	//
-
-	// Common ports
-	MetricsListenAddr string = ":9102"
-
-	// Firehose chain specific port
-	//
-	// The initial 18XXX prefix is different for every chain supported by Firehose.
-	// The current prefix is the one you should use for your chain. Once you have copied
-	// this whole repository, you should open a PR on firehose-acme to bump it again
-	// so the next team supporting Firehose will use 18XXX and so forth.
-	ReaderNodeGRPCAddr             string = ":18010"
-	ReaderNodeManagerAPIAddr       string = ":18011"
-	MergerServingAddr              string = ":18012"
-	NodeManagerAPIAddr             string = ":18013"
-	RelayerServingAddr             string = ":18014"
-	FirehoseGRPCServingAddr        string = ":18015"
-	SubstreamsTier1GRPCServingAddr string = ":18044"
-	SubstreamsTier2GRPCServingAddr string = ":18045"
-
-	// Data storage default locations
-	BlocksCacheDirectory string = "file://{sf-data-dir}/storage/blocks-cache"
-	MergedBlocksStoreURL string = "file://{sf-data-dir}/storage/merged-blocks"
-	OneBlockStoreURL     string = "file://{sf-data-dir}/storage/one-blocks"
-	ForkedBlocksStoreURL string = "file://{sf-data-dir}/storage/forked-blocks"
 )

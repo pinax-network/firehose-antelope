@@ -28,9 +28,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/eoscanada/eos-go"
 	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/eoscanada/eos-go"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dmetrics"
 	"github.com/tidwall/gjson"

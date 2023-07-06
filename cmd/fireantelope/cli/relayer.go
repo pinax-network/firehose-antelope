@@ -17,18 +17,21 @@ func init() {
 		Description: "Serves blocks as a stream, with a buffer",
 		RegisterFlags: func(cmd *cobra.Command) error {
 			cmd.Flags().String("relayer-grpc-listen-addr", RelayerServingAddr, "Address to listen for incoming gRPC requests")
-			cmd.Flags().StringSlice("relayer-source", []string{ReaderNodeGRPCAddr}, "List of live sources (reader(s)) to connect to for live block feeds (repeat flag as needed)")
+			cmd.Flags().StringSlice("relayer-source", []string{ReaderGRPCAddr}, "List of Blockstream sources (reader-nodes) to connect to for live block feeds (repeat flag as needed)")
 			cmd.Flags().Duration("relayer-max-source-latency", 999999*time.Hour, "Max latency tolerated to connect to a source. A performance optimization for when you have redundant sources and some may not have caught up")
 			return nil
 		},
 		FactoryFunc: func(runtime *launcher.Runtime) (launcher.App, error) {
-			sfDataDir := runtime.AbsDataDir
-
+			_, oneBlocksStoreURL, _, err := getCommonStoresURLs(runtime.AbsDataDir)
+			if err != nil {
+				return nil, err
+			}
 			return relayerApp.New(&relayerApp.Config{
-				SourcesAddr:      viper.GetStringSlice("relayer-source"),
-				OneBlocksURL:     mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url")),
-				GRPCListenAddr:   viper.GetString("relayer-grpc-listen-addr"),
-				MaxSourceLatency: viper.GetDuration("relayer-max-source-latency"),
+				SourceRequestBurst: 1,
+				SourcesAddr:        viper.GetStringSlice("relayer-source"),
+				OneBlocksURL:       oneBlocksStoreURL,
+				GRPCListenAddr:     viper.GetString("relayer-grpc-listen-addr"),
+				MaxSourceLatency:   viper.GetDuration("relayer-max-source-latency"),
 			}), nil
 		},
 	})
