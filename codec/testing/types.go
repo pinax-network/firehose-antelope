@@ -11,10 +11,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
 	"github.com/mitchellh/go-testing-interface"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"

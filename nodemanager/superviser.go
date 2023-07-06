@@ -43,7 +43,7 @@ type NodeosSuperviser struct {
 	serverVersion       string
 	serverVersionString string
 
-	snapshotRestorePath        string
+	snapshotRestorePath string
 
 	headBlockUpdateFunc nodeManager.HeadBlockUpdater
 

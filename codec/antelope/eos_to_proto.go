@@ -18,9 +18,9 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 

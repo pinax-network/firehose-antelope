@@ -3,8 +3,8 @@ package antelope
 import (
 	"unicode/utf8"
 
-	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/eoscanada/eos-go"
+	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 )
 
 // CreationFlatTree represents the creation order tree
