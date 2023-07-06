@@ -109,8 +109,8 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		sfDataDir := runtime.AbsDataDir
 
 		nodePath := viper.GetString(flagPrefix + "path")
-		nodeDataDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
-		nodeConfigDir := replaceNodeRole(kind, mustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"config-dir")))
+		nodeDataDir := replaceNodeRole(kind, MustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"data-dir")))
+		nodeConfigDir := replaceNodeRole(kind, MustReplaceDataDir(sfDataDir, viper.GetString(flagPrefix+"config-dir")))
 
 		readinessMaxLatency := viper.GetDuration(flagPrefix + "readiness-max-latency")
 		debugFirehose := viper.GetBool(flagPrefix + "debug-firehose-logs")
@@ -162,8 +162,8 @@ func nodeFactoryFunc(flagPrefix, kind string) func(*launcher.Runtime) (launcher.
 		}
 
 		blockStreamServer := blockstream.NewUnmanagedServer(blockstream.ServerOptionWithLogger(appLogger))
-		oneBlocksStoreURL := mustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
-		workingDir := mustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir"))
+		oneBlocksStoreURL := MustReplaceDataDir(sfDataDir, viper.GetString("common-one-block-store-url"))
+		workingDir := MustReplaceDataDir(sfDataDir, viper.GetString("reader-node-working-dir"))
 		gprcListenAddr := viper.GetString("reader-node-grpc-listen-addr")
 		batchStartBlockNum := viper.GetUint64("reader-node-start-block-num")
 		batchStopBlockNum := viper.GetUint64("reader-node-stop-block-num")
