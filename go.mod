@@ -20,10 +20,10 @@ require (
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f
 	github.com/streamingfast/dlauncher v0.0.0-20230201165548-2d1aa7607b13
-	github.com/streamingfast/dmetering v0.0.0-20230620155208-31b97a817964
+	github.com/streamingfast/dmetering v0.0.0-20230706141508-cd783a0fb671
 	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
-	github.com/streamingfast/firehose v0.1.1-0.20230630134959-2f996e99f2e4
+	github.com/streamingfast/firehose v0.1.1-0.20230706150258-7b499a314743
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230606032957-27cce5be41f0
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
@@ -32,7 +32,7 @@ require (
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230607184109-6fff9dd0c7df
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9
-	github.com/streamingfast/substreams v1.1.8-0.20230704200109-a97666e153d7
+	github.com/streamingfast/substreams v1.1.8
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
