@@ -597,6 +597,7 @@ func (d *ABIDecoder) decodeAction(action *pbantelope.Action, globalSequence uint
 		return nil
 	}
 
+	zlog.Debug("successfully decoded action data", zap.String("action", action.SimpleName()), zap.String("json_data", string(jsonData)))
 	action.JsonData = string(jsonData)
 
 	return nil
