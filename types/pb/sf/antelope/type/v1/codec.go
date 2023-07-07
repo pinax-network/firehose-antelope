@@ -341,6 +341,7 @@ func (a *ActionTrace) IsInput() bool {
 /// Action
 //
 
+// SimpleName returns the action in the format <contract>:<action name>
 func (a *Action) SimpleName() string {
 	return a.Account + ":" + a.Name
 }
