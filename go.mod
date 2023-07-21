@@ -5,7 +5,7 @@ go 1.20
 require (
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20230403130542-2a31f6a393a2
+	github.com/eoscanada/eos-go v0.10.3-0.20230609180026-5d4ee54fe15e
 	github.com/lithammer/dedent v1.1.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/bstream v0.0.2-0.20230619183735-f8325d186119
 	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
-	github.com/streamingfast/dauth v0.0.0-20230630134904-f19ce9a5b859
+	github.com/streamingfast/dauth v0.0.0-20230711181128-22be70e6ca49
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f
@@ -23,7 +23,7 @@ require (
 	github.com/streamingfast/dmetering v0.0.0-20230706141508-cd783a0fb671
 	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
-	github.com/streamingfast/firehose v0.1.1-0.20230706150258-7b499a314743
+	github.com/streamingfast/firehose v0.1.1-0.20230717171430-1d7a06ed55c5
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230606032957-27cce5be41f0
 	github.com/streamingfast/merger v0.0.3-0.20221123202507-445dfd357868
@@ -32,7 +32,7 @@ require (
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230607184109-6fff9dd0c7df
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9
-	github.com/streamingfast/substreams v1.1.8
+	github.com/streamingfast/substreams v1.1.9-0.20230719143500-268a83a38f4f
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
@@ -79,11 +79,10 @@ require (
 	github.com/bufbuild/connect-grpchealth-go v1.1.1 // indirect
 	github.com/bufbuild/connect-grpcreflect-go v1.0.0 // indirect
 	github.com/bufbuild/connect-opentelemetry-go v0.3.0 // indirect
-	github.com/bytecodealliance/wasmtime-go/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
+	github.com/chzyer/readline v1.5.0 // indirect
 	github.com/cilium/ebpf v0.4.0 // indirect
 	github.com/cncf/udpa/go v0.0.0-20220112060539-c52dc94e7fbe // indirect
 	github.com/cncf/xds/go v0.0.0-20230105202645-06c439db220b // indirect
@@ -190,7 +189,8 @@ require (
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
-	golang.org/x/mod v0.8.0 // indirect
+	golang.org/x/exp v0.0.0-20230711153332-06a737ee72cb // indirect
+	golang.org/x/mod v0.11.0 // indirect
 	golang.org/x/net v0.10.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sync v0.2.0 // indirect
