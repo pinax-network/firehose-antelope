@@ -41,6 +41,28 @@ func (b *Block) Time() time.Time {
 	return b.Header.Timestamp.AsTime()
 }
 
+// firecore
+
+func (b *Block) GetFirehoseBlockID() string {
+	return b.ID()
+}
+
+func (b *Block) GetFirehoseBlockNumber() uint64 {
+	return b.Num()
+}
+
+func (b *Block) GetFirehoseBlockParentID() string {
+	return b.PreviousID()
+}
+
+func (b *Block) GetFirehoseBlockTime() time.Time {
+	return b.Time()
+}
+
+func (b *Block) GetFirehoseBlockLIBNum() uint64 {
+	return b.LIBNum()
+}
+
 // todo legacy code should be replaced with timestamppb
 //func (b *Block) Time() (time.Time, error) {
 //	timestamp, err := ptypes.Timestamp(b.Header.Timestamp)
