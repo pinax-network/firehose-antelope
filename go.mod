@@ -15,7 +15,7 @@ require (
 	github.com/spf13/viper v1.10.1
 	github.com/streamingfast/bstream v0.0.2-0.20230619183735-f8325d186119
 	github.com/streamingfast/cli v0.0.4-0.20230120202400-0357b9c6f2be
-	github.com/streamingfast/dauth v0.0.0-20230711181128-22be70e6ca49
+	github.com/streamingfast/dauth v0.0.0-20230719201351-ed7e87520891
 	github.com/streamingfast/dbin v0.0.0-20210809205249-73d5eca35dc5
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f
@@ -32,7 +32,7 @@ require (
 	github.com/streamingfast/relayer v0.0.2-0.20220909122435-e67fbc964fd9
 	github.com/streamingfast/sf-tools v0.0.0-20230607184109-6fff9dd0c7df
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9
-	github.com/streamingfast/substreams v1.1.9-0.20230719143500-268a83a38f4f
+	github.com/streamingfast/substreams v1.1.9
 	github.com/stretchr/testify v1.8.3
 	github.com/tidwall/gjson v1.14.3
 	go.uber.org/atomic v1.10.0
