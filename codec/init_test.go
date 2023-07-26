@@ -1,6 +1,7 @@
 package codec
 
 import (
+	fireantelope "github.com/pinax-network/firehose-antelope"
 	"github.com/streamingfast/logging"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
@@ -10,6 +11,7 @@ var zlogTest, _ = logging.PackageLogger("fireantelope", "github.com/pinax-networ
 
 func init() {
 	logging.InstantiateLoggers()
+	fireantelope.TestingInitBstream()
 }
 
 type ObjectReader func() (interface{}, error)

@@ -21,7 +21,7 @@ func printBlock(block *bstream.Block, alsoPrintTransactions bool, out io.Writer)
 
 	if alsoPrintTransactions {
 		for _, trx := range nativeBlock.Transactions() {
-			if _, err := fmt.Fprintf(out, "- Transaction %d\n", trx.Id); err != nil {
+			if _, err := fmt.Fprintf(out, "- Transaction %s\n", trx.Id); err != nil {
 				return err
 			}
 		}
