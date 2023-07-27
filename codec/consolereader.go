@@ -21,7 +21,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/codec/antelope"
-	"github.com/pinax-network/firehose-antelope/types"
+	firecore "github.com/streamingfast/firehose-core"
+	"github.com/streamingfast/logging"
 	"io"
 	"os"
 	"strconv"
@@ -43,23 +44,26 @@ var supportedVersionStrings = []string{"13"}
 // ConsoleReader is what reads the `nodeos` output directly. It builds
 // up some LogEntry objects. See `LogReader to read those entries.
 type ConsoleReader struct {
-	lines chan string
-	close func()
+	lines        chan string
+	close        func()
+	blockEncoder firecore.BlockEncoder
 
 	ctx   *parseCtx
 	done  chan interface{}
 	stats *consoleReaderStats
 
 	logger *zap.Logger
+	tracer logging.Tracer
 }
 
-func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, error) {
+func NewConsoleReader(lines chan string, blockEncoder firecore.BlockEncoder, logger *zap.Logger, tracer logging.Tracer) (*ConsoleReader, error) {
 	globalStats := newConsoleReaderStats()
 	globalStats.StartPeriodicLogToZap(context.Background(), logger, 30*time.Second)
 
 	l := &ConsoleReader{
-		lines: lines,
-		close: func() {},
+		lines:        lines,
+		close:        func() {},
+		blockEncoder: blockEncoder,
 
 		ctx: &parseCtx{
 			logger:       logger,
@@ -72,6 +76,7 @@ func NewConsoleReader(logger *zap.Logger, lines chan string) (*ConsoleReader, er
 		stats: globalStats,
 
 		logger: logger,
+		tracer: tracer,
 	}
 
 	return l, nil
@@ -268,10 +273,10 @@ func (c *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
 		return nil, fmt.Errorf("console reader read a nil *bstream.Block, this is invalid")
 	}
 
-	return v.(*bstream.Block), nil
+	return c.blockEncoder.Encode(v)
 }
 
-func (c *ConsoleReader) next() (out interface{}, err error) {
+func (c *ConsoleReader) next() (block *pbantelope.Block, err error) {
 
 	ctx := c.ctx
 	c.logger.Debug("next()")
@@ -788,7 +793,7 @@ func (ctx *parseCtx) readStartBlock(line string) error {
 // Line format:
 //
 //	ACCEPTED_BLOCK ${block_num} ${block_state_hex}
-func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
+func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 	chunks := strings.SplitN(line, " ", 3)
 	if len(chunks) != 3 {
 		return nil, fmt.Errorf("expected 3 fields, got %d", len(chunks))
@@ -831,7 +836,7 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*bstream.Block, error) {
 	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
 	ctx.resetBlock()
 
-	return types.BlockFromProto(block)
+	return block, nil
 }
 
 // Line format:

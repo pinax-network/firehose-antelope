@@ -22,6 +22,7 @@ import (
 	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
 	"github.com/pinax-network/firehose-antelope/types"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
+	firecore "github.com/streamingfast/firehose-core"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/zap"
@@ -229,8 +230,9 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 func testReaderConsoleReader(helperFunc func(), lines chan string, closer func(), logger *zap.Logger) *ConsoleReader {
 
 	l := &ConsoleReader{
-		lines: lines,
-		close: closer,
+		lines:        lines,
+		blockEncoder: firecore.NewGenericBlockEncoder(1),
+		close:        closer,
 		ctx: &parseCtx{
 			logger:       zlogTest,
 			globalStats:  newConsoleReaderStats(),
