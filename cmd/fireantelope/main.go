@@ -5,6 +5,7 @@ import (
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	"github.com/streamingfast/dmetering"
 	firecore "github.com/streamingfast/firehose-core"
 	"github.com/streamingfast/logging"
 	"github.com/streamingfast/node-manager/mindreader"
@@ -17,6 +18,9 @@ func init() {
 }
 
 func main() {
+	// todo this is only a temporary fix until firehose-core is fixed
+	dmetering.RegisterNull()
+
 	firecore.Main(&firecore.Chain[*pbantelope.Block]{
 		ShortName:            "antelope",
 		LongName:             "Antelope",

@@ -15,6 +15,7 @@ require (
 	github.com/streamingfast/bstream v0.0.2-0.20230731165201-639b4f347707
 	github.com/streamingfast/cli v0.0.4-0.20230608140431-f501fec4f1ce
 	github.com/streamingfast/dbin v0.9.1-0.20220513054835-1abebbb944ad
+	github.com/streamingfast/dmetering v0.0.0-20230731155453-e1df53e362aa
 	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
 	github.com/streamingfast/firehose-core v0.1.5
@@ -172,7 +173,6 @@ require (
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20230623191332-4ed02c06bc6f // indirect
 	github.com/streamingfast/dlauncher v0.0.0-20230607184145-76399faad89e // indirect
-	github.com/streamingfast/dmetering v0.0.0-20230731155453-e1df53e362aa // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/firehose v0.1.1-0.20230731171526-3428fc0ff8d9 // indirect
 	github.com/streamingfast/index-builder v0.0.0-20221031203737-fa2e70f09dc2 // indirect
