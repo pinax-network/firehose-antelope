@@ -12,12 +12,12 @@ require (
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.15.0
-	github.com/streamingfast/bstream v0.0.2-0.20230731165201-639b4f347707
+	github.com/streamingfast/bstream v0.0.2-0.20230829131224-b9272048dc6a
 	github.com/streamingfast/cli v0.0.4-0.20230608140431-f501fec4f1ce
 	github.com/streamingfast/dbin v0.9.1-0.20220513054835-1abebbb944ad
 	github.com/streamingfast/dmetrics v0.0.0-20230516031116-28fcfeb4b9ed
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
-	github.com/streamingfast/firehose-core v0.1.6
+	github.com/streamingfast/firehose-core v0.1.8
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/streamingfast/node-manager v0.0.2-0.20230406142433-692298a8b8d2
@@ -183,7 +183,7 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.1.11 // indirect
+	github.com/streamingfast/substreams v1.1.12 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
 	github.com/tetratelabs/wazero v1.1.0 // indirect
