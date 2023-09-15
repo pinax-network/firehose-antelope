@@ -20,7 +20,7 @@ main() {
     go test ./... "$@"
   popd&> /dev/null
 
-  go test -timeout 30m ./... "$@"
+  go test ./... "$@"
 }
 
 usage_error() {
