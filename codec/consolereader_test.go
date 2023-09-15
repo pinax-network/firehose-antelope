@@ -239,9 +239,7 @@ func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()
 			globalStats:  newConsoleReaderStats(),
 			currentBlock: &pbantelope.Block{},
 			currentTrace: &pbantelope.TransactionTrace{},
-			abiDecoder:   newABIDecoder(),
-			// TODO re-enable this line whenever we have a dmlog for testing with valid only ABIs
-			// abiDecoder:   newABIDecoderInStrictMode(),
+			abiDecoder:   newABIDecoderInStrictMode(),
 		},
 		logger: zlogTest,
 	}
