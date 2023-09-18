@@ -20,12 +20,13 @@ func main() {
 	firecore.Main(&firecore.Chain[*pbantelope.Block]{
 		ShortName:            "antelope",
 		LongName:             "Antelope",
-		ExecutableName:       "antelope-firehose-indexer",
+		ExecutableName:       "nodeos",
 		FullyQualifiedModule: "github.com/pinax-network/firehose-antelope",
 		Version:              version,
 
-		Protocol:        "EOS",
-		ProtocolVersion: 1,
+		Protocol:             "EOS",
+		ProtocolVersion:      1,
+		FirstStreamableBlock: 2,
 
 		BlockFactory: func() firecore.Block { return new(pbantelope.Block) },
 
