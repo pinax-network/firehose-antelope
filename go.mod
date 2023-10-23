@@ -243,3 +243,5 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
+
+replace github.com/eoscanada/eos-go => github.com/pinax-network/eos-go v0.0.0-20231023134916-7d2c5c4ca569
