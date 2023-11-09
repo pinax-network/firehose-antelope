@@ -7,7 +7,7 @@ toolchain go1.21.1
 require (
 	github.com/ShinyTrinkets/overseer v0.3.0
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20230609180026-5d4ee54fe15e
+	github.com/eoscanada/eos-go v0.10.3-0.20231109144819-59afdfa3a37d
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/pinax-network/firehose-antelope/types v0.0.0-20230317150217-417f23cbea8d
@@ -243,5 +243,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
-
-replace github.com/eoscanada/eos-go => github.com/pinax-network/eos-go v0.0.0-20231023134916-7d2c5c4ca569
