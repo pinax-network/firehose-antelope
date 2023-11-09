@@ -37,6 +37,13 @@ func (b *Block) PreviousID() string {
 	return b.Header.Previous
 }
 
+func (b *Block) PreviousNumber() uint64 {
+	if b.PreviousID() == "" {
+		return 0
+	}
+	return uint64(b.Number) - 1
+}
+
 func (b *Block) Time() time.Time {
 	return b.Header.Timestamp.AsTime()
 }
@@ -55,32 +62,21 @@ func (b *Block) GetFirehoseBlockParentID() string {
 	return b.PreviousID()
 }
 
+func (b *Block) GetFirehoseBlockParentNumber() uint64 {
+	return b.PreviousNumber()
+}
+
 func (b *Block) GetFirehoseBlockTime() time.Time {
 	return b.Time()
+}
+
+func (b *Block) GetFirehoseBlockVersion() int32 {
+	return int32(b.Version)
 }
 
 func (b *Block) GetFirehoseBlockLIBNum() uint64 {
 	return b.LIBNum()
 }
-
-// todo legacy code should be replaced with timestamppb
-//func (b *Block) Time() (time.Time, error) {
-//	timestamp, err := ptypes.Timestamp(b.Header.Timestamp)
-//	if err != nil {
-//		return time.Time{}, fmt.Errorf("unable to turn google proto Timestamp into time.Time: %s", err)
-//	}
-//
-//	return timestamp, nil
-//}
-//
-//func (b *Block) MustTime() time.Time {
-//	timestamp, err := b.Time()
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	return timestamp
-//}
 
 func (b *Block) LIBNum() uint64 {
 	return uint64(b.DposIrreversibleBlocknum)
@@ -172,19 +168,6 @@ func (b *Block) MigrateV0ToV1() {
 				b.UnfilteredExecutedInputActionCount++
 			}
 		}
-	}
-}
-
-func (b *Block) MigrateV1ToV2() {
-	if b.Version != 1 {
-		return
-	}
-	b.Version = 2
-
-	if b.FilteringApplied {
-		// prendre filtering_include_filter_expr -> mettre dans un pbcodec.FilteringFilters{}
-		// hasher ceux qui sont trop gros? tous? pour tous les blocks où blockNum%100 != 0
-		// on append ce FilteredApplied à
 	}
 }
 
