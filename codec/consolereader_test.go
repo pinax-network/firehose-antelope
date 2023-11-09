@@ -232,7 +232,7 @@ func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()
 
 	l := &ConsoleReader{
 		lines:        lines,
-		blockEncoder: firecore.NewGenericBlockEncoder(1),
+		blockEncoder: firecore.NewBlockEncoder(),
 		close:        closer,
 		ctx: &parseCtx{
 			logger:       zlogTest,
