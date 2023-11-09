@@ -37,6 +37,14 @@ func (b *Block) PreviousID() string {
 	return b.Header.Previous
 }
 
+func (b *Block) PreviousNumber() uint64 {
+	if uint64(b.Number) == bstream.GetProtocolFirstStreamableBlock {
+		return 0
+	} else {
+		return uint64(b.Number - 1)
+	}
+}
+
 func (b *Block) Time() time.Time {
 	return b.Header.Timestamp.AsTime()
 }
@@ -55,8 +63,16 @@ func (b *Block) GetFirehoseBlockParentID() string {
 	return b.PreviousID()
 }
 
+func (b *Block) GetFirehoseBlockParentNumber() uint64 {
+	return b.PreviousNumber()
+}
+
 func (b *Block) GetFirehoseBlockTime() time.Time {
 	return b.Time()
+}
+
+func (b *Block) GetFirehoseBlockVersion() int32 {
+	return int32(b.Version)
 }
 
 func (b *Block) GetFirehoseBlockLIBNum() uint64 {
