@@ -179,7 +179,7 @@ require (
 	github.com/streamingfast/dgrpc v0.0.0-20230929132851-893fc52687fa // indirect
 	github.com/streamingfast/dlauncher v0.0.0-20230607184145-76399faad89e // indirect
 	github.com/streamingfast/dmetering v0.0.0-20230731155453-e1df53e362aa // indirect
-	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
+	github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb // indirect
 	github.com/streamingfast/firehose v0.1.1-0.20230731171526-3428fc0ff8d9 // indirect
 	github.com/streamingfast/index-builder v0.0.0-20221031203737-fa2e70f09dc2 // indirect
 	github.com/streamingfast/merger v0.0.3-0.20231027161314-209c2ddd8d96 // indirect
@@ -244,3 +244,7 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.2.0 // indirect
 )
+
+replace github.com/streamingfast/dauth => github.com/pinax-network/dauth v0.0.0-20231010131310-d03898dcd645
+
+replace github.com/streamingfast/dmetering => github.com/pinax-network/dmetering v0.0.0-20231110090534-d679ab21d7ff
