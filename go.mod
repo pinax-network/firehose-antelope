@@ -179,7 +179,7 @@ require (
 	github.com/streamingfast/dgrpc v0.0.0-20230929132851-893fc52687fa // indirect
 	github.com/streamingfast/dlauncher v0.0.0-20230607184145-76399faad89e // indirect
 	github.com/streamingfast/dmetering v0.0.0-20230731155453-e1df53e362aa // indirect
-	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
+	github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb // indirect
 	github.com/streamingfast/firehose v0.1.1-0.20231109192301-ebfed7417cf6 // indirect
 	github.com/streamingfast/index-builder v0.0.0-20221031203737-fa2e70f09dc2 // indirect
 	github.com/streamingfast/merger v0.0.3-0.20231027161314-209c2ddd8d96 // indirect
