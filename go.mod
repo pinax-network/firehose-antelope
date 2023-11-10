@@ -248,3 +248,5 @@ require (
 replace github.com/streamingfast/dauth => github.com/pinax-network/dauth v0.0.0-20231010131310-d03898dcd645
 
 replace github.com/streamingfast/dmetering => github.com/pinax-network/dmetering v0.0.0-20231110090534-d679ab21d7ff
+
+replace github.com/streamingfast/substreams => github.com/fschoell/substreams v0.0.0-20231110110022-9fb096ae80c4
