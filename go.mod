@@ -250,3 +250,5 @@ replace github.com/streamingfast/dauth => github.com/pinax-network/dauth v0.0.0-
 replace github.com/streamingfast/dmetering => github.com/pinax-network/dmetering v0.0.0-20231110090534-d679ab21d7ff
 
 replace github.com/streamingfast/substreams => github.com/fschoell/substreams v0.0.0-20231110110925-f7b0ba46262e
+
+replace github.com/streamingfast/firehose => github.com/fschoell/firehose v0.0.0-20231110142954-073deeed5881
