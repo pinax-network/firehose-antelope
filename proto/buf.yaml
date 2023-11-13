@@ -1,0 +1,14 @@
+version: v1
+name: buf.build/pinax/firehose-antelope
+
+build:
+  excludes:
+  - google
+
+lint:
+  use:
+    - DEFAULT
+
+breaking:
+  use:
+    - FILE
