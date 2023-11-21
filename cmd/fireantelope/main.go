@@ -10,6 +10,11 @@ import (
 	"github.com/streamingfast/node-manager/mindreader"
 	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"go.uber.org/zap"
+
+	_ "github.com/streamingfast/dauth"
+	_ "github.com/streamingfast/dmetering"
+	_ "github.com/streamingfast/firehose"
+	_ "github.com/streamingfast/substreams"
 )
 
 func init() {
