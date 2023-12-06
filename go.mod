@@ -19,7 +19,7 @@ require (
 	github.com/streamingfast/dbin v0.9.1-0.20220513054835-1abebbb944ad
 	github.com/streamingfast/dmetrics v0.0.0-20230919161904-206fa8ebd545
 	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
-	github.com/streamingfast/firehose-core v0.2.3
+	github.com/streamingfast/firehose-core v0.2.4
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/streamingfast/node-manager v0.0.2-0.20230406142433-692298a8b8d2
@@ -174,13 +174,13 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/streamingfast/atm v0.0.0-20220131151839-18c87005e680 // indirect
-	github.com/streamingfast/dauth v0.0.0-20230929180355-921f9c9be330 // indirect
+	github.com/streamingfast/dauth v0.0.0-20231120142446-843f4e045cc2 // indirect
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20230929132851-893fc52687fa // indirect
 	github.com/streamingfast/dlauncher v0.0.0-20230607184145-76399faad89e // indirect
-	github.com/streamingfast/dmetering v0.0.0-20230731155453-e1df53e362aa // indirect
+	github.com/streamingfast/dmetering v0.0.0-20231120142327-a3405f0eed83 // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
-	github.com/streamingfast/firehose v0.1.1-0.20231109192301-ebfed7417cf6 // indirect
+	github.com/streamingfast/firehose v0.1.1-0.20231204192037-7b23ef908c0c // indirect
 	github.com/streamingfast/index-builder v0.0.0-20221031203737-fa2e70f09dc2 // indirect
 	github.com/streamingfast/merger v0.0.3-0.20231027161314-209c2ddd8d96 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
@@ -188,7 +188,7 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.1.20 // indirect
+	github.com/streamingfast/substreams v1.1.23-0.20231205181347-5c760774d263 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
 	github.com/tetratelabs/wazero v1.1.0 // indirect
@@ -211,14 +211,14 @@ require (
 	go.opentelemetry.io/proto/otlp v1.0.0 // indirect
 	go.uber.org/automaxprocs v1.5.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.13.0 // indirect
+	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.15.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/oauth2 v0.10.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.12.0 // indirect
-	golang.org/x/term v0.12.0 // indirect
+	golang.org/x/sys v0.13.0 // indirect
+	golang.org/x/term v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect
 	golang.org/x/time v0.1.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
