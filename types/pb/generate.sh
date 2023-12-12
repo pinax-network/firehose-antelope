@@ -16,7 +16,6 @@
 ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../.. && pwd )"
 
 # Protobuf definitions
-PROTO=${1:-"$ROOT/../proto"}
 PROTO_ANTELOPE=${2:-"$ROOT/proto"}
 
 function main() {
@@ -28,7 +27,6 @@ function main() {
   generate "sf/antelope/type/v1/type.proto"
 
   echo "generate.sh - `date` - `whoami`" > ./last_generate.txt
-  echo "streamingfast/proto revision: `GIT_DIR=$PROTO/.git git rev-parse HEAD`" >> ./last_generate.txt
   echo "streamingfast/firehose-antelope/proto revision: `GIT_DIR=$ROOT/.git git log -n 1 --pretty=format:%h -- proto`" >> ./last_generate.txt
 }
 
@@ -42,7 +40,7 @@ function generate() {
     fi
 
     for file in "$@"; do
-      protoc -I$PROTO -I$PROTO_ANTELOPE \
+      protoc -I$PROTO_ANTELOPE \
         --go_out=. --go_opt=paths=source_relative \
         --go-grpc_out=. --go-grpc_opt=paths=source_relative,require_unimplemented_servers=false \
          $base$file
