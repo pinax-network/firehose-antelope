@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/types"
+	"github.com/streamingfast/bstream"
 	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
@@ -16,7 +17,6 @@ import (
 	"github.com/eoscanada/eos-go/system"
 	"github.com/mitchellh/go-testing-interface"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
 	"github.com/stretchr/testify/require"
@@ -157,26 +157,19 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 	return pbblock
 }
 
-func ToBstreamBlock(t testing.T, block *pbantelope.Block) *bstream.Block {
+func ToBstreamBlock(t testing.T, block *pbantelope.Block) *pbbstream.Block {
 	blk, err := types.BlockFromProto(block, block.LIBNum())
 	require.NoError(t, err)
 
 	return blk
 }
 
-func ToBstreamBlocks(t testing.T, blocks []*pbantelope.Block) (out []*bstream.Block) {
-	out = make([]*bstream.Block, len(blocks))
+func ToBstreamBlocks(t testing.T, blocks []*pbantelope.Block) (out []*pbbstream.Block) {
+	out = make([]*pbbstream.Block, len(blocks))
 	for i, block := range blocks {
 		out[i] = ToBstreamBlock(t, block)
 	}
 	return
-}
-
-func ToPbbstreamBlock(t testing.T, block *pbantelope.Block) *pbbstream.Block {
-	blk, err := ToBstreamBlock(t, block).ToProto()
-	require.NoError(t, err)
-
-	return blk
 }
 
 type TrxID string
