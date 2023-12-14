@@ -55,9 +55,11 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 
 		Tools: &firecore.ToolsConfig[*pbantelope.Block]{
 
-			RegisterExtraCmd: func(chain *firecore.Chain[*pbantelope.Block], toolsCmd *cobra.Command, zlog *zap.Logger, tracer logging.Tracer) error {
+			RegisterExtraCmd: func(chain *firecore.Chain[*pbantelope.Block], parent *cobra.Command, zlog *zap.Logger, tracer logging.Tracer) error {
 				//toolsCmd.AddCommand(newToolsGenerateNodeKeyCmd(chain))
 				//toolsCmd.AddCommand(newToolsBackfillCmd(zlog))
+				parent.AddCommand(newPollerCmd(zlog, tracer))
+				parent.AddCommand(newSilkwormPollerCmd(zlog, tracer))
 
 				return nil
 			},
