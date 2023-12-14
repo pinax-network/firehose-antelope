@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/types"
+	"github.com/streamingfast/bstream"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"reflect"
@@ -15,10 +17,8 @@ import (
 	"github.com/eoscanada/eos-go/system"
 	"github.com/mitchellh/go-testing-interface"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
-	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
-	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
@@ -28,11 +28,7 @@ type Hash string
 type BlockTime string
 type BlockTimestamp time.Time
 
-var zlog *zap.Logger
-
-func init() {
-	logging.Register("github.com/dfuse-io/dfuse-eosio/codec/testing", &zlog)
-}
+var zlog, _ = logging.PackageLogger("fireantelope", "github.com/pinax-network/firehose-antelope/codec.tests/types")
 
 func (h Hash) Bytes(t testing.T) []byte {
 	bytes, err := hex.DecodeString(string(h))
@@ -157,26 +153,19 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 	return pbblock
 }
 
-func ToBstreamBlock(t testing.T, block *pbantelope.Block) *bstream.Block {
-	blk, err := types.BlockFromProto(block)
+func ToBstreamBlock(t testing.T, block *pbantelope.Block) *pbbstream.Block {
+	blk, err := types.BlockFromProto(block, block.LIBNum())
 	require.NoError(t, err)
 
 	return blk
 }
 
-func ToBstreamBlocks(t testing.T, blocks []*pbantelope.Block) (out []*bstream.Block) {
-	out = make([]*bstream.Block, len(blocks))
+func ToBstreamBlocks(t testing.T, blocks []*pbantelope.Block) (out []*pbbstream.Block) {
+	out = make([]*pbbstream.Block, len(blocks))
 	for i, block := range blocks {
 		out[i] = ToBstreamBlock(t, block)
 	}
 	return
-}
-
-func ToPbbstreamBlock(t testing.T, block *pbantelope.Block) *pbbstream.Block {
-	blk, err := ToBstreamBlock(t, block).ToProto()
-	require.NoError(t, err)
-
-	return blk
 }
 
 type TrxID string
@@ -471,10 +460,6 @@ func findTypedComponent(components []interface{}, typeInfo interface{}) interfac
 	return nil
 }
 
-func hasComponent(components []interface{}, doesMatch func(component interface{}) bool) bool {
-	return findComponent(components, doesMatch) != nil
-}
-
 func TrxOp(t testing.T, signedTrx *pbantelope.SignedTransaction) *pbantelope.TrxOp {
 	op := &pbantelope.TrxOp{
 		Transaction: signedTrx,
@@ -665,8 +650,4 @@ func failInvalidComponent(t testing.T, tag string, component interface{}, option
 	}
 
 	require.FailNowf(t, "invalid component", "Invalid %s component of type %T", tag, component)
-}
-
-func logInvalidComponent(tag string, component interface{}) {
-	zlog.Info(fmt.Sprintf("invalid %s component of type %T", tag, component))
 }

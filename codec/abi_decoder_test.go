@@ -385,10 +385,10 @@ func TestABIDecoder(t *testing.T) {
 		//return out
 	}
 
-	hexRegex := regexp.MustCompile("^[0-9a-fA-F]+$")
-	actionTraceRegex := regexp.MustCompile("^block (\\d+)/trace (\\d+)/action (\\d+)$")
-	dtrxOpRegex := regexp.MustCompile("^block (\\d+)/trace (\\d+)/dtrxOp (\\d+)/(action|cfaAction) (\\d+)$")
-	trxOpRegex := regexp.MustCompile("^block (\\d+)/trxOp (\\d+)/(action|cfaAction) (\\d+)$")
+	hexRegex := regexp.MustCompile(`^[0-9a-fA-F]+$`)
+	actionTraceRegex := regexp.MustCompile(`^block (\d+)/trace (\d+)/action (\d+)$`)
+	dtrxOpRegex := regexp.MustCompile(`^block (\d+)/trace (\d+)/dtrxOp (\d+)/(action|cfaAction) (\d+)$`)
+	trxOpRegex := regexp.MustCompile(`^block (\d+)/trxOp (\d+)/(action|cfaAction) (\d+)$`)
 
 	toInt := func(in string) int {
 		out, err := strconv.ParseInt(in, 10, 32)
@@ -422,7 +422,7 @@ func TestABIDecoder(t *testing.T) {
 				abiBinary, err := eos.MarshalBinary(abi)
 				require.NoError(t, err)
 
-				decoder.addInitialABI(contract, base64.RawStdEncoding.EncodeToString(abiBinary))
+				_ = decoder.addInitialABI(contract, base64.RawStdEncoding.EncodeToString(abiBinary))
 			}
 
 			for _, block := range test.blocks {

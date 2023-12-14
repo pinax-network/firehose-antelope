@@ -15,34 +15,32 @@
 package types
 
 import (
-	"fmt"
-	"io"
-	"time"
-
+	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
-	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
+	firecore "github.com/streamingfast/firehose-core"
 )
 
+var _ firecore.Block = (*pbantelope.Block)(nil)
+
+var encoder = firecore.NewBlockEncoder()
+
+var BlockAcceptedVersions = []int32{1, 2}
+
+// init is kept for backward compatibility, `InitFireCore()` should be called directly instead in your
+// own `init()` function.
 func init() {
-	bstream.GetBlockWriterFactory = bstream.BlockWriterFactoryFunc(blockWriterFactory)
-	bstream.GetBlockReaderFactory = bstream.BlockReaderFactoryFunc(blockReaderFactory)
-	bstream.GetBlockDecoder = bstream.BlockDecoderFunc(BlockDecoder)
-	bstream.GetBlockWriterHeaderLen = 10
-	bstream.GetBlockPayloadSetter = bstream.MemoryBlockPayloadSetter
-	bstream.GetMemoizeMaxAge = 20 * time.Second
+	InitFireCore()
 }
 
-func blockReaderFactory(reader io.Reader) (bstream.BlockReader, error) {
-	return bstream.NewDBinBlockReader(reader, func(contentType string, version int32) error {
-		protocol := pbbstream.Protocol(pbbstream.Protocol_value[contentType])
-		if protocol != pbbstream.Protocol_EOS && version != 1 {
-			return fmt.Errorf("reader only knows about %s block kind at version 1, got %s at version %d", protocol, contentType, version)
-		}
-
-		return nil
-	})
+// InitFireCore initializes the firehose-core library and overrides some specific `bstream` elements with the proper
+// values for the Antelope chains.
+//
+// You should use this method explicitely in your `init()` function to make the dependency explicit.
+func InitFireCore() {
+	bstream.GetProtocolFirstStreamableBlock = 2
 }
 
-func blockWriterFactory(writer io.Writer) (bstream.BlockWriter, error) {
-	return bstream.NewDBinBlockWriter(writer, pbbstream.Protocol_EOS.String(), 1)
+func BlockFromProto(b *pbantelope.Block, libNum uint64) (*pbbstream.Block, error) {
+	return encoder.Encode(firecore.BlockEnveloppe{Block: b, LIBNum: libNum})
 }

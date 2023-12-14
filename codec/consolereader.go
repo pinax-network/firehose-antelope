@@ -21,7 +21,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/codec/antelope"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	firecore "github.com/streamingfast/firehose-core"
+	"github.com/streamingfast/firehose-core/node-manager/mindreader"
 	"github.com/streamingfast/logging"
 	"io"
 	"os"
@@ -56,7 +58,7 @@ type ConsoleReader struct {
 	tracer logging.Tracer
 }
 
-func NewConsoleReader(lines chan string, blockEncoder firecore.BlockEncoder, logger *zap.Logger, tracer logging.Tracer) (*ConsoleReader, error) {
+func NewConsoleReader(lines chan string, blockEncoder firecore.BlockEncoder, logger *zap.Logger, tracer logging.Tracer) (mindreader.ConsolerReader, error) {
 	globalStats := newConsoleReaderStats()
 	globalStats.StartPeriodicLogToZap(context.Background(), logger, 30*time.Second)
 
@@ -181,9 +183,8 @@ type parseCtx struct {
 	minorVersion uint64
 	hydrator     antelope.Hydrator
 
-	currentBlock         *pbantelope.Block
-	currentTrace         *pbantelope.TransactionTrace
-	currentTraceLogCount int
+	currentBlock *pbantelope.Block
+	currentTrace *pbantelope.TransactionTrace
 
 	abiDecoder     *ABIDecoder
 	activeBlockNum int64
@@ -262,7 +263,7 @@ type parseCtx struct {
 //	return l, nil
 //}
 
-func (c *ConsoleReader) ReadBlock() (out *bstream.Block, err error) {
+func (c *ConsoleReader) ReadBlock() (out *pbbstream.Block, err error) {
 
 	v, err := c.next()
 	if err != nil {
@@ -447,159 +448,6 @@ func (c *ConsoleReader) buildScanner(reader io.Reader) *bufio.Scanner {
 
 	return scanner
 }
-
-// ***********************************************************************************
-// ***********************************************************************************
-// ***********************************************************************************
-// ************************* OLD FUNCTIONALITY ***************************************
-// ***********************************************************************************
-// ***********************************************************************************
-// ***********************************************************************************
-
-// todo legacy setupScanner, remove when buildScanner done
-//func (c *ConsoleReader) buildScanner(reader io.Reader) *bufio.Scanner {
-//	maxTokenSize := uint64(50 * 1024 * 1024)
-//	if maxBufferSize := os.Getenv("MINDREADER_MAX_TOKEN_SIZE"); maxBufferSize != "" {
-//		bs, err := strconv.ParseUint(maxBufferSize, 10, 64)
-//		if err != nil {
-//			zlog.Error("environment variable 'MINDREADER_MAX_TOKEN_SIZE' is set but invalid parse uint", zap.Error(err))
-//		} else {
-//			zlog.Info("setting max_token_size from environment variable MINDREADER_MAX_TOKEN_SIZE", zap.Uint64("max_token_size", bs))
-//			maxTokenSize = bs
-//		}
-//	}
-//	buf := make([]byte, maxTokenSize)
-//	scanner := bufio.NewScanner(reader)
-//	scanner.Buffer(buf, len(buf))
-//    readBuffer := make(chan string, 2000)
-//
-//	go func() {
-//		for scanner.Scan() {
-//			line := scanner.Text()
-//			if !strings.HasPrefix(line, "DMLOG ") {
-//				continue
-//			}
-//			readBuffer <- line
-//		}
-//
-//		err := scanner.Err()
-//		if err != nil && err != io.EOF {
-//			zlog.Error("console read line scanner encountered an error", zap.Error(err))
-//		}
-//
-//		close(readBuffer)
-//	}()
-//
-//	return scanner
-//}
-
-// todo legacy Read() replace with ReaadBlock()
-//func (c *ConsoleReader) Read() (out interface{}, err error) {
-//	ctx := c.ctx
-//
-//	for line := range c.readBuffer {
-//		line = line[6:]
-//
-//		if traceEnabled {
-//			zlog.Debug("extracing deep mind data from line", zap.String("line", line))
-//		}
-//
-//		// Order of conditions is based (approximately) on those that will appear more often
-//		switch {
-//		case strings.HasPrefix(line, "RAM_OP"):
-//			err = ctx.readRAMOp(line)
-//
-//		case strings.HasPrefix(line, "CREATION_OP"):
-//			err = ctx.readCreationOp(line)
-//
-//		case strings.HasPrefix(line, "DB_OP"):
-//			err = ctx.readDBOp(line)
-//
-//		case strings.HasPrefix(line, "RLIMIT_OP"):
-//			err = ctx.readRlimitOp(line)
-//
-//		case strings.HasPrefix(line, "TRX_OP"):
-//			err = ctx.readTrxOp(line)
-//
-//		case strings.HasPrefix(line, "APPLIED_TRANSACTION"):
-//			err = ctx.readAppliedTransaction(line)
-//
-//		case strings.HasPrefix(line, "TBL_OP"):
-//			err = ctx.readTableOp(line)
-//
-//		case strings.HasPrefix(line, "PERM_OP"):
-//			err = ctx.readPermOp(line)
-//
-//		case strings.HasPrefix(line, "KV_OP"):
-//			err = ctx.readKVOp(line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP CREATE"):
-//			err = ctx.readCreateOrCancelDTrxOp("CREATE", line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP MODIFY_CREATE"):
-//			err = ctx.readCreateOrCancelDTrxOp("MODIFY_CREATE", line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP MODIFY_CANCEL"):
-//			err = ctx.readCreateOrCancelDTrxOp("MODIFY_CANCEL", line)
-//
-//		case strings.HasPrefix(line, "RAM_CORRECTION_OP"):
-//			err = ctx.readRAMCorrectionOp(line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP PUSH_CREATE"):
-//			err = ctx.readCreateOrCancelDTrxOp("PUSH_CREATE", line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP CANCEL"):
-//			err = ctx.readCreateOrCancelDTrxOp("CANCEL", line)
-//
-//		case strings.HasPrefix(line, "DTRX_OP FAILED"):
-//			err = ctx.readFailedDTrxOp(line)
-//
-//		case strings.HasPrefix(line, "ACCEPTED_BLOCK"):
-//			block, err := ctx.readAcceptedBlock(line)
-//			if err != nil {
-//				return nil, c.formatError(line, err)
-//			}
-//
-//			return block, nil
-//
-//		case strings.HasPrefix(line, "START_BLOCK"):
-//			err = ctx.readStartBlock(line)
-//
-//		case strings.HasPrefix(line, "FEATURE_OP ACTIVATE"):
-//			err = ctx.readFeatureOpActivate(line)
-//
-//		case strings.HasPrefix(line, "FEATURE_OP PRE_ACTIVATE"):
-//			err = ctx.readFeatureOpPreActivate(line)
-//
-//		case strings.HasPrefix(line, "SWITCH_FORK"):
-//			zlog.Info("fork signal, restarting state accumulation from beginning")
-//			ctx.resetBlock()
-//
-//		case strings.HasPrefix(line, "ABIDUMP START"):
-//			err = ctx.readABIStart(line)
-//		case strings.HasPrefix(line, "ABIDUMP ABI"):
-//			err = ctx.readABIDump(line)
-//		case strings.HasPrefix(line, "ABIDUMP END"):
-//			//noop
-//
-//		case strings.HasPrefix(line, "DEEP_MIND_VERSION"):
-//			ctx.majorVersion, ctx.minorVersion, ctx.hydrator, err = ctx.readDeepmindVersion(line)
-//
-//		default:
-//			zlog.Info("unknown log line", zap.String("line", line))
-//		}
-//
-//		if err != nil {
-//			return nil, c.formatError(line, err)
-//		}
-//	}
-//
-//	if c.scanner.Err() == nil {
-//		return nil, io.EOF
-//	}
-//
-//	return nil, c.scanner.Err()
-//}
 
 type creationOp struct {
 	kind        string // ROOT, NOTIFY, CFA_INLINE, INLINE
@@ -922,7 +770,7 @@ func (ctx *parseCtx) readDBOp(line string) error {
 
 	opString := chunks[1]
 
-	op := pbantelope.DBOp_OPERATION_UNKNOWN
+	var op pbantelope.DBOp_Operation
 	var oldData, newData string
 	var oldPayer, newPayer string
 	switch opString {
@@ -1157,7 +1005,7 @@ func (ctx *parseCtx) readPermOp(line string) error {
 		dataChunk = chunks[4]
 	}
 
-	op := pbantelope.PermOp_OPERATION_UNKNOWN
+	var op pbantelope.PermOp_Operation
 	var oldData, newData []byte
 
 	switch opString {
@@ -1451,7 +1299,7 @@ func (ctx *parseCtx) readRlimitOp(line string) error {
 	kindString := chunks[1]
 	operationString := chunks[2]
 
-	operation := pbantelope.RlimitOp_OPERATION_UNKNOWN
+	var operation pbantelope.RlimitOp_Operation
 	switch operationString {
 	case "INS":
 		operation = pbantelope.RlimitOp_OPERATION_INSERT
@@ -1526,7 +1374,7 @@ func (ctx *parseCtx) readTableOp(line string) error {
 	}
 
 	opString := chunks[1]
-	op := pbantelope.TableOp_OPERATION_UNKNOWN
+	var op pbantelope.TableOp_Operation
 	switch opString {
 	case "INS":
 		op = pbantelope.TableOp_OPERATION_INSERT

@@ -264,10 +264,7 @@ func (t *TransactionTrace) DtrxOpsForAction(idx uint32) (ops []*DTrxOp) {
 
 func (t *TransactionTrace) FeatureOpsForAction(idx uint32) (ops []*FeatureOp) {
 	for _, op := range t.FeatureOps {
-		if op.ActionIndex < 0 { // means not attached to any action
-			continue
-		}
-		if uint32(op.ActionIndex) == idx {
+		if op.ActionIndex == idx {
 			ops = append(ops, op)
 		}
 	}

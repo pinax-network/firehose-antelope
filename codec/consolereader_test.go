@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/andreyvit/diff"
 	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
-	"github.com/pinax-network/firehose-antelope/types"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	"github.com/stretchr/testify/assert"
@@ -37,44 +36,6 @@ import (
 	"testing"
 	"time"
 )
-
-// todo delete legacy benchmark replaced with console_reader_bench_test.go
-//func TestConsoleReaderPerformances(t *testing.T) {
-//	dmlogBenchmarkFile := os.Getenv("PERF_DMLOG_BENCHMARK_FILE")
-//	if dmlogBenchmarkFile == "" || !fileExists(dmlogBenchmarkFile) {
-//		t.Skipf("Environment variable 'PERF_DMLOG_BENCHMARK_FILE' not set or value %q is not an existing file", dmlogBenchmarkFile)
-//		return
-//	}
-//
-//	go func() {
-//		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
-//			zlogTest.Info("listening localhost:6060", zap.Error(err))
-//		}
-//	}()
-//
-//	fl, err := os.Open(dmlogBenchmarkFile)
-//	require.NoError(t, err)
-//
-//	r, err := NewConsoleReader(fl)
-//	require.NoError(t, err)
-//	defer r.Close()
-//
-//	count := 1999
-//
-//	t0 := time.Now()
-//
-//	for i := 0; i < count; i++ {
-//		blki, err := r.Read()
-//		require.NoError(t, err)
-//
-//		blk := blki.(*pbantelope.Block)
-//		fmt.Fprintln(os.Stderr, "Processing block", blk.Num())
-//	}
-//
-//	d1 := time.Since(t0)
-//	perSec := float64(count) / (float64(d1) / float64(time.Second))
-//	fmt.Printf("%d blocks in %s (%f blocks/sec)", count, d1, perSec)
-//}
 
 func TestParseFromFile(t *testing.T) {
 
@@ -107,7 +68,13 @@ func TestParseFromFile(t *testing.T) {
 					return nil, err
 				}
 
-				return out.ToProtocol().(*pbantelope.Block), nil
+				pbBlock := &pbantelope.Block{}
+				err = out.Payload.UnmarshalTo(pbBlock)
+				if err != nil {
+					return nil, err
+				}
+
+				return pbBlock, nil
 			}
 
 			buf := &bytes.Buffer{}
@@ -185,15 +152,12 @@ func TestGeneratePBBlocks(t *testing.T) {
 	for {
 		out, err := cr.ReadBlock()
 		if out != nil {
-			block := out.ToProtocol().(*pbantelope.Block)
 
-			bstreamBlock, err := types.BlockFromProto(block)
+			pbBlock := &pbantelope.Block{}
+			err = out.Payload.UnmarshalTo(pbBlock)
 			require.NoError(t, err)
 
-			pbBlock, err := bstreamBlock.ToProto()
-			require.NoError(t, err)
-
-			outputFile, err := os.Create(fmt.Sprintf("testdata/pbblocks/battlefield-block.%d.pb", block.Number))
+			outputFile, err := os.Create(fmt.Sprintf("testdata/pbblocks/battlefield-block.%d.pb", pbBlock.Number))
 			require.NoError(t, err)
 
 			pbBlockBytes, err := proto.Marshal(pbBlock)
@@ -223,7 +187,12 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 	// cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, zaptest.NewLogger(t))
 	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, nil)
 
-	go cr.ProcessData(fl)
+	go func() {
+		err := cr.ProcessData(fl)
+		if !errors.Is(err, io.EOF) {
+			require.NoError(t, err)
+		}
+	}()
 
 	return cr
 }
@@ -688,40 +657,11 @@ func mustTimeParse(input string) time.Time {
 	return value
 }
 
-func reader(in string) io.Reader {
-	return bytes.NewReader([]byte(in))
-}
-
 func protoJSONMarshalIndent(t *testing.T, message proto.Message) string {
 	value, err := MarshalIndentToString(message, "  ")
 	require.NoError(t, err)
 
 	return value
-}
-
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	if err != nil {
-		return false
-	}
-
-	return !info.IsDir()
-}
-
-func blockWithConsole(block *pbantelope.Block) bool {
-	for _, trxTrace := range block.TransactionTraces() {
-		for _, actTrace := range trxTrace.ActionTraces {
-			if len(actTrace.Console) > 0 {
-				return true
-			}
-		}
-	}
-
-	return false
 }
 
 func newParseCtx() *parseCtx {
