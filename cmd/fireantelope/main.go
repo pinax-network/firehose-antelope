@@ -6,26 +6,29 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	firecore "github.com/streamingfast/firehose-core"
+	fhCmd "github.com/streamingfast/firehose-core/cmd"
 	"github.com/streamingfast/logging"
-	"github.com/streamingfast/node-manager/mindreader"
-	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"go.uber.org/zap"
 )
 
-func init() {
-	firecore.UnsafePayloadKind = pbbstream.Protocol_EOS
+func main() {
+	fhCmd.Main(Chain())
 }
 
-func main() {
-	firecore.Main(&firecore.Chain[*pbantelope.Block]{
+var chain *firecore.Chain[*pbantelope.Block]
+
+func Chain() *firecore.Chain[*pbantelope.Block] {
+	if chain != nil {
+		return chain
+	}
+
+	chain = &firecore.Chain[*pbantelope.Block]{
 		ShortName:            "antelope",
 		LongName:             "Antelope",
 		ExecutableName:       "nodeos",
 		FullyQualifiedModule: "github.com/pinax-network/firehose-antelope",
 		Version:              version,
 
-		Protocol:             "EOS",
-		ProtocolVersion:      1,
 		FirstStreamableBlock: 2,
 
 		BlockFactory: func() firecore.Block { return new(pbantelope.Block) },
@@ -39,9 +42,7 @@ func main() {
 		//	transform.ReceiptFilterMessageName: transform.BasicReceiptFilterFactory,
 		//},
 
-		ConsoleReaderFactory: func(lines chan string, blockEncoder firecore.BlockEncoder, logger *zap.Logger, tracer logging.Tracer) (mindreader.ConsolerReader, error) {
-			return codec.NewConsoleReader(lines, blockEncoder, logger, tracer)
-		},
+		ConsoleReaderFactory: codec.NewConsoleReader,
 
 		RegisterExtraStartFlags: func(flags *pflag.FlagSet) {
 			flags.String("reader-node-config-file", "", "Node configuration file, the file is copied inside the {data-dir}/reader/data folder Use {hostname} label to use short hostname in path")
@@ -53,7 +54,6 @@ func main() {
 		// ReaderNodeBootstrapperFactory: newReaderNodeBootstrapper,
 
 		Tools: &firecore.ToolsConfig[*pbantelope.Block]{
-			BlockPrinter: printBlock,
 
 			RegisterExtraCmd: func(chain *firecore.Chain[*pbantelope.Block], toolsCmd *cobra.Command, zlog *zap.Logger, tracer logging.Tracer) error {
 				//toolsCmd.AddCommand(newToolsGenerateNodeKeyCmd(chain))
@@ -69,7 +69,9 @@ func main() {
 			//	},
 			//},
 		},
-	})
+	}
+
+	return chain
 }
 
 // Version value, injected via go build `ldflags` at build time

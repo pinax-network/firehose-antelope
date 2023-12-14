@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/types"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"reflect"
@@ -18,7 +19,6 @@ import (
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/jsonpb"
 	"github.com/streamingfast/logging"
-	pbbstream "github.com/streamingfast/pbgo/sf/bstream/v1"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
@@ -158,7 +158,7 @@ func Block(t testing.T, blkID string, components ...interface{}) *pbantelope.Blo
 }
 
 func ToBstreamBlock(t testing.T, block *pbantelope.Block) *bstream.Block {
-	blk, err := types.BlockFromProto(block)
+	blk, err := types.BlockFromProto(block, block.LIBNum())
 	require.NoError(t, err)
 
 	return blk

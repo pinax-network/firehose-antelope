@@ -38,44 +38,6 @@ import (
 	"time"
 )
 
-// todo delete legacy benchmark replaced with console_reader_bench_test.go
-//func TestConsoleReaderPerformances(t *testing.T) {
-//	dmlogBenchmarkFile := os.Getenv("PERF_DMLOG_BENCHMARK_FILE")
-//	if dmlogBenchmarkFile == "" || !fileExists(dmlogBenchmarkFile) {
-//		t.Skipf("Environment variable 'PERF_DMLOG_BENCHMARK_FILE' not set or value %q is not an existing file", dmlogBenchmarkFile)
-//		return
-//	}
-//
-//	go func() {
-//		if err := http.ListenAndServe("localhost:6060", nil); err != nil {
-//			zlogTest.Info("listening localhost:6060", zap.Error(err))
-//		}
-//	}()
-//
-//	fl, err := os.Open(dmlogBenchmarkFile)
-//	require.NoError(t, err)
-//
-//	r, err := NewConsoleReader(fl)
-//	require.NoError(t, err)
-//	defer r.Close()
-//
-//	count := 1999
-//
-//	t0 := time.Now()
-//
-//	for i := 0; i < count; i++ {
-//		blki, err := r.Read()
-//		require.NoError(t, err)
-//
-//		blk := blki.(*pbantelope.Block)
-//		fmt.Fprintln(os.Stderr, "Processing block", blk.Num())
-//	}
-//
-//	d1 := time.Since(t0)
-//	perSec := float64(count) / (float64(d1) / float64(time.Second))
-//	fmt.Printf("%d blocks in %s (%f blocks/sec)", count, d1, perSec)
-//}
-
 func TestParseFromFile(t *testing.T) {
 
 	tests := []struct {
@@ -185,8 +147,6 @@ func TestGeneratePBBlocks(t *testing.T) {
 	for {
 		out, err := cr.ReadBlock()
 		if out != nil {
-			block := out.ToProtocol().(*pbantelope.Block)
-
 			bstreamBlock, err := types.BlockFromProto(block)
 			require.NoError(t, err)
 
