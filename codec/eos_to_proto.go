@@ -25,22 +25,6 @@ import (
 	"sort"
 )
 
-func checksumsToBytesSlices(in []eos.Checksum256) [][]byte {
-	out := make([][]byte, len(in))
-	for i, s := range in {
-		out[i] = s
-	}
-	return out
-}
-
-func hexBytesToBytesSlices(in []eos.HexBytes) [][]byte {
-	out := make([][]byte, len(in))
-	for i, s := range in {
-		out[i] = s
-	}
-	return out
-}
-
 func bytesSlicesToHexBytes(in [][]byte) []eos.HexBytes {
 	out := make([]eos.HexBytes, len(in))
 	for i, s := range in {

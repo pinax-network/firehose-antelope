@@ -28,11 +28,7 @@ type Hash string
 type BlockTime string
 type BlockTimestamp time.Time
 
-var zlog *zap.Logger
-
-func init() {
-	logging.Register("github.com/dfuse-io/dfuse-eosio/codec/testing", &zlog)
-}
+var zlog, _ = logging.PackageLogger("fireantelope", "github.com/pinax-network/firehose-antelope/codec.tests/types")
 
 func (h Hash) Bytes(t testing.T) []byte {
 	bytes, err := hex.DecodeString(string(h))
@@ -464,10 +460,6 @@ func findTypedComponent(components []interface{}, typeInfo interface{}) interfac
 	return nil
 }
 
-func hasComponent(components []interface{}, doesMatch func(component interface{}) bool) bool {
-	return findComponent(components, doesMatch) != nil
-}
-
 func TrxOp(t testing.T, signedTrx *pbantelope.SignedTransaction) *pbantelope.TrxOp {
 	op := &pbantelope.TrxOp{
 		Transaction: signedTrx,
@@ -658,8 +650,4 @@ func failInvalidComponent(t testing.T, tag string, component interface{}, option
 	}
 
 	require.FailNowf(t, "invalid component", "Invalid %s component of type %T", tag, component)
-}
-
-func logInvalidComponent(tag string, component interface{}) {
-	zlog.Info(fmt.Sprintf("invalid %s component of type %T", tag, component))
 }

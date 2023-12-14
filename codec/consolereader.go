@@ -183,9 +183,8 @@ type parseCtx struct {
 	minorVersion uint64
 	hydrator     antelope.Hydrator
 
-	currentBlock         *pbantelope.Block
-	currentTrace         *pbantelope.TransactionTrace
-	currentTraceLogCount int
+	currentBlock *pbantelope.Block
+	currentTrace *pbantelope.TransactionTrace
 
 	abiDecoder     *ABIDecoder
 	activeBlockNum int64
@@ -771,7 +770,7 @@ func (ctx *parseCtx) readDBOp(line string) error {
 
 	opString := chunks[1]
 
-	op := pbantelope.DBOp_OPERATION_UNKNOWN
+	var op pbantelope.DBOp_Operation
 	var oldData, newData string
 	var oldPayer, newPayer string
 	switch opString {
@@ -1006,7 +1005,7 @@ func (ctx *parseCtx) readPermOp(line string) error {
 		dataChunk = chunks[4]
 	}
 
-	op := pbantelope.PermOp_OPERATION_UNKNOWN
+	var op pbantelope.PermOp_Operation
 	var oldData, newData []byte
 
 	switch opString {
@@ -1300,7 +1299,7 @@ func (ctx *parseCtx) readRlimitOp(line string) error {
 	kindString := chunks[1]
 	operationString := chunks[2]
 
-	operation := pbantelope.RlimitOp_OPERATION_UNKNOWN
+	var operation pbantelope.RlimitOp_Operation
 	switch operationString {
 	case "INS":
 		operation = pbantelope.RlimitOp_OPERATION_INSERT
@@ -1375,7 +1374,7 @@ func (ctx *parseCtx) readTableOp(line string) error {
 	}
 
 	opString := chunks[1]
-	op := pbantelope.TableOp_OPERATION_UNKNOWN
+	var op pbantelope.TableOp_Operation
 	switch opString {
 	case "INS":
 		op = pbantelope.TableOp_OPERATION_INSERT

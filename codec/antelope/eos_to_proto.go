@@ -431,21 +431,6 @@ func AuthorizationToDEOS(authorization []eos.PermissionLevel) (out []*pbantelope
 	return
 }
 
-func AccountRAMDeltasToDEOS(deltas []*eos.AccountRAMDelta) (out []*pbantelope.AccountRAMDelta) {
-	if len(deltas) <= 0 {
-		return nil
-	}
-
-	out = make([]*pbantelope.AccountRAMDelta, len(deltas))
-	for i, delta := range deltas {
-		out[i] = &pbantelope.AccountRAMDelta{
-			Account: string(delta.Account),
-			Delta:   int64(delta.Delta),
-		}
-	}
-	return
-}
-
 func ExceptionToDEOS(in *eos.Except) *pbantelope.Exception {
 	if in == nil {
 		return nil

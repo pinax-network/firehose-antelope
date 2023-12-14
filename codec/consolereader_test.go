@@ -187,7 +187,12 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 	// cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, zaptest.NewLogger(t))
 	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, nil)
 
-	go cr.ProcessData(fl)
+	go func() {
+		err := cr.ProcessData(fl)
+		if !errors.Is(err, io.EOF) {
+			require.NoError(t, err)
+		}
+	}()
 
 	return cr
 }
@@ -652,40 +657,11 @@ func mustTimeParse(input string) time.Time {
 	return value
 }
 
-func reader(in string) io.Reader {
-	return bytes.NewReader([]byte(in))
-}
-
 func protoJSONMarshalIndent(t *testing.T, message proto.Message) string {
 	value, err := MarshalIndentToString(message, "  ")
 	require.NoError(t, err)
 
 	return value
-}
-
-func fileExists(path string) bool {
-	info, err := os.Stat(path)
-	if os.IsNotExist(err) {
-		return false
-	}
-
-	if err != nil {
-		return false
-	}
-
-	return !info.IsDir()
-}
-
-func blockWithConsole(block *pbantelope.Block) bool {
-	for _, trxTrace := range block.TransactionTraces() {
-		for _, actTrace := range trxTrace.ActionTraces {
-			if len(actTrace.Console) > 0 {
-				return true
-			}
-		}
-	}
-
-	return false
 }
 
 func newParseCtx() *parseCtx {
