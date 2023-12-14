@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"github.com/andreyvit/diff"
 	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
-	"github.com/pinax-network/firehose-antelope/types"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	"github.com/stretchr/testify/assert"
@@ -69,7 +68,13 @@ func TestParseFromFile(t *testing.T) {
 					return nil, err
 				}
 
-				return out.ToProtocol().(*pbantelope.Block), nil
+				pbBlock := &pbantelope.Block{}
+				err = out.Payload.UnmarshalTo(pbBlock)
+				if err != nil {
+					return nil, err
+				}
+
+				return pbBlock, nil
 			}
 
 			buf := &bytes.Buffer{}
@@ -147,13 +152,12 @@ func TestGeneratePBBlocks(t *testing.T) {
 	for {
 		out, err := cr.ReadBlock()
 		if out != nil {
-			bstreamBlock, err := types.BlockFromProto(block)
+
+			pbBlock := &pbantelope.Block{}
+			err = out.Payload.UnmarshalTo(pbBlock)
 			require.NoError(t, err)
 
-			pbBlock, err := bstreamBlock.ToProto()
-			require.NoError(t, err)
-
-			outputFile, err := os.Create(fmt.Sprintf("testdata/pbblocks/battlefield-block.%d.pb", block.Number))
+			outputFile, err := os.Create(fmt.Sprintf("testdata/pbblocks/battlefield-block.%d.pb", pbBlock.Number))
 			require.NoError(t, err)
 
 			pbBlockBytes, err := proto.Marshal(pbBlock)
