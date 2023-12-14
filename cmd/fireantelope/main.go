@@ -76,6 +76,3 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 
 // Version value, injected via go build `ldflags` at build time
 var version = "dev"
-
-// Commit sha1 value, injected via go build `ldflags` at build time
-var commit = ""

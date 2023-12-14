@@ -3,7 +3,7 @@ package codec
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"os"
 	"path"
 	"testing"
 
@@ -265,7 +265,7 @@ func TestABICache_Truncate(t *testing.T) {
 
 func readABI(t *testing.T, abiFile string) (out *eos.ABI) {
 	path := path.Join("testdata", "abi", abiFile)
-	abiJSON, err := ioutil.ReadFile(path)
+	abiJSON, err := os.ReadFile(path)
 	require.NoError(t, err)
 
 	out = new(eos.ABI)
