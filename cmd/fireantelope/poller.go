@@ -63,13 +63,19 @@ func pollerRunE(logger *zap.Logger, tracer logging.Tracer) firecore.CommandExecu
 		handler := blockpoller.NewFireBlockHandler("type.googleapis.com/sf.ethereum.type.v2.Block")
 		poller := blockpoller.New(fetcher, handler, blockpoller.WithStoringState(stateDir), blockpoller.WithLogger(logger))
 
-		// there is currently no support for rpc.FinalizedBlock on eos evm, so we use the latest one
+		// there is currently no support for rpc.FinalizedBlock on eos evm, so query the latest one and then pass
+		// latest - 200 as the latest finalized block
 		latestBlock, err := rpcClient.GetBlockByNumber(ctx, rpc.LatestBlock)
 		if err != nil {
 			return fmt.Errorf("getting latest block: %w", err)
 		}
 
-		err = poller.Run(ctx, firstStreamableBlock, bstream.NewBlockRef(latestBlock.Hash.String(), uint64(latestBlock.Number)))
+		latestFinalizedBlock, err := rpcClient.GetBlockByNumber(ctx, rpc.BlockNumber(uint64(latestBlock.Number-200)))
+		if err != nil {
+			return fmt.Errorf("getting latest finalized block: %w", err)
+		}
+
+		err = poller.Run(ctx, firstStreamableBlock, bstream.NewBlockRef(latestFinalizedBlock.Hash.String(), uint64(latestFinalizedBlock.Number)))
 		if err != nil {
 			return fmt.Errorf("running poller: %w", err)
 		}
