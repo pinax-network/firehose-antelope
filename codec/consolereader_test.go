@@ -42,12 +42,13 @@ func TestParseFromFile(t *testing.T) {
 	tests := []struct {
 		name         string
 		deepMindFile string
-		includeBlock func(block *pbantelope.Block) bool
+		strictMode   bool
+		// includeBlock func(block *pbantelope.Block) bool
 		// readerOptions []ConsoleReaderOption
 	}{
-		// {"full", "testdata/deep-mind.dmlog", nil /*nil*/},
-		// {"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", nil /*nil*/},
-		{"dmlog", "testdata/dm.log", nil /*nil*/},
+		// {"full", "testdata/deep-mind.dmlog", /*nil nil*/},
+		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", false /*nil, nil*/},
+		{"dmlog", "testdata/dm.log", true /*nil, nil*/},
 		// {"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole /*[]ConsoleReaderOption{LimitConsoleLength(10)}*/},
 	}
 
@@ -60,7 +61,7 @@ func TestParseFromFile(t *testing.T) {
 			//	}
 			//}()
 
-			cr := testFileConsoleReader(t, test.deepMindFile)
+			cr := testFileConsoleReader(t, test.deepMindFile, test.strictMode)
 
 			var reader ObjectReader = func() (interface{}, error) {
 				out, err := cr.ReadBlock()
@@ -147,7 +148,7 @@ func unifiedDiff(t *testing.T, cnt1, cnt2 []byte) string {
 func TestGeneratePBBlocks(t *testing.T) {
 	t.Skip("generate only when deep-mind-3.1.x.dmlog changes")
 
-	cr := testFileConsoleReader(t, "testdata/deep-mind-3.1.x.dmlog")
+	cr := testFileConsoleReader(t, "testdata/deep-mind-3.1.x.dmlog", false)
 
 	for {
 		out, err := cr.ReadBlock()
@@ -177,15 +178,20 @@ func TestGeneratePBBlocks(t *testing.T) {
 	}
 }
 
-func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
+func testFileConsoleReader(t *testing.T, filename string, strictMode bool) *ConsoleReader {
 	t.Helper()
 
 	fl, err := os.Open(filename)
 	require.NoError(t, err)
 
+	abiDecoder := newABIDecoder()
+	if strictMode {
+		abiDecoder = newABIDecoderInStrictMode()
+	}
+
 	// todo use this if you want A LOT of logging
 	// cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, zaptest.NewLogger(t))
-	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, nil)
+	cr := testReaderConsoleReader(t.Helper, make(chan string, 10000), func() { fl.Close() }, nil, abiDecoder)
 
 	go func() {
 		err := cr.ProcessData(fl)
@@ -197,7 +203,7 @@ func testFileConsoleReader(t *testing.T, filename string) *ConsoleReader {
 	return cr
 }
 
-func testReaderConsoleReader(helperFunc func(), lines chan string, closer func(), logger *zap.Logger) *ConsoleReader {
+func testReaderConsoleReader(helperFunc func(), lines chan string, closer func(), logger *zap.Logger, abiDecoder *ABIDecoder) *ConsoleReader {
 
 	l := &ConsoleReader{
 		lines:        lines,
@@ -208,7 +214,7 @@ func testReaderConsoleReader(helperFunc func(), lines chan string, closer func()
 			globalStats:  newConsoleReaderStats(),
 			currentBlock: &pbantelope.Block{},
 			currentTrace: &pbantelope.TransactionTrace{},
-			abiDecoder:   newABIDecoderInStrictMode(),
+			abiDecoder:   abiDecoder,
 		},
 		logger: zlogTest,
 	}

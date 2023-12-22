@@ -44,7 +44,7 @@ func BenchmarkConsoleReader(b *testing.B) {
 			channel <- string(line)
 		}
 
-		readers[n] = testReaderConsoleReader(b.Helper, channel, func() {}, zaptest.NewLogger(b, zaptest.Level(zap.InfoLevel)))
+		readers[n] = testReaderConsoleReader(b.Helper, channel, func() {}, zaptest.NewLogger(b, zaptest.Level(zap.InfoLevel)), newABIDecoder())
 
 		// We close it right now, it will still be fully consumed
 		close(channel)
