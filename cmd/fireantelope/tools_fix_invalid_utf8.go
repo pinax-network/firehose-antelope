@@ -85,7 +85,10 @@ func createCheckBlocksE(logger *zap.Logger) firecore.CommandExecutor {
 				i++
 			}
 
-			if i != 100 {
+			// We expect 100 blocks per merged block, unless it's the first merged block, then we only expect 98 as
+			// Antelope chains start at block 2.
+			if i != 100 && !(startBlock == 0 && i == 98) {
+				logger.Error("start_block", zap.Any("startBlock", startBlock))
 				return fmt.Errorf("expected to have read 100 blocks, we have read %d. Bailing out.", i)
 			}
 
