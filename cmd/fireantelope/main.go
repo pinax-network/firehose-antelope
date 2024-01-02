@@ -60,6 +60,7 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 				//toolsCmd.AddCommand(newToolsBackfillCmd(zlog))
 				parent.AddCommand(newPollerCmd(zlog, tracer))
 				parent.AddCommand(newSilkwormPollerCmd(zlog, tracer))
+				parent.AddCommand(newCheckBlocksCmd(zlog))
 
 				return nil
 			},
