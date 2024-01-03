@@ -65,6 +65,8 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 				return nil
 			},
 
+			SanitizeBlockForCompare: sanitizeBlockForCompare,
+
 			//TransformFlags: map[string]*firecore.TransformFlag{
 			//	"receipt-account-filters": {
 			//		Description: "Comma-separated accounts to use as filter/index. If it contains a colon (:), it will be interpreted as <prefix>:<suffix> (each of which can be empty, ex: 'hello:' or ':world')",
