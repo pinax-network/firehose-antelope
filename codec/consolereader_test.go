@@ -18,6 +18,15 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"io"
+	_ "net/http/pprof"
+	"os"
+	"os/exec"
+	"reflect"
+	"strings"
+	"testing"
+	"time"
+
 	"github.com/andreyvit/diff"
 	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
@@ -27,16 +36,10 @@ import (
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"io"
-	_ "net/http/pprof"
-	"os"
-	"os/exec"
-	"reflect"
-	"strings"
-	"testing"
-	"time"
 )
 
+// to generate and validate deep-mind log file for this, test use https://github.com/pinax-network/leap-dmlog-gen
+// to generate golden file for a new dmlog file, add a test to tests slice and run this test as `GOLDEN_UPDATE=true go test ./codec -v -run TestParseFromFile`
 func TestParseFromFile(t *testing.T) {
 
 	tests := []struct {
@@ -48,6 +51,7 @@ func TestParseFromFile(t *testing.T) {
 	}{
 		// {"full", "testdata/deep-mind.dmlog", /*nil nil*/},
 		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", false /*nil, nil*/},
+		{"full-5.0.x", "testdata/deep-mind-5.0.x.dmlog", false /*nil, nil*/},
 		{"dmlog", "testdata/dm.log", true /*nil, nil*/},
 		// {"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole /*[]ConsoleReaderOption{LimitConsoleLength(10)}*/},
 	}
@@ -116,7 +120,12 @@ func TestParseFromFile(t *testing.T) {
 
 			goldenFile := test.deepMindFile + ".golden.json"
 			if os.Getenv("GOLDEN_UPDATE") == "true" {
-				err := os.WriteFile(goldenFile, buf.Bytes(), os.ModePerm)
+				_, err := os.Stat(goldenFile)
+				if err == nil {
+					t.Logf("Golden file already exists, skipping: %s", goldenFile)
+					return
+				}
+				err = os.WriteFile(goldenFile, buf.Bytes(), os.ModePerm)
 				require.NoError(t, err)
 			}
 
