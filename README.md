@@ -1,6 +1,14 @@
 # Firehose on Antelope
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
+This is the Antelope chain-specific implementation part of firehose-core and enables both Firehose and Substreams on
+Antelope chains with native blocks. 
+
+## For Developers
+
+
+
+
 This is Streamingfast's [Firehose](https://firehose.streamingfast.io) implementation adapted for Antelope chains, 
 effectively enabling [Substreams](https://substreams.streamingfast.io) on all Antelope chains. 
 
