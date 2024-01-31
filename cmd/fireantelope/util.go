@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var fixedTimestamp = timestamppb.New(time.Date(2006, 01, 02, 15, 04, 05, 0, time.UTC))
+
 func mustParseUint64(in string) uint64 {
 	out, err := strconv.ParseUint(in, 10, 64)
 	if err != nil {
@@ -18,8 +20,6 @@ func mustParseUint64(in string) uint64 {
 }
 
 func sanitizeBlockForCompare(block *pbantelope.Block) *pbantelope.Block {
-
-	fixedTimestamp := timestamppb.New(time.Now())
 
 	var sanitizeContext func(logContext *pbantelope.Exception_LogContext)
 	sanitizeContext = func(logContext *pbantelope.Exception_LogContext) {
