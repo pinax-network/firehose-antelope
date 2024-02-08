@@ -78,8 +78,10 @@ func sanitizeBlockForCompare(block *pbantelope.Block) *pbantelope.Block {
 		}
 
 		if trxTrace.FailedDtrxTrace != nil {
+			trxTrace.FailedDtrxTrace.Elapsed = 101010
 			sanitizeException(trxTrace.FailedDtrxTrace.Exception)
 			for _, actTrace := range trxTrace.FailedDtrxTrace.ActionTraces {
+				actTrace.Elapsed = 111111
 				sanitizeException(actTrace.Exception)
 			}
 		}
