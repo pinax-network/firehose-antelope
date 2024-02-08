@@ -56,6 +56,7 @@ func sanitizeBlockForCompare(block *pbantelope.Block) *pbantelope.Block {
 
 	for _, trxTrace := range block.UnfilteredTransactionTraces {
 		trxTrace.Elapsed = 888
+		sanitizeException(trxTrace.Exception)
 
 		for _, permOp := range trxTrace.PermOps {
 			if permOp.OldPerm != nil {
