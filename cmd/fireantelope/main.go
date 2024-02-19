@@ -33,15 +33,6 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 
 		BlockFactory: func() firecore.Block { return new(pbantelope.Block) },
 
-		//BlockIndexerFactories: map[string]firecore.BlockIndexerFactory[*pbantelope.Block]{
-		//	transform.ReceiptAddressIndexShortName: transform.NewNearBlockIndexer,
-		//},
-		//
-		//BlockTransformerFactories: map[protoreflect.FullName]firecore.BlockTransformerFactory{
-		//	transform.HeaderOnlyMessageName:    transform.NewHeaderOnlyTransformFactory,
-		//	transform.ReceiptFilterMessageName: transform.BasicReceiptFilterFactory,
-		//},
-
 		ConsoleReaderFactory: codec.NewConsoleReader,
 
 		RegisterExtraStartFlags: func(flags *pflag.FlagSet) {
@@ -51,28 +42,15 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 			flags.Bool("reader-node-overwrite-node-files", false, "Force download of node-key and config files even if they already exist on the machine.")
 		},
 
-		// ReaderNodeBootstrapperFactory: newReaderNodeBootstrapper,
-
 		Tools: &firecore.ToolsConfig[*pbantelope.Block]{
 
 			RegisterExtraCmd: func(chain *firecore.Chain[*pbantelope.Block], parent *cobra.Command, zlog *zap.Logger, tracer logging.Tracer) error {
-				//toolsCmd.AddCommand(newToolsGenerateNodeKeyCmd(chain))
-				//toolsCmd.AddCommand(newToolsBackfillCmd(zlog))
-				parent.AddCommand(newPollerCmd(zlog, tracer))
-				parent.AddCommand(newSilkwormPollerCmd(zlog, tracer))
 				parent.AddCommand(newCheckBlocksCmd(zlog))
 
 				return nil
 			},
 
 			SanitizeBlockForCompare: sanitizeBlockForCompare,
-
-			//TransformFlags: map[string]*firecore.TransformFlag{
-			//	"receipt-account-filters": {
-			//		Description: "Comma-separated accounts to use as filter/index. If it contains a colon (:), it will be interpreted as <prefix>:<suffix> (each of which can be empty, ex: 'hello:' or ':world')",
-			//		Parser:      parseReceiptAccountFilters,
-			//	},
-			//},
 		},
 	}
 
