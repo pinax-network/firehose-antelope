@@ -32,7 +32,7 @@ on [Awesome Substreams](https://github.com/pinax-network/awesome-substreams).
 
 Please have a look at the documentation [here](https://firehose.streamingfast.io) on how to set up your own Firehose &
 Substreams stack. Note that indexing larger Antelope chains such as EOS or WAX requires parallel processing of the chain
-and a lot of resources to be done in a reasonable time frame.
+and a lot of resources to have the indexing done in a reasonable time frame.
 
 ### EOS EVM
 
