@@ -22,9 +22,6 @@ import (
 	"time"
 )
 
-// TODO: We should probably memoize all fields that requires computation
-//       like Time() and likes.
-
 func (b *Block) ID() string {
 	return b.Id
 }
