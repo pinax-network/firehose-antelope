@@ -1,8 +1,8 @@
 module github.com/pinax-network/firehose-antelope
 
-go 1.21
+go 1.22
 
-toolchain go1.21.5
+toolchain go1.22.0
 
 require (
 	github.com/abourget/llerrgroup v0.2.0
@@ -12,12 +12,12 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
-	github.com/streamingfast/bstream v0.0.2-0.20240127132523-330edbf00208
+	github.com/streamingfast/bstream v0.0.2-0.20240207154557-a98153ba4b86
 	github.com/streamingfast/cli v0.0.4-0.20230825151644-8cc84512cd80
 	github.com/streamingfast/dmetrics v0.0.0-20230919161904-206fa8ebd545
-	github.com/streamingfast/dstore v0.1.1-0.20230620124109-3924b3b36c77
+	github.com/streamingfast/dstore v0.1.1-0.20240215171730-493ad5a0f537
 	github.com/streamingfast/eth-go v0.0.0-20231204174036-34e2cb6d64af
-	github.com/streamingfast/firehose-core v1.1.1
+	github.com/streamingfast/firehose-core v1.2.1
 	github.com/streamingfast/firehose-ethereum v1.4.23-0.20231213134745-920366d3b7aa
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
@@ -164,18 +164,19 @@ require (
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.15.0 // indirect
-	github.com/streamingfast/dauth v0.0.0-20231120142446-843f4e045cc2 // indirect
+	github.com/streamingfast/dauth v0.0.0-20240209195422-0d69eebd5587 // indirect
 	github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c // indirect
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20240119162453-69517bcc1a7f // indirect
-	github.com/streamingfast/dmetering v0.0.0-20231120142327-a3405f0eed83 // indirect
+	github.com/streamingfast/dhammer v0.0.0-20230125192823-c34bbd561bd4 // indirect
+	github.com/streamingfast/dmetering v0.0.0-20240215171500-4f0413a948bb // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
-	github.com/streamingfast/pbgo v0.0.6-0.20240126214028-e57a3692caee // indirect
+	github.com/streamingfast/pbgo v0.0.6-0.20240131193313-6b88bc7139db // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20230616174903-cd2ade641ca9 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.3.2 // indirect
+	github.com/streamingfast/substreams v1.3.6-0.20240215214651-fd61ad443d0e // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
 	github.com/tetratelabs/wazero v1.1.0 // indirect
