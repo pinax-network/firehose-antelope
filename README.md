@@ -28,6 +28,12 @@ Substreams which can be found [here](https://github.com/pinax-network/substreams
 A collection of resources around Substreams can also be found
 on [Awesome Substreams](https://github.com/pinax-network/awesome-substreams).
 
+### Subgraphs
+
+Although The Graph does not officially support any Antelope chains yet, it's possible to write Subgraphs based on
+Substreams and set up your own Graph node. You can find an
+example [here](https://github.com/pinax-network/eosio.token-subgraph) on how to achieve this.
+
 ## For Operators
 
 Please have a look at the documentation [here](https://firehose.streamingfast.io) on how to set up your own Firehose &
@@ -40,6 +46,12 @@ This implementation provides native Antelope blocks, including all Antelope spec
 for operating Firehose & Substreams for EOS EVM, please have a look at
 the [firehose-ethereum](https://github.com/streamingfast/firehose-ethereum) repository; it provides a generic evm poller
 to poll the EVM blocks from an RPC node.
+
+## Support
+
+In case of any questions around the Pinax endpoints or technology, feel free to hit us on
+our [Discord server](https://discord.gg/pinax). For more generic questions around Substreams you might also find the
+[Streamingfast Discord server](https://discord.gg/jZwqxJAvRs) useful.
 
 ## License
 
