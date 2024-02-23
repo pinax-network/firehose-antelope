@@ -50,7 +50,7 @@ to poll the EVM blocks from an RPC node.
 ## Support
 
 In case of any questions around the Pinax endpoints or technology, feel free to hit us on
-our [Discord server](https://discord.gg/pinax). For more generic questions around Substreams you might also find the
+our [Discord server](https://discord.gg/pinax). For more generic questions around Substreams, you might also find the
 [Streamingfast Discord server](https://discord.gg/jZwqxJAvRs) useful.
 
 ## License
