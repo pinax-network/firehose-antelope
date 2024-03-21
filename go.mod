@@ -234,3 +234,5 @@ replace (
 	github.com/graph-gophers/graphql-go => github.com/streamingfast/graphql-go v0.0.0-20210204202750-0e485a040a3c
 	github.com/jhump/protoreflect => github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d
 )
+
+replace github.com/streamingfast/firehose-core => github.com/pinax-network/firehose-core v0.0.0-20240321153512-34f272e45bbe
