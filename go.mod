@@ -13,8 +13,8 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/streamingfast/bstream v0.0.2-0.20240207154557-a98153ba4b86
 	github.com/streamingfast/dmetrics v0.0.0-20230919161904-206fa8ebd545
-	github.com/streamingfast/dstore v0.1.1-0.20240311181234-470a7a84936f
-	github.com/streamingfast/firehose-core v1.2.5
+	github.com/streamingfast/dstore v0.1.1-0.20240325191553-bcce8892a9bb
+	github.com/streamingfast/firehose-core v1.3.1
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/stretchr/testify v1.8.4
@@ -47,14 +47,14 @@ require (
 	github.com/KimMachineGun/automemlimit v0.2.4 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/RoaringBitmap/roaring v0.9.4 // indirect
+	github.com/RoaringBitmap/roaring v1.9.1 // indirect
 	github.com/ShinyTrinkets/meta-logger v0.2.0 // indirect
 	github.com/ShinyTrinkets/overseer v0.3.0 // indirect
 	github.com/abourget/llerrgroup v0.2.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.325 // indirect
 	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bits-and-blooms/bitset v1.3.1 // indirect
+	github.com/bits-and-blooms/bitset v1.12.0 // indirect
 	github.com/blendle/zapdriver v1.3.2-0.20200203083823-9200777f8a3d // indirect
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bobg/go-generics/v2 v2.1.1 // indirect
@@ -165,14 +165,14 @@ require (
 	github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c // indirect
 	github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20240222213940-b9f324ff4d5c // indirect
-	github.com/streamingfast/dmetering v0.0.0-20240227170539-29b479694f8f // indirect
+	github.com/streamingfast/dmetering v0.0.0-20240327163525-9249aa9bcceb // indirect
 	github.com/streamingfast/dtracing v0.0.0-20220305214756-b5c0e8699839 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/pbgo v0.0.6-0.20240131193313-6b88bc7139db // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20240209202324-9daa52c71a52 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.3.8-0.20240312140732-28fb8a59422a // indirect
+	github.com/streamingfast/substreams v1.5.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf // indirect
 	github.com/tetratelabs/wazero v1.1.0 // indirect
