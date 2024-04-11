@@ -28,6 +28,7 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 		ExecutableName:       "nodeos",
 		FullyQualifiedModule: "github.com/pinax-network/firehose-antelope",
 		Version:              version,
+		DefaultBlockType:     "sf.antelope.type.v1.Block",
 
 		FirstStreamableBlock: 2,
 
