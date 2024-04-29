@@ -14,7 +14,7 @@ require (
 	github.com/streamingfast/bstream v0.0.2-0.20240409115502-d29a2fb46f37
 	github.com/streamingfast/dmetrics v0.0.0-20230919161904-206fa8ebd545
 	github.com/streamingfast/dstore v0.1.1-0.20240325191553-bcce8892a9bb
-	github.com/streamingfast/firehose-core v1.3.6
+	github.com/streamingfast/firehose-core v1.3.7
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/stretchr/testify v1.8.4
