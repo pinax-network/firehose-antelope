@@ -613,7 +613,7 @@ func Test_readDeepMindVersion(t *testing.T) {
 			"version 14, unsupported",
 			`DEEP_MIND_VERSION leap 14 0`,
 			"leap", 14, 0,
-			errors.New("deep mind reported version 14, but this reader supports only 13"),
+			errors.New("deep mind reported version 14, but this reader supports only 1, 13"),
 		},
 	}
 
