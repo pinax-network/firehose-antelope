@@ -93,6 +93,16 @@ func (h *Hydrator) DecodeTransactionTrace(input []byte, opts ...antelope.Convers
 	return TransactionTraceToDEOS(h.logger, trxTrace, opts...), nil
 }
 
+func (h *Hydrator) DecodeFinalityData(input []byte) (*pbantelope.FinalityData, error) {
+
+	finalityData := &FinalityData{}
+	if err := unmarshalBinary(input, finalityData); err != nil {
+		return nil, fmt.Errorf("unmarshalling binary finality data: %w", err)
+	}
+
+	return FinalityDataToDEOS(finalityData), nil
+}
+
 func unmarshalBinary(data []byte, v interface{}) error {
 	decoder := eos.NewDecoder(data)
 	decoder.DecodeActions(false)

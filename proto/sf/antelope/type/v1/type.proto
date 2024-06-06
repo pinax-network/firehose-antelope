@@ -40,6 +40,10 @@ message Block {
   PendingProducerSchedule pending_schedule = 16;
   ActivatedProtocolFeatures activated_protocol_features = 17;
 
+  // from Spring v1 this field will contain the lib block number in favour of the dpos_proposed_irreversible_blocknum
+  uint32 finality_lib = 60;
+  FinalityData finality_data = 61;
+
   // EOS 2.1.x feature, did not make it into leap
   // bool validated = 18;
   reserved 18;
@@ -205,6 +209,28 @@ message Block {
   // The CEL filter expression used to include system actions, required by some systems, works
   // in combination with the two other filters above.
   string filtering_system_actions_include_filter_expr = 50;
+}
+
+message FinalityData {
+  uint32 major_version = 1;
+  uint32 minor_version = 2;
+  uint32 active_finalizer_policy_generation = 3;
+  uint32 final_on_strong_qc_block_num = 4;
+  bytes action_mroot = 5;
+  bytes base_digest = 6;
+  FinalizerPolicy proposed_finalizer_policy = 7;
+}
+
+message FinalizerPolicy {
+  uint32 generation = 1;
+  uint64 threshold = 2;
+  repeated FinalizerAuthority finalizers = 3;
+}
+
+message FinalizerAuthority {
+  string description = 1;
+  uint64 weight = 2;
+  string public_key = 3;
 }
 
 // BlockWithRefs is a lightweight block, with traces and transactions

@@ -40,8 +40,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var supportedVersions = []uint64{13}
-var supportedVersionStrings = []string{"13"}
+var supportedVersions = []uint64{1, 13}
+var supportedVersionStrings = []string{"1", "13"}
 
 // ConsoleReader is what reads the `nodeos` output directly. It builds
 // up some LogEntry objects. See `LogReader to read those entries.
@@ -668,6 +668,71 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 	}
 
 	block := ctx.currentBlock
+
+	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
+	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
+	if err != nil {
+		return nil, fmt.Errorf("abi decoding post-process failed: %w", err)
+	}
+
+	ctx.globalStats.lastBlock = ctx.currentBlock.AsRef()
+	ctx.globalStats.blockRate.Inc()
+	ctx.globalStats.blockAverageParseTime.AddElapsedTime(ctx.stats.startAt)
+	ctx.globalStats.transactionRate.IncBy(int64(len(ctx.currentBlock.TransactionTraces())))
+	ctx.stats.log()
+
+	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
+	ctx.resetBlock()
+
+	return block, nil
+}
+
+// Line format:
+//
+//	ACCEPTED_BLOCK_V2 ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
+func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
+	chunks := strings.SplitN(line, " ", 5)
+	if len(chunks) != 3 {
+		return nil, fmt.Errorf("expected 5 fields, got %d", len(chunks))
+	}
+
+	blockNum, err := strconv.ParseInt(chunks[1], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("block_num not a valid number, got: %q", chunks[1])
+	}
+
+	if ctx.activeBlockNum != blockNum {
+		return nil, fmt.Errorf("block_num %d doesn't match the active block num (%d)", blockNum, ctx.activeBlockNum)
+	}
+
+	ctx.stats = newParsingStats(ctx.logger, uint64(blockNum))
+
+	blockStateHex, err := hex.DecodeString(chunks[3])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
+	}
+
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex); err != nil {
+		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
+	}
+	block := ctx.currentBlock
+
+	lib, err := strconv.ParseInt(chunks[2], 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("lib not a valid number, got: %q", chunks[2])
+	}
+	block.FinalityLib = uint32(lib)
+
+	finalityDataHex, err := hex.DecodeString(chunks[4])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finality data hex: %w", err)
+	}
+
+	finalityData, err := ctx.hydrator.DecodeFinalityData(finalityDataHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finality data: %w", err)
+	}
+	block.FinalityData = finalityData
 
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)

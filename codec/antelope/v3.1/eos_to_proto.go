@@ -222,3 +222,35 @@ func SignaturesToDEOS(in []ecc.Signature) (out []string) {
 	}
 	return
 }
+
+func FinalityDataToDEOS(in *FinalityData) *pbantelope.FinalityData {
+
+	res := &pbantelope.FinalityData{
+		MajorVersion:                    in.MajorVersion,
+		MinorVersion:                    in.MinorVersion,
+		ActiveFinalizerPolicyGeneration: in.ActiveFinalizerPolicyGeneration,
+		FinalOnStrongQcBlockNum:         in.FinalOnStrongQCBlockNum,
+		ActionMroot:                     in.ActionMroot,
+		BaseDigest:                      in.BaseDigest,
+	}
+
+	if in.ProposedFinalizerPolicy != nil {
+		finalizerPolicy := &pbantelope.FinalizerPolicy{
+			Generation: in.ProposedFinalizerPolicy.Generation,
+			Threshold:  in.ProposedFinalizerPolicy.Threshold,
+			Finalizers: nil,
+		}
+
+		finalizers := make([]*pbantelope.FinalizerAuthority, 0, len(finalizerPolicy.Finalizers))
+		for _, finalizer := range finalizerPolicy.Finalizers {
+			finalizers = append(finalizers, &pbantelope.FinalizerAuthority{
+				Description: finalizer.Description,
+				Weight:      finalizer.Weight,
+				PublicKey:   finalizer.PublicKey,
+			})
+		}
+		finalizerPolicy.Finalizers = finalizers
+	}
+
+	return res
+}

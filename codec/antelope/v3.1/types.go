@@ -49,6 +49,33 @@ type SignedBlock struct {
 	BlockExtensions []*eos.Extension      `json:"block_extensions"`
 }
 
+// FinalityData
+//
+// File hierarchy:
+//
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_state.hpp#L61
+type FinalityData struct {
+	MajorVersion                    uint32           `json:"major_version"`
+	MinorVersion                    uint32           `json:"minor_version"`
+	ActiveFinalizerPolicyGeneration uint32           `json:"active_finalizer_policy_generation"`
+	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
+	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
+	BaseDigest                      eos.Checksum256  `json:"base_digest"`
+	ProposedFinalizerPolicy         *FinalizerPolicy `json:"proposed_finalizer_policy" eos:"optional"`
+}
+
+type FinalizerPolicy struct {
+	Generation uint32                `json:"generation"`
+	Threshold  uint64                `json:"threshold"`
+	Finalizers []*FinalizerAuthority `json:"finalizers"`
+}
+
+type FinalizerAuthority struct {
+	Description string `json:"description"`
+	Weight      uint64 `json:"weight"`
+	PublicKey   string `json:"public_key"`
+}
+
 // TransactionTrace
 //
 // File hierarchy:
