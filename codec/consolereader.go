@@ -357,6 +357,15 @@ func (c *ConsoleReader) next() (block *pbantelope.Block, err error) {
 			ctx.stats.inc("DTRX_OP FAILED")
 			err = ctx.readFailedDTrxOp(line)
 
+		case strings.HasPrefix(line, "ACCEPTED_BLOCK_V2"):
+			ctx.stats.inc("ACCEPTED_BLOCK_V2")
+			block, err := ctx.readAcceptedBlockV2(line)
+			if err != nil {
+				return nil, c.formatError(line, err)
+			}
+
+			return block, nil
+
 		case strings.HasPrefix(line, "ACCEPTED_BLOCK"):
 			ctx.stats.inc("ACCEPTED_BLOCK")
 			block, err := ctx.readAcceptedBlock(line)
