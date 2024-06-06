@@ -701,7 +701,7 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 //	ACCEPTED_BLOCK_V2 ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
 func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
 	chunks := strings.SplitN(line, " ", 5)
-	if len(chunks) != 3 {
+	if len(chunks) != 5 {
 		return nil, fmt.Errorf("expected 5 fields, got %d", len(chunks))
 	}
 
