@@ -26,11 +26,11 @@ type LegacyBlockState struct {
 	// From 'struct block_header_state_legacy'
 	BlockID                   eos.Checksum256                   `json:"id"`
 	Header                    *eos.SignedBlockHeader            `json:"header,omitempty"`
-	ActivatedProtocolFeatures *eos.ProtocolFeatureActivationSet `json:"activated_protocol_features,omitempty" eos:"optional"`
 	PendingSchedule           *eos.PendingSchedule              `json:"pending_schedule"`
+	ActivatedProtocolFeatures *eos.ProtocolFeatureActivationSet `json:"activated_protocol_features,omitempty"`
 	AdditionalSignatures      []ecc.Signature                   `json:"additional_signatures"`
 
-	SignedBlock        *SignedBlock    `json:"block,omitempty" eos:"optional"`
+	SignedBlock        *SignedBlock    `json:"block,omitempty"`
 	Validated          bool            `json:"validated"`
 	ActionMrootSavanna eos.Checksum256 `json:"action_mroot_savanna,omitempty" eos:"optional"`
 }
@@ -51,8 +51,8 @@ type FinalityData struct {
 	MinorVersion                    uint32           `json:"minor_version"`
 	ActiveFinalizerPolicyGeneration uint32           `json:"active_finalizer_policy_generation"`
 	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
-	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
-	BaseDigest                      eos.Checksum256  `json:"base_digest"`
+	ActionMroot                     eos.Checksum160  `json:"action_mroot"`
+	BaseDigest                      eos.Checksum160  `json:"base_digest"`
 	ProposedFinalizerPolicy         *FinalizerPolicy `json:"proposed_finalizer_policy" eos:"optional"`
 }
 

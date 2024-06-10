@@ -35,7 +35,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		block.Number = blockState.BlockNum
 		// Version 1: Added the total counts (ExecutedInputActionCount, ExecutedTotalActionCount,
 		// TransactionCount, TransactionTraceCount)
-		block.Version = 1
+		block.Version = 2
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
 		block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
