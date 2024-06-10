@@ -39,14 +39,16 @@ message Block {
   repeated uint32 confirm_count = 15;
   PendingProducerSchedule pending_schedule = 16;
   ActivatedProtocolFeatures activated_protocol_features = 17;
+  bool validated = 18;
+
+  // to be used during Legacy to Savanna transition where action_mroot
+  // needs to be converted from Legacy merkle to Savanna merkle
+  bytes action_mroot_savanna = 60;
 
   // from Spring v1 this field will contain the lib block number in favour of the dpos_proposed_irreversible_blocknum
-  uint32 finality_lib = 60;
-  FinalityData finality_data = 61;
+  uint32 finality_lib = 61;
+  FinalityData finality_data = 62;
 
-  // EOS 2.1.x feature, did not make it into leap
-  // bool validated = 18;
-  reserved 18;
 
   repeated RlimitOp rlimit_ops = 19;
 

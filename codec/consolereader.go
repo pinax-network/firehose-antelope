@@ -32,7 +32,8 @@ import (
 	"time"
 
 	"github.com/eoscanada/eos-go"
-	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
+	leap_v5 "github.com/pinax-network/firehose-antelope/codec/antelope/leap_v5"
+	spring_v1 "github.com/pinax-network/firehose-antelope/codec/antelope/spring_v1"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dmetrics"
@@ -1248,7 +1249,11 @@ func (ctx *parseCtx) readDeepmindVersion(line string) (software string, majorVer
 	zlog.Info("read deep mind version", zap.Uint64("major_version", majorVersion))
 
 	// differentiate future hydrators here if necessary
-	hydrator = antelope_v3_1.NewHydrator(zlog)
+	if strings.ToLower(software) == "spring" {
+		hydrator = spring_v1.NewHydrator(zlog)
+	} else {
+		hydrator = leap_v5.NewHydrator(zlog)
+	}
 
 	return
 }

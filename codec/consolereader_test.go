@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/andreyvit/diff"
-	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
+	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/leap_v5"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	"github.com/stretchr/testify/assert"

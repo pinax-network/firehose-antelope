@@ -1,2 +1,2 @@
-generate.sh - Thu Jun  6 13:43:55 CEST 2024 - work
-streamingfast/firehose-antelope/proto revision: fc5f9bd
+generate.sh - Mon Jun 10 15:55:20 CEST 2024 - work
+streamingfast/firehose-antelope/proto revision: 7513564
