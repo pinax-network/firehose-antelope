@@ -51,8 +51,8 @@ type FinalityData struct {
 	MinorVersion                    uint32           `json:"minor_version"`
 	ActiveFinalizerPolicyGeneration uint32           `json:"active_finalizer_policy_generation"`
 	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
-	ActionMroot                     eos.Checksum160  `json:"action_mroot"`
-	BaseDigest                      eos.Checksum160  `json:"base_digest"`
+	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
+	BaseDigest                      eos.Checksum256  `json:"base_digest"`
 	ProposedFinalizerPolicy         *FinalizerPolicy `json:"proposed_finalizer_policy" eos:"optional"`
 }
 
