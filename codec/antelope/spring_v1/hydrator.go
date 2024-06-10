@@ -19,68 +19,106 @@ type Hydrator struct {
 	logger *zap.Logger
 }
 
-func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte) error {
-	h.logger.Debug("hydrating block from bytes")
+func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version string) error {
+	h.logger.Debug("hydrating block from bytes", zap.String("version", version))
 
-	blockState := &BlockState{}
-	err := unmarshalBinary(input, blockState)
-	if err != nil {
-		return fmt.Errorf("unmarshalling binary block state (spring v1): %w", err)
-	}
+	if version == "v1" {
+		blockState := &LegacyBlockState{}
+		err := unmarshalBinary(input, blockState)
+		if err != nil {
+			return fmt.Errorf("unmarshalling binary block state (spring v1): %w", err)
+		}
 
-	signedBlock := blockState.SignedBlock
+		signedBlock := blockState.SignedBlock
 
-	block.Id = blockState.BlockID.String()
-	block.Number = blockState.BlockNum
-	// Version 1: Added the total counts (ExecutedInputActionCount, ExecutedTotalActionCount,
-	// TransactionCount, TransactionTraceCount)
-	block.Version = 1
-	block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
-	block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
-	block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
-	block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
-	// block.Validated = blockState.Validated
-	block.BlockrootMerkle = antelope.BlockrootMerkleToDEOS(blockState.BlockrootMerkle)
-	block.ProducerToLastProduced = antelope.ProducerToLastProducedToDEOS(blockState.ProducerToLastProduced)
-	block.ProducerToLastImpliedIrb = antelope.ProducerToLastImpliedIrbToDEOS(blockState.ProducerToLastImpliedIRB)
-	block.ActivatedProtocolFeatures = antelope.ActivatedProtocolFeaturesToDEOS(blockState.ActivatedProtocolFeatures)
-	block.ProducerSignature = signedBlock.ProducerSignature.String()
-	block.Validated = blockState.Validated
-	block.ActionMrootSavanna = blockState.ActionMrootSavanna
+		block.Id = blockState.BlockID.String()
+		block.Number = blockState.BlockNum
+		// Version 1: Added the total counts (ExecutedInputActionCount, ExecutedTotalActionCount,
+		// TransactionCount, TransactionTraceCount)
+		block.Version = 1
+		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
+		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
+		block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
+		block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
+		block.BlockrootMerkle = antelope.BlockrootMerkleToDEOS(blockState.BlockrootMerkle)
+		block.ProducerToLastProduced = antelope.ProducerToLastProducedToDEOS(blockState.ProducerToLastProduced)
+		block.ProducerToLastImpliedIrb = antelope.ProducerToLastImpliedIrbToDEOS(blockState.ProducerToLastImpliedIRB)
+		block.ActivatedProtocolFeatures = antelope.ActivatedProtocolFeaturesToDEOS(blockState.ActivatedProtocolFeatures)
+		block.ProducerSignature = signedBlock.ProducerSignature.String()
+		block.Validated = blockState.Validated
+		block.ActionMrootSavanna = blockState.ActionMrootSavanna
 
-	block.ConfirmCount = make([]uint32, len(blockState.ConfirmCount))
-	for i, count := range blockState.ConfirmCount {
-		block.ConfirmCount[i] = uint32(count)
-	}
+		block.ConfirmCount = make([]uint32, len(blockState.ConfirmCount))
+		for i, count := range blockState.ConfirmCount {
+			block.ConfirmCount[i] = uint32(count)
+		}
 
-	if blockState.PendingSchedule != nil {
-		block.PendingSchedule = antelope.PendingScheduleToDEOS(blockState.PendingSchedule)
-	}
+		if blockState.PendingSchedule != nil {
+			block.PendingSchedule = antelope.PendingScheduleToDEOS(blockState.PendingSchedule)
+		}
 
-	block.ValidBlockSigningAuthorityV2 = antelope.BlockSigningAuthorityToDEOS(blockState.ValidBlockSigningAuthorityV2)
-	block.ActiveScheduleV2 = antelope.ProducerAuthorityScheduleToDEOS(blockState.ActiveSchedule)
+		block.ValidBlockSigningAuthorityV2 = antelope.BlockSigningAuthorityToDEOS(blockState.ValidBlockSigningAuthorityV2)
+		block.ActiveScheduleV2 = antelope.ProducerAuthorityScheduleToDEOS(blockState.ActiveSchedule)
 
-	block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
-	for idx, transaction := range signedBlock.Transactions {
-		deosTransaction := TransactionReceiptToDEOS(transaction)
-		deosTransaction.Index = uint64(idx)
+		block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
+		for idx, transaction := range signedBlock.Transactions {
+			deosTransaction := TransactionReceiptToDEOS(transaction)
+			deosTransaction.Index = uint64(idx)
 
-		block.UnfilteredTransactions = append(block.UnfilteredTransactions, deosTransaction)
-	}
+			block.UnfilteredTransactions = append(block.UnfilteredTransactions, deosTransaction)
+		}
 
-	block.UnfilteredTransactionTraceCount = uint32(len(block.UnfilteredTransactionTraces))
-	for idx, t := range block.UnfilteredTransactionTraces {
-		t.Index = uint64(idx)
-		t.BlockTime = block.Header.Timestamp
-		t.ProducerBlockId = block.Id
-		t.BlockNum = uint64(block.Number)
+		block.UnfilteredTransactionTraceCount = uint32(len(block.UnfilteredTransactionTraces))
+		for idx, t := range block.UnfilteredTransactionTraces {
+			t.Index = uint64(idx)
+			t.BlockTime = block.Header.Timestamp
+			t.ProducerBlockId = block.Id
+			t.BlockNum = uint64(block.Number)
 
-		for _, actionTrace := range t.ActionTraces {
-			block.UnfilteredExecutedTotalActionCount++
-			if actionTrace.IsInput() {
-				block.UnfilteredExecutedInputActionCount++
+			for _, actionTrace := range t.ActionTraces {
+				block.UnfilteredExecutedTotalActionCount++
+				if actionTrace.IsInput() {
+					block.UnfilteredExecutedInputActionCount++
+				}
 			}
 		}
+	} else if version == "v2" {
+		signedBlock := &SignedBlock{}
+
+		err := unmarshalBinary(input, signedBlock)
+		if err != nil {
+			return fmt.Errorf("unmarshalling signed block (spring v2): %w", err)
+		}
+
+		block.Version = 2
+		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
+		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
+		block.ProducerSignature = signedBlock.ProducerSignature.String()
+
+		block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
+		for idx, transaction := range signedBlock.Transactions {
+			deosTransaction := TransactionReceiptToDEOS(transaction)
+			deosTransaction.Index = uint64(idx)
+
+			block.UnfilteredTransactions = append(block.UnfilteredTransactions, deosTransaction)
+		}
+
+		block.UnfilteredTransactionTraceCount = uint32(len(block.UnfilteredTransactionTraces))
+		for idx, t := range block.UnfilteredTransactionTraces {
+			t.Index = uint64(idx)
+			t.BlockTime = block.Header.Timestamp
+			t.ProducerBlockId = block.Id
+			t.BlockNum = uint64(block.Number)
+
+			for _, actionTrace := range t.ActionTraces {
+				block.UnfilteredExecutedTotalActionCount++
+				if actionTrace.IsInput() {
+					block.UnfilteredExecutedInputActionCount++
+				}
+			}
+		}
+	} else {
+		return fmt.Errorf("unsupported version: %s", version)
 	}
 
 	return nil

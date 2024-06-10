@@ -673,7 +673,7 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
 	}
 
-	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex); err != nil {
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex, "v1"); err != nil {
 		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
 	}
 
@@ -722,7 +722,7 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
 	}
 
-	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex); err != nil {
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex, "v2"); err != nil {
 		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
 	}
 	block := ctx.currentBlock

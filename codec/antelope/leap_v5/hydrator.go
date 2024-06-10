@@ -20,8 +20,12 @@ type Hydrator struct {
 	logger *zap.Logger
 }
 
-func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte) error {
-	h.logger.Debug("hydrating block from bytes")
+func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version string) error {
+	h.logger.Debug("hydrating block from bytes", zap.String("version", version))
+
+	if version != "v1" {
+		return fmt.Errorf("unsupported version: %s", version)
+	}
 
 	blockState := &BlockState{}
 	err := unmarshalBinary(input, blockState)

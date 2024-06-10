@@ -5,13 +5,12 @@ import (
 	"github.com/eoscanada/eos-go/ecc"
 )
 
-// BlockState
+// LegacyBlockState
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_header_state.hpp#L57
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_header_state.hpp#L126
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_state.hpp#L10
-type BlockState struct {
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_header_state_legacy.hpp
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_state_legacy.hpp
+type LegacyBlockState struct {
 
 	// From 'struct block_header_state_legacy_common'
 	BlockNum                         uint32                         `json:"block_num"`
@@ -72,7 +71,7 @@ type FinalizerAuthority struct {
 // TransactionTrace
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/trace.hpp#L51
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/trace.hpp
 type TransactionTrace struct {
 	ID              eos.Checksum256               `json:"id"`
 	BlockNum        uint32                        `json:"block_num"`
@@ -89,10 +88,10 @@ type TransactionTrace struct {
 	ErrorCode       *eos.Uint64                   `json:"error_code,omitempty" eos:"optional"`
 }
 
-// TransactionTrace
+// ActionTrace
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/trace.hpp#L22
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/trace.hpp
 type ActionTrace struct {
 	ActionOrdinal                          eos.Varuint32           `json:"action_ordinal"`
 	CreatorActionOrdinal                   eos.Varuint32           `json:"creator_action_ordinal"`

@@ -5,7 +5,7 @@ import "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 type Hydrator interface {
 	// HydrateBlock decodes the received Deep Mind AcceptedBlock data structure against the
 	// correct struct for this version of EOSIO supported by this hydrator.
-	HydrateBlock(block *pbantelope.Block, input []byte) error
+	HydrateBlock(block *pbantelope.Block, input []byte, version string) error
 
 	// DecodeTransactionTrace decodes the received Deep Mind AppliedTransaction data structure against the
 	// correct struct for this version of EOSIO supported by this hydrator.
