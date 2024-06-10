@@ -27,10 +27,10 @@ type LegacyBlockState struct {
 	BlockID                   eos.Checksum256                   `json:"id"`
 	Header                    *eos.SignedBlockHeader            `json:"header,omitempty"`
 	PendingSchedule           *eos.PendingSchedule              `json:"pending_schedule"`
-	ActivatedProtocolFeatures *eos.ProtocolFeatureActivationSet `json:"activated_protocol_features,omitempty"`
+	ActivatedProtocolFeatures *eos.ProtocolFeatureActivationSet `json:"activated_protocol_features,omitempty" eos:"optional"`
 	AdditionalSignatures      []ecc.Signature                   `json:"additional_signatures"`
 
-	SignedBlock        *SignedBlock    `json:"block,omitempty"`
+	SignedBlock        *SignedBlock    `json:"block,omitempty" eos:"optional"`
 	Validated          bool            `json:"validated"`
 	ActionMrootSavanna eos.Checksum256 `json:"action_mroot_savanna,omitempty" eos:"optional"`
 }
