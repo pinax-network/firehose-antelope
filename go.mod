@@ -17,11 +17,11 @@ require (
 	github.com/streamingfast/firehose-core v1.5.1
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/tidwall/gjson v1.14.1
 	go.uber.org/atomic v1.10.0
 	go.uber.org/zap v1.26.0
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/protobuf v1.34.1
 )
 
 require (
@@ -111,7 +111,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
-	github.com/klauspost/compress v1.17.4 // indirect
+	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.4 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
 	github.com/libp2p/go-flow-metrics v0.1.0 // indirect
@@ -129,7 +129,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mostynb/go-grpc-compression v1.1.17 // indirect
+	github.com/mostynb/go-grpc-compression v1.2.3 // indirect
 	github.com/mr-tron/base58 v1.2.0 // indirect
 	github.com/mschoch/smat v0.2.0 // indirect
 	github.com/multiformats/go-base32 v0.1.0 // indirect
