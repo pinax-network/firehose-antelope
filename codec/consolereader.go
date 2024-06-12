@@ -699,14 +699,14 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 
 // Line format:
 //
-//	ACCEPTED_BLOCK_V2 ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
+//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
 func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
-	chunks := strings.SplitN(line, " ", 5)
-	if len(chunks) != 5 {
-		return nil, fmt.Errorf("expected 5 fields, got %d", len(chunks))
+	chunks := strings.SplitN(line, " ", 6)
+	if len(chunks) != 6 {
+		return nil, fmt.Errorf("expected 6 fields, got %d", len(chunks))
 	}
 
-	blockNum, err := strconv.ParseInt(chunks[1], 10, 64)
+	blockNum, err := strconv.ParseInt(chunks[2], 10, 64)
 	if err != nil {
 		return nil, fmt.Errorf("block_num not a valid number, got: %q", chunks[1])
 	}
@@ -717,7 +717,7 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 
 	ctx.stats = newParsingStats(ctx.logger, uint64(blockNum))
 
-	blockStateHex, err := hex.DecodeString(chunks[3])
+	blockStateHex, err := hex.DecodeString(chunks[4])
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
 	}
@@ -727,13 +727,15 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 	}
 	block := ctx.currentBlock
 
-	lib, err := strconv.ParseInt(chunks[2], 10, 32)
+	block.Id = chunks[1]
+
+	lib, err := strconv.ParseInt(chunks[3], 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("lib not a valid number, got: %q", chunks[2])
 	}
 	block.FinalityLib = uint32(lib)
 
-	finalityDataHex, err := hex.DecodeString(chunks[4])
+	finalityDataHex, err := hex.DecodeString(chunks[5])
 	if err != nil {
 		return nil, fmt.Errorf("unable to decode finality data hex: %w", err)
 	}
