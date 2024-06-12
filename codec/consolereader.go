@@ -728,6 +728,7 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 	block := ctx.currentBlock
 
 	block.Id = chunks[1]
+	block.Number = uint32(blockNum)
 
 	lib, err := strconv.ParseInt(chunks[3], 10, 32)
 	if err != nil {
@@ -745,8 +746,6 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 		return nil, fmt.Errorf("unable to decode finality data: %w", err)
 	}
 	block.FinalityData = finalityData
-
-	ctx.logger.Info("decoded ACCEPTED BLOCK V2", zap.Any("block", block))
 
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
