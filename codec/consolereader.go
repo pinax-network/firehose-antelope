@@ -746,6 +746,8 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 	}
 	block.FinalityData = finalityData
 
+	ctx.logger.Info("decoded ACCEPTED BLOCK V2", zap.Any("block", block))
+
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
 	if err != nil {
