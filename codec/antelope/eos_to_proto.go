@@ -163,10 +163,14 @@ func ExtensionsToDEOS(in []*eos.Extension) (out []*pbantelope.Extension) {
 	return
 }
 
-func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, error) {
+func BlockHeaderExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockHeaderExtension, error) {
 
-	res := make([]*pbantelope.BlockExtension, 0, len(in))
+	res := make([]*pbantelope.BlockHeaderExtension, 0, len(in))
 	for _, extension := range in {
+
+		extJson, _ := json.Marshal(extension)
+		fmt.Println(string(extJson))
+
 		ext, err := extension.AsBlockHeaderExtension("EOS")
 		if err != nil {
 			return nil, fmt.Errorf("unable to convert to block header extension: %w", err)
@@ -176,8 +180,8 @@ func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, e
 
 		case eos.EOS_ProtocolFeatureActivation:
 			pfaExtension := ext.(*eos.ProtocolFeatureActivationExtension)
-			res = append(res, &pbantelope.BlockExtension{
-				Extension: &pbantelope.BlockExtension_ProtocolFeatureActivationExtension{
+			res = append(res, &pbantelope.BlockHeaderExtension{
+				Extension: &pbantelope.BlockHeaderExtension_ProtocolFeatureActivationExtension{
 					ProtocolFeatureActivationExtension: &pbantelope.ProtocolFeatureActivationExtension{
 						ProtocolFeatures: checksumsToBytesSlices(pfaExtension.FeatureDigests),
 					},
@@ -186,33 +190,13 @@ func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, e
 
 		case eos.EOS_ProducerScheduleChangeExtension:
 			pscExtension := ext.(*eos.ProducerScheduleChangeExtension)
-			res = append(res, &pbantelope.BlockExtension{
-				Extension: &pbantelope.BlockExtension_ProducerScheduleChangeExtension{
+			res = append(res, &pbantelope.BlockHeaderExtension{
+				Extension: &pbantelope.BlockHeaderExtension_ProducerScheduleChangeExtension{
 					ProducerScheduleChangeExtension: &pbantelope.ProducerScheduleChangeExtension{
 						ProducerSchedule: ProducerAuthorityScheduleToDEOS(&eos.ProducerAuthoritySchedule{
 							Version:   pscExtension.Version,
 							Producers: pscExtension.Producers,
 						}),
-					},
-				},
-			})
-
-		case eos.EOS_AdditionalBlockSignatureExtension:
-			absExtension := ext.(*eos.AdditionalBlockSignatureExtension)
-			res = append(res, &pbantelope.BlockExtension{
-				Extension: &pbantelope.BlockExtension_AdditionalBlockSignatureExtension{
-					AdditionalBlockSignatureExtension: &pbantelope.AdditionalBlockSignatureExtension{
-						Signatures: SignaturesToDEOS(absExtension.Signatures),
-					},
-				},
-			})
-
-		case eos.EOS_QuorumCertificateExtension:
-			qcExtension := ext.(*eos.QuorumCertificateExtension)
-			res = append(res, &pbantelope.BlockExtension{
-				Extension: &pbantelope.BlockExtension_QuorumCertificateExtension{
-					QuorumCertificateExtension: &pbantelope.QuorumCertificateExtension{
-						Qc: QuorumCertificateToDEOS(qcExtension.QuorumCertificate),
 					},
 				},
 			})
@@ -225,16 +209,16 @@ func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, e
 	return res, nil
 }
 
-func QuorumCertificateToDEOS(qc eos.QuorumCertificate) *pbantelope.QuorumCertificate {
-	return &pbantelope.QuorumCertificate{
-		BlockNum: qc.BlockNum,
-		Data: &pbantelope.ValidQuorumCertificate{
-			StrongVotes:           qc.ValidQuorumCertificate.StrongVotes,
-			WeakVotes:             qc.ValidQuorumCertificate.WeakVotes,
-			BlsAggregateSignature: qc.ValidQuorumCertificate.BlsAggregateSignature.String(),
-		},
-	}
-}
+//func QuorumCertificateToDEOS(qc eos.QuorumCertificate) *pbantelope.QuorumCertificate {
+//	return &pbantelope.QuorumCertificate{
+//		BlockNum: qc.BlockNum,
+//		Data: &pbantelope.ValidQuorumCertificate{
+//			StrongVotes:           qc.ValidQuorumCertificate.StrongVotes,
+//			WeakVotes:             qc.ValidQuorumCertificate.WeakVotes,
+//			BlsAggregateSignature: qc.ValidQuorumCertificate.BlsAggregateSignature.String(),
+//		},
+//	}
+//}
 
 func ProducerAuthoritiesToDEOS(producerAuthorities []*eos.ProducerAuthority) (out []*pbantelope.ProducerAuthority) {
 	if len(producerAuthorities) <= 0 {

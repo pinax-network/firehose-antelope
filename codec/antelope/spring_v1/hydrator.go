@@ -38,11 +38,13 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		block.Version = 2
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
-		parsedBlockExtensions, err := antelope.BlockExtensionsToDEOS(signedBlock.BlockExtensions)
+
+		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
 		if err != nil {
-			return fmt.Errorf("unmarshalling block extensions (spring v2): %w", err)
+			h.logger.Error("failed to decode block header extensions", zap.Error(err))
+		} else {
+			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
 		}
-		block.DecodedBlockExtensions = parsedBlockExtensions
 
 		block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
 		block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
@@ -99,11 +101,13 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		block.Version = 2
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
-		parsedBlockExtensions, err := antelope.BlockExtensionsToDEOS(signedBlock.BlockExtensions)
+
+		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
 		if err != nil {
-			return fmt.Errorf("unmarshalling block extensions (spring v2): %w", err)
+			h.logger.Error("failed to decode block header extensions", zap.Error(err))
+		} else {
+			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
 		}
-		block.DecodedBlockExtensions = parsedBlockExtensions
 
 		block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
 		for idx, transaction := range signedBlock.Transactions {

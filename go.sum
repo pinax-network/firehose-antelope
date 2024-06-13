@@ -535,8 +535,8 @@ github.com/paulbellamy/ratecounter v0.2.0/go.mod h1:Hfx1hDpSGoqxkVVpBi/IlYD7kChl
 github.com/pelletier/go-toml/v2 v2.0.6 h1:nrzqCb7j9cDFj2coyLNLaZuJTLjWjlaz6nvTvIwycIU=
 github.com/pelletier/go-toml/v2 v2.0.6/go.mod h1:eumQOmlWiOPt5WriQQqoM5y18pDHwha2N+QD+EUNTek=
 github.com/pierrec/lz4 v2.0.5+incompatible/go.mod h1:pdkljMzZIN41W+lC3N2tnIh5sFi+IEE17M5jbnwPHcY=
-github.com/pinax-network/eos-go v0.0.0-20240613115143-71a2bb038d07 h1:FvZJ992WCrv9lWPqwpgmWI0EdV91zGjzfisM2QZi7f0=
-github.com/pinax-network/eos-go v0.0.0-20240613115143-71a2bb038d07/go.mod h1:Wqe3BDXKvJ2tNIQ0UQyzhTaneP85GgLp6IqOSNXfn2Q=
+github.com/pinax-network/eos-go v0.0.0-20240613140425-0a86c810f4a0 h1:lZuUTvsukRPvmP9Q2Jw3OPSxai21+xWaZxoqr3HsE+s=
+github.com/pinax-network/eos-go v0.0.0-20240613140425-0a86c810f4a0/go.mod h1:Wqe3BDXKvJ2tNIQ0UQyzhTaneP85GgLp6IqOSNXfn2Q=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

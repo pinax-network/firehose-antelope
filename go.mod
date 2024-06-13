@@ -240,4 +240,4 @@ replace (
 	github.com/jhump/protoreflect => github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d
 )
 
-replace github.com/eoscanada/eos-go => github.com/pinax-network/eos-go v0.0.0-20240613115143-71a2bb038d07
+replace github.com/eoscanada/eos-go => github.com/pinax-network/eos-go v0.0.0-20240613140425-0a86c810f4a0
