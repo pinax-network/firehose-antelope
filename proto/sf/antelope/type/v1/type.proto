@@ -31,6 +31,9 @@ message Block {
   BlockHeader header = 4;
   string producer_signature = 5;
   repeated Extension block_extensions = 7;
+
+  repeated BlockExtension block_extensions_v2 = 63;
+
   uint32 dpos_proposed_irreversible_blocknum = 8;
   uint32 dpos_irreversible_blocknum = 9;
   BlockRootMerkle blockroot_merkle = 11;
@@ -45,10 +48,9 @@ message Block {
   // needs to be converted from Legacy merkle to Savanna merkle
   bytes action_mroot_savanna = 60;
 
-  // from Spring v1 this field will contain the lib block number in favour of the dpos_proposed_irreversible_blocknum
+  // the LIB post-Savanna activation, pre-Savanna this is found in dpos_irreversible_blocknum
   uint32 finality_lib = 61;
   FinalityData finality_data = 62;
-
 
   repeated RlimitOp rlimit_ops = 19;
 
@@ -155,6 +157,7 @@ message Block {
 
   // This was a single string element representing a public key (eos-go#ecc.PublicKey).
   // It has been replaced by `valid_block_signing_authority_v2`.
+  // deprecated
   string block_signing_key = 14;
 
   // This was a list of `{name, publicKey}` elements, each block being signed by a single key,
@@ -233,6 +236,32 @@ message FinalizerAuthority {
   string description = 1;
   uint64 weight = 2;
   string public_key = 3;
+}
+
+message BlockExtension {
+  oneof extension {
+    AdditionalBlockSignatureExtensions additional_block_signature_extension = 1;
+    QuorumCertificateExtension quorum_certificate_extension = 2;
+  }
+}
+
+message AdditionalBlockSignatureExtensions {
+  repeated string signatures = 1;
+}
+
+message QuorumCertificateExtension {
+  QuorumCertificate qc = 1;
+}
+
+message QuorumCertificate {
+  uint32 block_num = 1;
+  ValidQuorumCertificate data = 2;
+}
+
+message ValidQuorumCertificate {
+  bytes strong_votes = 1;
+  bytes weak_votes = 2;
+  string bls_aggregate_signature = 3;
 }
 
 // BlockWithRefs is a lightweight block, with traces and transactions

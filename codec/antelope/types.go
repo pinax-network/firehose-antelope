@@ -1,6 +1,7 @@
 package antelope
 
 import (
+	"github.com/eoscanada/eos-go/ecc"
 	"unicode/utf8"
 
 	"github.com/eoscanada/eos-go"
@@ -110,4 +111,23 @@ func GetPublicKeysFromSignedTransaction(chainID eos.Checksum256, signedTransacti
 	}
 
 	return publicKeys
+}
+
+type AdditionalBlockSignatureExtension struct {
+	Signatures []ecc.Signature `json:"signatures"`
+}
+
+type QuorumCertificateExtension struct {
+	QuorumCertificate QuorumCertificate `json:"qc"`
+}
+
+type QuorumCertificate struct {
+	BlockNum               uint32                 `json:"block_num"`
+	ValidQuorumCertificate ValidQuorumCertificate `json:"data"`
+}
+
+type ValidQuorumCertificate struct {
+	StrongVotes           []uint8       `json:"strong_votes" eos:"optional"`
+	WeakVotes             []uint8       `json:"weak_votes" eos:"optional"`
+	BlsAggregateSignature ecc.Signature `json:"bls_aggregate_signature"`
 }

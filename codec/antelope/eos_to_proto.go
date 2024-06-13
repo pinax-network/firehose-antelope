@@ -24,6 +24,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type BlockExtensionId uint16
+
+const (
+	AdditionalBlockSignatureExtensionsId BlockExtensionId = 2
+	QuorumCertificateExtensionId         BlockExtensionId = 3
+)
+
 func ActivatedProtocolFeaturesToDEOS(in *eos.ProtocolFeatureActivationSet) *pbantelope.ActivatedProtocolFeatures {
 	out := &pbantelope.ActivatedProtocolFeatures{}
 	out.ProtocolFeatures = checksumsToBytesSlices(in.ProtocolFeatures)
@@ -154,6 +161,60 @@ func ExtensionsToDEOS(in []*eos.Extension) (out []*pbantelope.Extension) {
 	}
 
 	return
+}
+
+func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, error) {
+
+	res := make([]*pbantelope.BlockExtension, 0, len(in))
+
+	for _, extension := range in {
+		switch extension.Type {
+		case uint16(AdditionalBlockSignatureExtensionsId):
+			additionalBlockSignatureExtension := &AdditionalBlockSignatureExtension{}
+			err := eos.NewDecoder(extension.Data).Decode(additionalBlockSignatureExtension)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode additional block signature extension: %w", err)
+			}
+
+			res = append(res, &pbantelope.BlockExtension{
+				Extension: &pbantelope.BlockExtension_AdditionalBlockSignatureExtension{
+					AdditionalBlockSignatureExtension: &pbantelope.AdditionalBlockSignatureExtensions{
+						Signatures: SignaturesToDEOS(additionalBlockSignatureExtension.Signatures),
+					},
+				},
+			})
+
+		case uint16(QuorumCertificateExtensionId):
+			quorumCertificateExtension := &QuorumCertificateExtension{}
+			err := eos.NewDecoder(extension.Data).Decode(quorumCertificateExtension)
+			if err != nil {
+				return nil, fmt.Errorf("failed to decode quorum certificate extension: %w", err)
+			}
+
+			res = append(res, &pbantelope.BlockExtension{
+				Extension: &pbantelope.BlockExtension_QuorumCertificateExtension{
+					QuorumCertificateExtension: &pbantelope.QuorumCertificateExtension{
+						Qc: QuorumCertificateToDEOS(quorumCertificateExtension.QuorumCertificate),
+					},
+				},
+			})
+		default:
+			return nil, fmt.Errorf("unknown extension type: %v", extension.Type)
+		}
+	}
+
+	return res, nil
+}
+
+func QuorumCertificateToDEOS(qc QuorumCertificate) *pbantelope.QuorumCertificate {
+	return &pbantelope.QuorumCertificate{
+		BlockNum: qc.BlockNum,
+		Data: &pbantelope.ValidQuorumCertificate{
+			StrongVotes:           qc.ValidQuorumCertificate.StrongVotes,
+			WeakVotes:             qc.ValidQuorumCertificate.WeakVotes,
+			BlsAggregateSignature: qc.ValidQuorumCertificate.BlsAggregateSignature.String(),
+		},
+	}
 }
 
 func ProducerAuthoritiesToDEOS(producerAuthorities []*eos.ProducerAuthority) (out []*pbantelope.ProducerAuthority) {
