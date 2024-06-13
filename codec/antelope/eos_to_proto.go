@@ -166,38 +166,57 @@ func ExtensionsToDEOS(in []*eos.Extension) (out []*pbantelope.Extension) {
 func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, error) {
 
 	res := make([]*pbantelope.BlockExtension, 0, len(in))
-
 	for _, extension := range in {
-		switch extension.Type {
-		case uint16(AdditionalBlockSignatureExtensionsId):
-			additionalBlockSignatureExtension := &AdditionalBlockSignatureExtension{}
-			err := eos.NewDecoder(extension.Data).Decode(additionalBlockSignatureExtension)
-			if err != nil {
-				return nil, fmt.Errorf("failed to decode additional block signature extension: %w", err)
-			}
+		ext, err := extension.AsBlockHeaderExtension("EOS")
+		if err != nil {
+			return nil, fmt.Errorf("unable to convert to block header extension: %w", err)
+		}
 
+		switch ext.TypeID() {
+
+		case eos.EOS_ProtocolFeatureActivation:
+			pfaExtension := ext.(*eos.ProtocolFeatureActivationExtension)
 			res = append(res, &pbantelope.BlockExtension{
-				Extension: &pbantelope.BlockExtension_AdditionalBlockSignatureExtension{
-					AdditionalBlockSignatureExtension: &pbantelope.AdditionalBlockSignatureExtensions{
-						Signatures: SignaturesToDEOS(additionalBlockSignatureExtension.Signatures),
+				Extension: &pbantelope.BlockExtension_ProtocolFeatureActivationExtension{
+					ProtocolFeatureActivationExtension: &pbantelope.ProtocolFeatureActivationExtension{
+						ProtocolFeatures: checksumsToBytesSlices(pfaExtension.FeatureDigests),
 					},
 				},
 			})
 
-		case uint16(QuorumCertificateExtensionId):
-			quorumCertificateExtension := &QuorumCertificateExtension{}
-			err := eos.NewDecoder(extension.Data).Decode(quorumCertificateExtension)
-			if err != nil {
-				return nil, fmt.Errorf("failed to decode quorum certificate extension: %w", err)
-			}
+		case eos.EOS_ProducerScheduleChangeExtension:
+			pscExtension := ext.(*eos.ProducerScheduleChangeExtension)
+			res = append(res, &pbantelope.BlockExtension{
+				Extension: &pbantelope.BlockExtension_ProducerScheduleChangeExtension{
+					ProducerScheduleChangeExtension: &pbantelope.ProducerScheduleChangeExtension{
+						ProducerSchedule: ProducerAuthorityScheduleToDEOS(&eos.ProducerAuthoritySchedule{
+							Version:   pscExtension.Version,
+							Producers: pscExtension.Producers,
+						}),
+					},
+				},
+			})
 
+		case eos.EOS_AdditionalBlockSignatureExtension:
+			absExtension := ext.(*eos.AdditionalBlockSignatureExtension)
+			res = append(res, &pbantelope.BlockExtension{
+				Extension: &pbantelope.BlockExtension_AdditionalBlockSignatureExtension{
+					AdditionalBlockSignatureExtension: &pbantelope.AdditionalBlockSignatureExtension{
+						Signatures: SignaturesToDEOS(absExtension.Signatures),
+					},
+				},
+			})
+
+		case eos.EOS_QuorumCertificateExtension:
+			qcExtension := ext.(*eos.QuorumCertificateExtension)
 			res = append(res, &pbantelope.BlockExtension{
 				Extension: &pbantelope.BlockExtension_QuorumCertificateExtension{
 					QuorumCertificateExtension: &pbantelope.QuorumCertificateExtension{
-						Qc: QuorumCertificateToDEOS(quorumCertificateExtension.QuorumCertificate),
+						Qc: QuorumCertificateToDEOS(qcExtension.QuorumCertificate),
 					},
 				},
 			})
+
 		default:
 			return nil, fmt.Errorf("unknown extension type: %v", extension.Type)
 		}
@@ -206,7 +225,7 @@ func BlockExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockExtension, e
 	return res, nil
 }
 
-func QuorumCertificateToDEOS(qc QuorumCertificate) *pbantelope.QuorumCertificate {
+func QuorumCertificateToDEOS(qc eos.QuorumCertificate) *pbantelope.QuorumCertificate {
 	return &pbantelope.QuorumCertificate{
 		BlockNum: qc.BlockNum,
 		Data: &pbantelope.ValidQuorumCertificate{

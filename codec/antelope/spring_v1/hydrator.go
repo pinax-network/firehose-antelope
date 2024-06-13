@@ -42,7 +42,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		if err != nil {
 			return fmt.Errorf("unmarshalling block extensions (spring v2): %w", err)
 		}
-		block.BlockExtensionsV2 = parsedBlockExtensions
+		block.DecodedBlockExtensions = parsedBlockExtensions
 
 		block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
 		block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
@@ -103,7 +103,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		if err != nil {
 			return fmt.Errorf("unmarshalling block extensions (spring v2): %w", err)
 		}
-		block.BlockExtensionsV2 = parsedBlockExtensions
+		block.DecodedBlockExtensions = parsedBlockExtensions
 
 		block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
 		for idx, transaction := range signedBlock.Transactions {

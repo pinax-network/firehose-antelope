@@ -32,7 +32,7 @@ message Block {
   string producer_signature = 5;
   repeated Extension block_extensions = 7;
 
-  repeated BlockExtension block_extensions_v2 = 63;
+  repeated BlockExtension decoded_block_extensions = 63;
 
   uint32 dpos_proposed_irreversible_blocknum = 8;
   uint32 dpos_irreversible_blocknum = 9;
@@ -240,12 +240,22 @@ message FinalizerAuthority {
 
 message BlockExtension {
   oneof extension {
-    AdditionalBlockSignatureExtensions additional_block_signature_extension = 1;
-    QuorumCertificateExtension quorum_certificate_extension = 2;
+    ProtocolFeatureActivationExtension protocol_feature_activation_extension = 1;
+    ProducerScheduleChangeExtension producer_schedule_change_extension = 2;
+    AdditionalBlockSignatureExtension additional_block_signature_extension = 3;
+    QuorumCertificateExtension quorum_certificate_extension = 4;
   }
 }
 
-message AdditionalBlockSignatureExtensions {
+message ProtocolFeatureActivationExtension {
+  repeated bytes protocol_features = 1;
+}
+
+message ProducerScheduleChangeExtension {
+  ProducerAuthoritySchedule producer_schedule = 1;
+}
+
+message AdditionalBlockSignatureExtension {
   repeated string signatures = 1;
 }
 
