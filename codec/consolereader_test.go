@@ -49,12 +49,10 @@ func TestParseFromFile(t *testing.T) {
 		// includeBlock func(block *pbantelope.Block) bool
 		// readerOptions []ConsoleReaderOption
 	}{
-		// {"full", "testdata/deep-mind.dmlog", /*nil nil*/},
 		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", false /*nil, nil*/},
 		{"full-5.0.x", "testdata/deep-mind-5.0.x.dmlog", false /*nil, nil*/},
 		{"dmlog", "testdata/dm.log", true /*nil, nil*/},
-		{"full-spring-1.0.x", "testdata/deep-mind-spring-1.0.x.dmlog", false /*nil, nil*/},
-		// {"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole /*[]ConsoleReaderOption{LimitConsoleLength(10)}*/},
+		{"full-spring-1.0.x-pre-savanna", "testdata/deep-mind-spring-1.0.x-pre-savanna.dmlog", false /*nil, nil*/},
 	}
 
 	for _, test := range tests {

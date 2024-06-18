@@ -168,9 +168,6 @@ func BlockHeaderExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockHeader
 	res := make([]*pbantelope.BlockHeaderExtension, 0, len(in))
 	for _, extension := range in {
 
-		extJson, _ := json.Marshal(extension)
-		fmt.Println(string(extJson))
-
 		ext, err := extension.AsBlockHeaderExtension("EOS")
 		if err != nil {
 			return nil, fmt.Errorf("unable to convert to block header extension: %w", err)
