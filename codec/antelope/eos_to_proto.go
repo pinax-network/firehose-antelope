@@ -24,6 +24,13 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+type BlockExtensionId uint16
+
+const (
+	AdditionalBlockSignatureExtensionsId BlockExtensionId = 2
+	QuorumCertificateExtensionId         BlockExtensionId = 3
+)
+
 func ActivatedProtocolFeaturesToDEOS(in *eos.ProtocolFeatureActivationSet) *pbantelope.ActivatedProtocolFeatures {
 	out := &pbantelope.ActivatedProtocolFeatures{}
 	out.ProtocolFeatures = checksumsToBytesSlices(in.ProtocolFeatures)
@@ -155,6 +162,60 @@ func ExtensionsToDEOS(in []*eos.Extension) (out []*pbantelope.Extension) {
 
 	return
 }
+
+func BlockHeaderExtensionsToDEOS(in []*eos.Extension) ([]*pbantelope.BlockHeaderExtension, error) {
+
+	res := make([]*pbantelope.BlockHeaderExtension, 0, len(in))
+	for _, extension := range in {
+
+		ext, err := extension.AsBlockHeaderExtension("EOS")
+		if err != nil {
+			return nil, fmt.Errorf("unable to convert to block header extension: %w", err)
+		}
+
+		switch ext.TypeID() {
+
+		case eos.EOS_ProtocolFeatureActivation:
+			pfaExtension := ext.(*eos.ProtocolFeatureActivationExtension)
+			res = append(res, &pbantelope.BlockHeaderExtension{
+				Extension: &pbantelope.BlockHeaderExtension_ProtocolFeatureActivationExtension{
+					ProtocolFeatureActivationExtension: &pbantelope.ProtocolFeatureActivationExtension{
+						ProtocolFeatures: checksumsToBytesSlices(pfaExtension.FeatureDigests),
+					},
+				},
+			})
+
+		case eos.EOS_ProducerScheduleChangeExtension:
+			pscExtension := ext.(*eos.ProducerScheduleChangeExtension)
+			res = append(res, &pbantelope.BlockHeaderExtension{
+				Extension: &pbantelope.BlockHeaderExtension_ProducerScheduleChangeExtension{
+					ProducerScheduleChangeExtension: &pbantelope.ProducerScheduleChangeExtension{
+						ProducerSchedule: ProducerAuthorityScheduleToDEOS(&eos.ProducerAuthoritySchedule{
+							Version:   pscExtension.Version,
+							Producers: pscExtension.Producers,
+						}),
+					},
+				},
+			})
+
+		default:
+			return nil, fmt.Errorf("unknown extension type: %v", extension.Type)
+		}
+	}
+
+	return res, nil
+}
+
+//func QuorumCertificateToDEOS(qc eos.QuorumCertificate) *pbantelope.QuorumCertificate {
+//	return &pbantelope.QuorumCertificate{
+//		BlockNum: qc.BlockNum,
+//		Data: &pbantelope.ValidQuorumCertificate{
+//			StrongVotes:           qc.ValidQuorumCertificate.StrongVotes,
+//			WeakVotes:             qc.ValidQuorumCertificate.WeakVotes,
+//			BlsAggregateSignature: qc.ValidQuorumCertificate.BlsAggregateSignature.String(),
+//		},
+//	}
+//}
 
 func ProducerAuthoritiesToDEOS(producerAuthorities []*eos.ProducerAuthority) (out []*pbantelope.ProducerAuthority) {
 	if len(producerAuthorities) <= 0 {

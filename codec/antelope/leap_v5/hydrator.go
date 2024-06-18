@@ -1,6 +1,7 @@
 package antelope
 
 import (
+	"errors"
 	"fmt"
 	"github.com/pinax-network/firehose-antelope/codec/antelope"
 
@@ -11,7 +12,7 @@ import (
 
 func NewHydrator(parentLogger *zap.Logger) *Hydrator {
 	return &Hydrator{
-		logger: parentLogger.With(zap.String("antelope", "3.1.x")),
+		logger: parentLogger.With(zap.String("antelope", "leap v5")),
 	}
 }
 
@@ -19,13 +20,17 @@ type Hydrator struct {
 	logger *zap.Logger
 }
 
-func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte) error {
-	h.logger.Debug("hydrating block from bytes")
+func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version string) error {
+	h.logger.Debug("hydrating block from bytes", zap.String("version", version))
+
+	if version != "v1" {
+		return fmt.Errorf("unsupported version: %s", version)
+	}
 
 	blockState := &BlockState{}
 	err := unmarshalBinary(input, blockState)
 	if err != nil {
-		return fmt.Errorf("unmarshalling binary block state (3.1.x): %w", err)
+		return fmt.Errorf("unmarshalling binary block state (leap v5): %w", err)
 	}
 
 	signedBlock := blockState.SignedBlock
@@ -91,6 +96,10 @@ func (h *Hydrator) DecodeTransactionTrace(input []byte, opts ...antelope.Convers
 	}
 
 	return TransactionTraceToDEOS(h.logger, trxTrace, opts...), nil
+}
+
+func (h *Hydrator) DecodeFinalityData(input []byte) (*pbantelope.FinalityData, error) {
+	return nil, errors.New("finality not supported in pre spring versions")
 }
 
 func unmarshalBinary(data []byte, v interface{}) error {

@@ -5,14 +5,14 @@ import (
 	"github.com/eoscanada/eos-go/ecc"
 )
 
-// BlockState
+// LegacyBlockState
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_header_state.hpp#L57
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_header_state.hpp#L126
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block_state.hpp#L10
-type BlockState struct {
-	// From 'struct block_header_state_common'
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_header_state_legacy.hpp
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_state_legacy.hpp
+type LegacyBlockState struct {
+
+	// From 'struct block_header_state_legacy_common'
 	BlockNum                         uint32                         `json:"block_num"`
 	DPoSProposedIrreversibleBlockNum uint32                         `json:"dpos_proposed_irreversible_blocknum"`
 	DPoSIrreversibleBlockNum         uint32                         `json:"dpos_irreversible_blocknum"`
@@ -23,36 +23,55 @@ type BlockState struct {
 	ValidBlockSigningAuthorityV2     *eos.BlockSigningAuthority     `json:"valid_block_signing_authority,omitempty"`
 	ConfirmCount                     []uint8                        `json:"confirm_count,omitempty"`
 
-	// From 'struct block_header_state'
+	// From 'struct block_header_state_legacy'
 	BlockID                   eos.Checksum256                   `json:"id"`
 	Header                    *eos.SignedBlockHeader            `json:"header,omitempty"`
 	PendingSchedule           *eos.PendingSchedule              `json:"pending_schedule"`
 	ActivatedProtocolFeatures *eos.ProtocolFeatureActivationSet `json:"activated_protocol_features,omitempty" eos:"optional"`
 	AdditionalSignatures      []ecc.Signature                   `json:"additional_signatures"`
 
-	// From 'struct block_state'
-	// Type changed in v2.1.x
-	SignedBlock *SignedBlock `json:"block,omitempty" eos:"optional"`
-	// Validated   bool         `json:"validated"`
+	SignedBlock        *SignedBlock    `json:"block,omitempty" eos:"optional"`
+	Validated          bool            `json:"validated"`
+	ActionMrootSavanna eos.Checksum256 `json:"action_mroot_savanna,omitempty" eos:"optional"`
 }
 
-// BlockState
-//
-// File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/block.hpp#L135
 type SignedBlock struct {
 	eos.SignedBlockHeader
-	// Added in v2.1.x
-	// PruneState uint8 `json:"prune_state"`
-	// Type changed in v2.1.x
 	Transactions    []*TransactionReceipt `json:"transactions"`
 	BlockExtensions []*eos.Extension      `json:"block_extensions"`
+}
+
+// FinalityData
+//
+// File hierarchy:
+//
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_state.hpp#L61
+type FinalityData struct {
+	MajorVersion                    uint32           `json:"major_version"`
+	MinorVersion                    uint32           `json:"minor_version"`
+	ActiveFinalizerPolicyGeneration uint32           `json:"active_finalizer_policy_generation"`
+	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
+	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
+	BaseDigest                      eos.Checksum256  `json:"base_digest"`
+	ProposedFinalizerPolicy         *FinalizerPolicy `json:"proposed_finalizer_policy,omitempty" eos:"optional"`
+}
+
+type FinalizerPolicy struct {
+	Generation uint32                `json:"generation"`
+	Threshold  uint64                `json:"threshold"`
+	Finalizers []*FinalizerAuthority `json:"finalizers"`
+}
+
+type FinalizerAuthority struct {
+	Description string `json:"description"`
+	Weight      uint64 `json:"weight"`
+	PublicKey   string `json:"public_key"`
 }
 
 // TransactionTrace
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/trace.hpp#L51
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/trace.hpp
 type TransactionTrace struct {
 	ID              eos.Checksum256               `json:"id"`
 	BlockNum        uint32                        `json:"block_num"`
@@ -69,10 +88,10 @@ type TransactionTrace struct {
 	ErrorCode       *eos.Uint64                   `json:"error_code,omitempty" eos:"optional"`
 }
 
-// TransactionTrace
+// ActionTrace
 //
 // File hierarchy:
-//   - https://github.com/EOSIO/eos/blob/v2.1.0/libraries/chain/include/eosio/chain/trace.hpp#L22
+//   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/trace.hpp
 type ActionTrace struct {
 	ActionOrdinal                          eos.Varuint32           `json:"action_ordinal"`
 	CreatorActionOrdinal                   eos.Varuint32           `json:"creator_action_ordinal"`

@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/andreyvit/diff"
-	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
+	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/leap_v5"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	"github.com/stretchr/testify/assert"
@@ -49,11 +49,10 @@ func TestParseFromFile(t *testing.T) {
 		// includeBlock func(block *pbantelope.Block) bool
 		// readerOptions []ConsoleReaderOption
 	}{
-		// {"full", "testdata/deep-mind.dmlog", /*nil nil*/},
 		{"full-3.1.x", "testdata/deep-mind-3.1.x.dmlog", false /*nil, nil*/},
 		{"full-5.0.x", "testdata/deep-mind-5.0.x.dmlog", false /*nil, nil*/},
 		{"dmlog", "testdata/dm.log", true /*nil, nil*/},
-		// {"max-console-log", "testdata/deep-mind.dmlog", blockWithConsole /*[]ConsoleReaderOption{LimitConsoleLength(10)}*/},
+		{"full-spring-1.0.x-pre-savanna", "testdata/deep-mind-spring-1.0.x-pre-savanna.dmlog", false /*nil, nil*/},
 	}
 
 	for _, test := range tests {
@@ -613,7 +612,7 @@ func Test_readDeepMindVersion(t *testing.T) {
 			"version 14, unsupported",
 			`DEEP_MIND_VERSION leap 14 0`,
 			"leap", 14, 0,
-			errors.New("deep mind reported version 14, but this reader supports only 13"),
+			errors.New("deep mind reported version 14, but this reader supports only 1, 13"),
 		},
 	}
 

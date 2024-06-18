@@ -32,7 +32,8 @@ import (
 	"time"
 
 	"github.com/eoscanada/eos-go"
-	antelope_v3_1 "github.com/pinax-network/firehose-antelope/codec/antelope/v3.1"
+	leap_v5 "github.com/pinax-network/firehose-antelope/codec/antelope/leap_v5"
+	spring_v1 "github.com/pinax-network/firehose-antelope/codec/antelope/spring_v1"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"github.com/streamingfast/dmetrics"
@@ -40,8 +41,8 @@ import (
 	"go.uber.org/zap"
 )
 
-var supportedVersions = []uint64{13}
-var supportedVersionStrings = []string{"13"}
+var supportedVersions = []uint64{1, 13}
+var supportedVersionStrings = []string{"1", "13"}
 
 // ConsoleReader is what reads the `nodeos` output directly. It builds
 // up some LogEntry objects. See `LogReader to read those entries.
@@ -357,6 +358,15 @@ func (c *ConsoleReader) next() (block *pbantelope.Block, err error) {
 			ctx.stats.inc("DTRX_OP FAILED")
 			err = ctx.readFailedDTrxOp(line)
 
+		case strings.HasPrefix(line, "ACCEPTED_BLOCK_V2"):
+			ctx.stats.inc("ACCEPTED_BLOCK_V2")
+			block, err := ctx.readAcceptedBlockV2(line)
+			if err != nil {
+				return nil, c.formatError(line, err)
+			}
+
+			return block, nil
+
 		case strings.HasPrefix(line, "ACCEPTED_BLOCK"):
 			ctx.stats.inc("ACCEPTED_BLOCK")
 			block, err := ctx.readAcceptedBlock(line)
@@ -663,11 +673,79 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
 	}
 
-	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex); err != nil {
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex, "v1"); err != nil {
 		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
 	}
 
 	block := ctx.currentBlock
+
+	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
+	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
+	if err != nil {
+		return nil, fmt.Errorf("abi decoding post-process failed: %w", err)
+	}
+
+	ctx.globalStats.lastBlock = ctx.currentBlock.AsRef()
+	ctx.globalStats.blockRate.Inc()
+	ctx.globalStats.blockAverageParseTime.AddElapsedTime(ctx.stats.startAt)
+	ctx.globalStats.transactionRate.IncBy(int64(len(ctx.currentBlock.TransactionTraces())))
+	ctx.stats.log()
+
+	zlog.Debug("abi decoder terminated all decoding operations, resetting block")
+	ctx.resetBlock()
+
+	return block, nil
+}
+
+// Line format:
+//
+//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
+func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
+	chunks := strings.SplitN(line, " ", 6)
+	if len(chunks) != 6 {
+		return nil, fmt.Errorf("expected 6 fields, got %d", len(chunks))
+	}
+
+	blockNum, err := strconv.ParseInt(chunks[2], 10, 64)
+	if err != nil {
+		return nil, fmt.Errorf("block_num not a valid number, got: %q", chunks[1])
+	}
+
+	if ctx.activeBlockNum != blockNum {
+		return nil, fmt.Errorf("block_num %d doesn't match the active block num (%d)", blockNum, ctx.activeBlockNum)
+	}
+
+	ctx.stats = newParsingStats(ctx.logger, uint64(blockNum))
+
+	blockStateHex, err := hex.DecodeString(chunks[4])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode block %d state hex: %w", blockNum, err)
+	}
+
+	if err := ctx.hydrator.HydrateBlock(ctx.currentBlock, blockStateHex, "v2"); err != nil {
+		return nil, fmt.Errorf("hydrate block %d: %w", blockNum, err)
+	}
+	block := ctx.currentBlock
+
+	block.Id = chunks[1]
+	block.Number = uint32(blockNum)
+
+	lib, err := strconv.ParseInt(chunks[3], 10, 32)
+	if err != nil {
+		return nil, fmt.Errorf("lib not a valid number, got: %q", chunks[2])
+	}
+	block.FinalityLib = uint32(lib)
+
+	finalityDataHex, err := hex.DecodeString(chunks[5])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finality data hex: %w", err)
+	}
+
+	finalityData, err := ctx.hydrator.DecodeFinalityData(finalityDataHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finality data: %w", err)
+	}
+	block.FinalityData = finalityData
 
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
@@ -1174,7 +1252,11 @@ func (ctx *parseCtx) readDeepmindVersion(line string) (software string, majorVer
 	zlog.Info("read deep mind version", zap.Uint64("major_version", majorVersion))
 
 	// differentiate future hydrators here if necessary
-	hydrator = antelope_v3_1.NewHydrator(zlog)
+	if strings.ToLower(software) == "spring" {
+		hydrator = spring_v1.NewHydrator(zlog)
+	} else {
+		hydrator = leap_v5.NewHydrator(zlog)
+	}
 
 	return
 }

@@ -76,6 +76,10 @@ func (b *Block) GetFirehoseBlockLIBNum() uint64 {
 }
 
 func (b *Block) LIBNum() uint64 {
+	if b.FinalityLib > 0 {
+		return uint64(b.FinalityLib)
+	}
+
 	return uint64(b.DposIrreversibleBlocknum)
 }
 
