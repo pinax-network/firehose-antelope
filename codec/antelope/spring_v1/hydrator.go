@@ -41,7 +41,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 
 		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
 		if err != nil {
-			h.logger.Error("failed to decode block header extensions", zap.Error(err))
+			h.logger.Debug("failed to decode block header extensions", zap.Error(err))
 		} else {
 			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
 		}
@@ -104,7 +104,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 
 		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
 		if err != nil {
-			h.logger.Error("failed to decode block header extensions", zap.Error(err))
+			h.logger.Debug("failed to decode block header extensions", zap.Error(err))
 		} else {
 			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
 		}
