@@ -1,10 +1,6 @@
 package antelope
 
 import (
-	"encoding/hex"
-	"encoding/json"
-	"fmt"
-	"github.com/eoscanada/eos-go"
 	"testing"
 	"unicode/utf8"
 
@@ -47,19 +43,4 @@ func TestLimitConsoleLengthConversionOption(t *testing.T) {
 			assert.True(t, utf8.ValidString(actTrace.Console), "The truncated string is not a fully valid utf-8 sequence")
 		})
 	}
-}
-
-func TestBlockExtensionsToDEOS(t *testing.T) {
-
-	qcBytes, err := hex.DecodeString("053512000115fffb1f00c0016d7c4c1762ce7320572ef02a04dcbae1822af1658c2c65b441a6b214e1a7a5fc098667519359e84a19b2a22723905f02cf184696e292af4ac8d35c59818d4f7956a27aad59e802f7f2ead304d32cad13c2570c29e7797b1127a9748740b2b40cb5d1b0ecd83755ce03eaca747228ef1d05316fd970467d1b28529cd0f1f96a4cb750d7460bde5ceb05baa778e3f1fd033175f4689b8745bd89cdaa681883b076e4a5423a9c0e27490e188579be18d1f6932112c389875d9d25f567b06c410418")
-	assert.NoError(t, err)
-
-	res := &eos.QuorumCertificateExtension{}
-	err = eos.NewDecoder(qcBytes).Decode(res)
-	assert.NoError(t, err)
-
-	fmt.Println(res.QuorumCertificate.ValidQuorumCertificate.BlsAggregateSignature.String())
-
-	resJson, _ := json.Marshal(&res)
-	fmt.Println(string(resJson))
 }
