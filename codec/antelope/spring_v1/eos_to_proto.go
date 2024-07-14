@@ -234,23 +234,29 @@ func FinalityDataToDEOS(in *FinalityData) *pbantelope.FinalityData {
 		BaseDigest:                      in.BaseDigest,
 	}
 
-	if in.ProposedFinalizerPolicy != nil {
-		finalizerPolicy := &pbantelope.FinalizerPolicy{
-			Generation: in.ProposedFinalizerPolicy.Generation,
-			Threshold:  in.ProposedFinalizerPolicy.Threshold,
-			Finalizers: nil,
-		}
-
-		finalizers := make([]*pbantelope.FinalizerAuthority, 0, len(finalizerPolicy.Finalizers))
-		for _, finalizer := range finalizerPolicy.Finalizers {
-			finalizers = append(finalizers, &pbantelope.FinalizerAuthority{
-				Description: finalizer.Description,
-				Weight:      finalizer.Weight,
-				PublicKey:   finalizer.PublicKey,
-			})
-		}
-		finalizerPolicy.Finalizers = finalizers
+	if in.PendingFinalizerPolicy != nil {
+		res.PendingFinalizerPolicy = FinalizerPolicyToDEOS(in.PendingFinalizerPolicy)
 	}
+
+	return res
+}
+
+func FinalizerPolicyToDEOS(in *FinalizerPolicy) *pbantelope.FinalizerPolicy {
+	res := &pbantelope.FinalizerPolicy{
+		Generation: in.Generation,
+		Threshold:  in.Threshold,
+		Finalizers: nil,
+	}
+
+	finalizers := make([]*pbantelope.FinalizerAuthority, 0, len(res.Finalizers))
+	for _, finalizer := range res.Finalizers {
+		finalizers = append(finalizers, &pbantelope.FinalizerAuthority{
+			Description: finalizer.Description,
+			Weight:      finalizer.Weight,
+			PublicKey:   finalizer.PublicKey,
+		})
+	}
+	res.Finalizers = finalizers
 
 	return res
 }

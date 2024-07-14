@@ -53,7 +53,7 @@ type FinalityData struct {
 	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
 	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
 	BaseDigest                      eos.Checksum256  `json:"base_digest"`
-	ProposedFinalizerPolicy         *FinalizerPolicy `json:"proposed_finalizer_policy,omitempty" eos:"optional"`
+	PendingFinalizerPolicy          *FinalizerPolicy `json:"pending_finalizer_policy,omitempty" eos:"optional"`
 }
 
 type FinalizerPolicy struct {

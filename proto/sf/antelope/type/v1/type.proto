@@ -222,7 +222,7 @@ message FinalityData {
   uint32 final_on_strong_qc_block_num = 4;
   bytes action_mroot = 5;
   bytes base_digest = 6;
-  FinalizerPolicy proposed_finalizer_policy = 7;
+  FinalizerPolicy pending_finalizer_policy = 7;
 }
 
 message FinalizerPolicy {
