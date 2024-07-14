@@ -254,3 +254,10 @@ func FinalityDataToDEOS(in *FinalityData) *pbantelope.FinalityData {
 
 	return res
 }
+
+func ProposerPolicyToDEOS(in *ProposerPolicy) *pbantelope.ProposerPolicy {
+	return &pbantelope.ProposerPolicy{
+		ActiveTime:       timestamppb.New(in.ActiveTime.Time),
+		ProposerSchedule: antelope.ProducerAuthorityScheduleToDEOS(in.ProducerSchedule),
+	}
+}

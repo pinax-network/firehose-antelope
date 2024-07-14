@@ -68,6 +68,11 @@ type FinalizerAuthority struct {
 	PublicKey   string `json:"public_key"`
 }
 
+type ProposerPolicy struct {
+	ActiveTime       eos.BlockTimestamp             `json:"active_time"`
+	ProducerSchedule *eos.ProducerAuthoritySchedule `json:"proposer_schedule"`
+}
+
 // TransactionTrace
 //
 // File hierarchy:

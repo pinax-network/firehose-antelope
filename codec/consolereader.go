@@ -699,11 +699,11 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 
 // Line format:
 //
-//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
+//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${blk} ${finality_data_hex} ${proposer_policy} ${finalizer_policy_with_string_key}
 func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
-	chunks := strings.SplitN(line, " ", 6)
-	if len(chunks) != 6 {
-		return nil, fmt.Errorf("expected 6 fields, got %d", len(chunks))
+	chunks := strings.SplitN(line, " ", 8)
+	if len(chunks) != 8 {
+		return nil, fmt.Errorf("expected 8 fields, got %d", len(chunks))
 	}
 
 	blockNum, err := strconv.ParseInt(chunks[2], 10, 64)
