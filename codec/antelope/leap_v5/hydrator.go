@@ -98,8 +98,16 @@ func (h *Hydrator) DecodeTransactionTrace(input []byte, opts ...antelope.Convers
 	return TransactionTraceToDEOS(h.logger, trxTrace, opts...), nil
 }
 
-func (h *Hydrator) DecodeFinalityData(input []byte) (*pbantelope.FinalityData, error) {
-	return nil, errors.New("finality not supported in pre spring versions")
+func (h *Hydrator) DecodeFinalityData(_ []byte) (*pbantelope.FinalityData, error) {
+	return nil, errors.New("finality not supported in pre-spring versions")
+}
+
+func (h *Hydrator) DecodeProposerPolicy(_ []byte) (*pbantelope.ProposerPolicy, error) {
+	return nil, errors.New("proposer policy not supported in pre-spring versions")
+}
+
+func (h *Hydrator) DecodeFinalizerPolicy(_ []byte) (*pbantelope.FinalizerPolicy, error) {
+	return nil, errors.New("finalizer policy not supported in pre-spring versions")
 }
 
 func unmarshalBinary(data []byte, v interface{}) error {

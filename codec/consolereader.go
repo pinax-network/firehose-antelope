@@ -747,6 +747,28 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 	}
 	block.FinalityData = finalityData
 
+	proposerPolicyHex, err := hex.DecodeString(chunks[6])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode proposer policy hex: %w", err)
+	}
+
+	proposerPolicy, err := ctx.hydrator.DecodeProposerPolicy(proposerPolicyHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode proposer policy: %w", err)
+	}
+	block.ProposerPolicy = proposerPolicy
+
+	finalizerPolicyHex, err := hex.DecodeString(chunks[7])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finalizer policy hex: %w", err)
+	}
+
+	finalizerPolicy, err := ctx.hydrator.DecodeFinalizerPolicy(finalizerPolicyHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finalizer policy: %w", err)
+	}
+	block.FinalizerPolicy = finalizerPolicy
+
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)
 	if err != nil {

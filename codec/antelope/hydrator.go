@@ -12,4 +12,8 @@ type Hydrator interface {
 	DecodeTransactionTrace(input []byte, opts ...ConversionOption) (*pbantelope.TransactionTrace, error)
 
 	DecodeFinalityData(input []byte) (*pbantelope.FinalityData, error)
+
+	DecodeProposerPolicy(input []byte) (*pbantelope.ProposerPolicy, error)
+
+	DecodeFinalizerPolicy(input []byte) (*pbantelope.FinalizerPolicy, error)
 }

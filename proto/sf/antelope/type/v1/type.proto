@@ -50,6 +50,7 @@ message Block {
   uint32 finality_lib = 61;
   FinalityData finality_data = 62;
   ProposerPolicy proposer_policy = 63;
+  FinalizerPolicy finalizer_policy = 64;
 
   repeated RlimitOp rlimit_ops = 19;
 

@@ -153,6 +153,15 @@ func (h *Hydrator) DecodeProposerPolicy(input []byte) (*pbantelope.ProposerPolic
 	return ProposerPolicyToDEOS(proposerPolicy), nil
 }
 
+func (h *Hydrator) DecodeFinalizerPolicy(input []byte) (*pbantelope.FinalizerPolicy, error) {
+	finalizerPolicy := &FinalizerPolicy{}
+	if err := unmarshalBinary(input, finalizerPolicy); err != nil {
+		return nil, fmt.Errorf("unmarshalling binary finalizer policy: %w", err)
+	}
+
+	return FinalizerPolicyToDEOS(finalizerPolicy), nil
+}
+
 func unmarshalBinary(data []byte, v interface{}) error {
 	decoder := eos.NewDecoder(data)
 	decoder.DecodeActions(false)
