@@ -226,31 +226,48 @@ func SignaturesToDEOS(in []ecc.Signature) (out []string) {
 func FinalityDataToDEOS(in *FinalityData) *pbantelope.FinalityData {
 
 	res := &pbantelope.FinalityData{
-		MajorVersion:                    in.MajorVersion,
-		MinorVersion:                    in.MinorVersion,
-		ActiveFinalizerPolicyGeneration: in.ActiveFinalizerPolicyGeneration,
-		FinalOnStrongQcBlockNum:         in.FinalOnStrongQCBlockNum,
-		ActionMroot:                     in.ActionMroot,
-		BaseDigest:                      in.BaseDigest,
+		MajorVersion:                         in.MajorVersion,
+		MinorVersion:                         in.MinorVersion,
+		ActiveFinalizerPolicyGeneration:      in.ActiveFinalizerPolicyGeneration,
+		ActionMroot:                          in.ActionMroot,
+		ReversibleBlocksMroot:                in.ReversibleBlocksMroot,
+		LatestQcClaimBlockNum:                in.LatestQCClaimBlockNum,
+		LatestQcClaimFinalityDigest:          in.LatestQCClaimFinalityDigest,
+		LatestQcClaimTimestamp:               timestamppb.New(in.LatestQCClaimTimestamp.Time),
+		BaseDigest:                           in.BaseDigest,
+		LastPendingFinalizerPolicyGeneration: in.LastPendingFinalizerPolicyGeneration,
 	}
 
-	if in.ProposedFinalizerPolicy != nil {
-		finalizerPolicy := &pbantelope.FinalizerPolicy{
-			Generation: in.ProposedFinalizerPolicy.Generation,
-			Threshold:  in.ProposedFinalizerPolicy.Threshold,
-			Finalizers: nil,
-		}
-
-		finalizers := make([]*pbantelope.FinalizerAuthority, 0, len(finalizerPolicy.Finalizers))
-		for _, finalizer := range finalizerPolicy.Finalizers {
-			finalizers = append(finalizers, &pbantelope.FinalizerAuthority{
-				Description: finalizer.Description,
-				Weight:      finalizer.Weight,
-				PublicKey:   finalizer.PublicKey,
-			})
-		}
-		finalizerPolicy.Finalizers = finalizers
+	if in.PendingFinalizerPolicy != nil {
+		res.PendingFinalizerPolicy = FinalizerPolicyToDEOS(in.PendingFinalizerPolicy)
 	}
 
 	return res
+}
+
+func FinalizerPolicyToDEOS(in *FinalizerPolicy) *pbantelope.FinalizerPolicy {
+	res := &pbantelope.FinalizerPolicy{
+		Generation: in.Generation,
+		Threshold:  in.Threshold,
+		Finalizers: nil,
+	}
+
+	finalizers := make([]*pbantelope.FinalizerAuthority, 0, len(res.Finalizers))
+	for _, finalizer := range res.Finalizers {
+		finalizers = append(finalizers, &pbantelope.FinalizerAuthority{
+			Description: finalizer.Description,
+			Weight:      finalizer.Weight,
+			PublicKey:   finalizer.PublicKey,
+		})
+	}
+	res.Finalizers = finalizers
+
+	return res
+}
+
+func ProposerPolicyToDEOS(in *ProposerPolicy) *pbantelope.ProposerPolicy {
+	return &pbantelope.ProposerPolicy{
+		ActiveTime:       timestamppb.New(in.ActiveTime.Time),
+		ProposerSchedule: antelope.ProducerAuthorityScheduleToDEOS(in.ProducerSchedule),
+	}
 }

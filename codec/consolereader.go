@@ -699,11 +699,11 @@ func (ctx *parseCtx) readAcceptedBlock(line string) (*pbantelope.Block, error) {
 
 // Line format:
 //
-//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${block_state_hex} ${finality_data_hex}
+//	ACCEPTED_BLOCK_V2 ${block_id} ${block_num} ${lib} ${blk} ${finality_data_hex} ${proposer_policy} ${finalizer_policy_with_string_key}
 func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error) {
-	chunks := strings.SplitN(line, " ", 6)
-	if len(chunks) != 6 {
-		return nil, fmt.Errorf("expected 6 fields, got %d", len(chunks))
+	chunks := strings.SplitN(line, " ", 8)
+	if len(chunks) != 8 {
+		return nil, fmt.Errorf("expected 8 fields, got %d", len(chunks))
 	}
 
 	blockNum, err := strconv.ParseInt(chunks[2], 10, 64)
@@ -746,6 +746,28 @@ func (ctx *parseCtx) readAcceptedBlockV2(line string) (*pbantelope.Block, error)
 		return nil, fmt.Errorf("unable to decode finality data: %w", err)
 	}
 	block.FinalityData = finalityData
+
+	proposerPolicyHex, err := hex.DecodeString(chunks[6])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode proposer policy hex: %w", err)
+	}
+
+	proposerPolicy, err := ctx.hydrator.DecodeProposerPolicy(proposerPolicyHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode proposer policy: %w", err)
+	}
+	block.ProposerPolicy = proposerPolicy
+
+	finalizerPolicyHex, err := hex.DecodeString(chunks[7])
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finalizer policy hex: %w", err)
+	}
+
+	finalizerPolicy, err := ctx.hydrator.DecodeFinalizerPolicy(finalizerPolicyHex)
+	if err != nil {
+		return nil, fmt.Errorf("unable to decode finalizer policy: %w", err)
+	}
+	block.FinalizerPolicy = finalizerPolicy
 
 	zlog.Debug("blocking until abi decoder has decoded every transaction pushed to it")
 	err = ctx.abiDecoder.endBlock(ctx.currentBlock)

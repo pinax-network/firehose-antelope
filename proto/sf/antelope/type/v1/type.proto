@@ -32,8 +32,6 @@ message Block {
   string producer_signature = 5;
   repeated Extension block_extensions = 7;
 
-  // repeated BlockExtension decoded_block_extensions = 63;
-
   uint32 dpos_proposed_irreversible_blocknum = 8;
   uint32 dpos_irreversible_blocknum = 9;
   BlockRootMerkle blockroot_merkle = 11;
@@ -51,6 +49,8 @@ message Block {
   // the LIB post-Savanna activation, pre-Savanna this is found in dpos_irreversible_blocknum
   uint32 finality_lib = 61;
   FinalityData finality_data = 62;
+  ProposerPolicy proposer_policy = 63;
+  FinalizerPolicy finalizer_policy = 64;
 
   repeated RlimitOp rlimit_ops = 19;
 
@@ -179,7 +179,7 @@ message Block {
   // See BlockSigningAuthority for further details
   BlockSigningAuthority valid_block_signing_authority_v2 = 30;
 
-  // This repleaces the old type `ProducerSchedule` for the `active_schedule`
+  // This replaces the old type `ProducerSchedule` for the `active_schedule`
   // field. This was only a type change in EOSIO 2.0, the field's name remained
   // the same.
   //
@@ -220,10 +220,14 @@ message FinalityData {
   uint32 major_version = 1;
   uint32 minor_version = 2;
   uint32 active_finalizer_policy_generation = 3;
-  uint32 final_on_strong_qc_block_num = 4;
-  bytes action_mroot = 5;
-  bytes base_digest = 6;
-  FinalizerPolicy proposed_finalizer_policy = 7;
+  bytes action_mroot = 4;
+  bytes reversible_blocks_mroot = 5;
+  uint32 latest_qc_claim_block_num = 6;
+  bytes latest_qc_claim_finality_digest = 7;
+  google.protobuf.Timestamp latest_qc_claim_timestamp = 8;
+  bytes base_digest = 9;
+  FinalizerPolicy pending_finalizer_policy = 10;
+  uint32 last_pending_finalizer_policy_generation = 11;
 }
 
 message FinalizerPolicy {
@@ -236,25 +240,6 @@ message FinalizerAuthority {
   string description = 1;
   uint64 weight = 2;
   string public_key = 3;
-}
-
-message AdditionalBlockSignatureExtension {
-  repeated string signatures = 1;
-}
-
-message QuorumCertificateExtension {
-  QuorumCertificate qc = 1;
-}
-
-message QuorumCertificate {
-  uint32 block_num = 1;
-  ValidQuorumCertificate data = 2;
-}
-
-message ValidQuorumCertificate {
-  bytes strong_votes = 1;
-  bytes weak_votes = 2;
-  string bls_aggregate_signature = 3;
 }
 
 // BlockWithRefs is a lightweight block, with traces and transactions
@@ -318,6 +303,11 @@ message ProducerAuthoritySchedule {
 message ProducerAuthority {
   string account_name = 1;
   BlockSigningAuthority block_signing_authority = 2;
+}
+
+message ProposerPolicy {
+  google.protobuf.Timestamp active_time = 1;
+  ProducerAuthoritySchedule proposer_schedule = 2;
 }
 
 // Present in EOSIO 2.x only

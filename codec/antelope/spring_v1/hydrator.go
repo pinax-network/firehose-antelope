@@ -39,13 +39,6 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
 
-		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
-		if err != nil {
-			h.logger.Debug("failed to decode block header extensions", zap.Error(err))
-		} else {
-			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
-		}
-
 		block.DposIrreversibleBlocknum = blockState.DPoSIrreversibleBlockNum
 		block.DposProposedIrreversibleBlocknum = blockState.DPoSProposedIrreversibleBlockNum
 		block.BlockrootMerkle = antelope.BlockrootMerkleToDEOS(blockState.BlockrootMerkle)
@@ -102,13 +95,6 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
 
-		decodedBlockHeaderExtensions, err := antelope.BlockHeaderExtensionsToDEOS(signedBlock.BlockHeader.HeaderExtensions)
-		if err != nil {
-			h.logger.Debug("failed to decode block header extensions", zap.Error(err))
-		} else {
-			block.Header.DecodedHeaderExtensions = decodedBlockHeaderExtensions
-		}
-
 		block.UnfilteredTransactionCount = uint32(len(signedBlock.Transactions))
 		for idx, transaction := range signedBlock.Transactions {
 			deosTransaction := TransactionReceiptToDEOS(transaction)
@@ -155,6 +141,25 @@ func (h *Hydrator) DecodeFinalityData(input []byte) (*pbantelope.FinalityData, e
 	}
 
 	return FinalityDataToDEOS(finalityData), nil
+}
+
+func (h *Hydrator) DecodeProposerPolicy(input []byte) (*pbantelope.ProposerPolicy, error) {
+
+	proposerPolicy := &ProposerPolicy{}
+	if err := unmarshalBinary(input, proposerPolicy); err != nil {
+		return nil, fmt.Errorf("unmarshalling binary proposer policy: %w", err)
+	}
+
+	return ProposerPolicyToDEOS(proposerPolicy), nil
+}
+
+func (h *Hydrator) DecodeFinalizerPolicy(input []byte) (*pbantelope.FinalizerPolicy, error) {
+	finalizerPolicy := &FinalizerPolicy{}
+	if err := unmarshalBinary(input, finalizerPolicy); err != nil {
+		return nil, fmt.Errorf("unmarshalling binary finalizer policy: %w", err)
+	}
+
+	return FinalizerPolicyToDEOS(finalizerPolicy), nil
 }
 
 func unmarshalBinary(data []byte, v interface{}) error {
