@@ -226,12 +226,16 @@ func SignaturesToDEOS(in []ecc.Signature) (out []string) {
 func FinalityDataToDEOS(in *FinalityData) *pbantelope.FinalityData {
 
 	res := &pbantelope.FinalityData{
-		MajorVersion:                    in.MajorVersion,
-		MinorVersion:                    in.MinorVersion,
-		ActiveFinalizerPolicyGeneration: in.ActiveFinalizerPolicyGeneration,
-		FinalOnStrongQcBlockNum:         in.FinalOnStrongQCBlockNum,
-		ActionMroot:                     in.ActionMroot,
-		BaseDigest:                      in.BaseDigest,
+		MajorVersion:                         in.MajorVersion,
+		MinorVersion:                         in.MinorVersion,
+		ActiveFinalizerPolicyGeneration:      in.ActiveFinalizerPolicyGeneration,
+		ActionMroot:                          in.ActionMroot,
+		ReversibleBlocksMroot:                in.ReversibleBlocksMroot,
+		LatestQcClaimBlockNum:                in.LatestQCClaimBlockNum,
+		LatestQcClaimFinalityDigest:          in.LatestQCClaimFinalityDigest,
+		LatestQcClaimTimestamp:               timestamppb.New(in.LatestQCClaimTimestamp.Time),
+		BaseDigest:                           in.BaseDigest,
+		LastPendingFinalizerPolicyGeneration: in.LastPendingFinalizerPolicyGeneration,
 	}
 
 	if in.PendingFinalizerPolicy != nil {

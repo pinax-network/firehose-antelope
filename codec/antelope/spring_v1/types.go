@@ -47,13 +47,17 @@ type SignedBlock struct {
 //
 //   - https://github.com/AntelopeIO/spring/blob/main/libraries/chain/include/eosio/chain/block_state.hpp#L61
 type FinalityData struct {
-	MajorVersion                    uint32           `json:"major_version"`
-	MinorVersion                    uint32           `json:"minor_version"`
-	ActiveFinalizerPolicyGeneration uint32           `json:"active_finalizer_policy_generation"`
-	FinalOnStrongQCBlockNum         uint32           `json:"final_on_strong_qc_block_num"`
-	ActionMroot                     eos.Checksum256  `json:"action_mroot"`
-	BaseDigest                      eos.Checksum256  `json:"base_digest"`
-	PendingFinalizerPolicy          *FinalizerPolicy `json:"pending_finalizer_policy,omitempty" eos:"optional"`
+	MajorVersion                         uint32             `json:"major_version"`
+	MinorVersion                         uint32             `json:"minor_version"`
+	ActiveFinalizerPolicyGeneration      uint32             `json:"active_finalizer_policy_generation"`
+	ActionMroot                          eos.Checksum256    `json:"action_mroot"`
+	ReversibleBlocksMroot                eos.Checksum256    `json:"reversible_blocks_mroot"`
+	LatestQCClaimBlockNum                uint32             `json:"latest_qc_claim_block_num"`
+	LatestQCClaimFinalityDigest          eos.Checksum256    `json:"latest_qc_claim_finality_digest"`
+	LatestQCClaimTimestamp               eos.BlockTimestamp `json:"latest_qc_claim_timestamp"`
+	BaseDigest                           eos.Checksum256    `json:"base_digest"`
+	PendingFinalizerPolicy               *FinalizerPolicy   `json:"pending_finalizer_policy,omitempty" eos:"optional"`
+	LastPendingFinalizerPolicyGeneration uint32             `json:"last_pending_finalizer_policy_generation"`
 }
 
 type FinalizerPolicy struct {

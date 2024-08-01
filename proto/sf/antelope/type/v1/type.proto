@@ -220,10 +220,14 @@ message FinalityData {
   uint32 major_version = 1;
   uint32 minor_version = 2;
   uint32 active_finalizer_policy_generation = 3;
-  uint32 final_on_strong_qc_block_num = 4;
-  bytes action_mroot = 5;
-  bytes base_digest = 6;
-  FinalizerPolicy pending_finalizer_policy = 7;
+  bytes action_mroot = 4;
+  bytes reversible_blocks_mroot = 5;
+  uint32 latest_qc_claim_block_num = 6;
+  bytes latest_qc_claim_finality_digest = 7;
+  google.protobuf.Timestamp latest_qc_claim_timestamp = 8;
+  bytes base_digest = 9;
+  FinalizerPolicy pending_finalizer_policy = 10;
+  uint32 last_pending_finalizer_policy_generation = 11;
 }
 
 message FinalizerPolicy {
