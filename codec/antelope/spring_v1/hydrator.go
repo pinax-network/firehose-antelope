@@ -91,7 +91,7 @@ func (h *Hydrator) HydrateBlock(block *pbantelope.Block, input []byte, version s
 			return fmt.Errorf("unmarshalling signed block (spring v2): %w", err)
 		}
 
-		block.Version = 1
+		block.Version = 2
 		block.Header = antelope.BlockHeaderToDEOS(&signedBlock.BlockHeader)
 		block.BlockExtensions = antelope.ExtensionsToDEOS(signedBlock.BlockExtensions)
 
