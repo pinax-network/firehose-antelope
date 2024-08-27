@@ -1,13 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"github.com/pinax-network/firehose-antelope/codec"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	fhCmd "github.com/streamingfast/firehose-core/cmd"
+	"github.com/streamingfast/firehose-core/firehose/info"
 	"github.com/streamingfast/logging"
+	"github.com/streamingfast/pbgo/sf/firehose/v2"
 	"go.uber.org/zap"
 )
 
@@ -43,14 +47,22 @@ func Chain() *firecore.Chain[*pbantelope.Block] {
 			flags.Bool("reader-node-overwrite-node-files", false, "Force download of node-key and config files even if they already exist on the machine.")
 		},
 
-		Tools: &firecore.ToolsConfig[*pbantelope.Block]{
+		InfoResponseFiller: func(firstStreamableBlock *pbbstream.Block, resp *pbfirehose.InfoResponse, validate bool) error {
+			antelopeBlock := &pbantelope.Block{}
+			if err := firstStreamableBlock.Payload.UnmarshalTo(antelopeBlock); err != nil && validate {
+				return fmt.Errorf("cannot decode first streamable block: %w", err)
+			}
+			if err := info.DefaultInfoResponseFiller(firstStreamableBlock, resp, validate); err != nil && validate {
+				return err
+			}
+			return nil
+		},
 
+		Tools: &firecore.ToolsConfig[*pbantelope.Block]{
 			RegisterExtraCmd: func(chain *firecore.Chain[*pbantelope.Block], parent *cobra.Command, zlog *zap.Logger, tracer logging.Tracer) error {
 				parent.AddCommand(newCheckBlocksCmd(zlog))
-
 				return nil
 			},
-
 			SanitizeBlockForCompare: sanitizeBlockForCompare,
 		},
 	}
