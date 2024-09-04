@@ -1,24 +1,41 @@
-# syntax=docker/dockerfile:1.2
+ARG COREVERSION="latest"
 
-FROM ubuntu:20.04
+FROM golang:1.22-alpine as build
+WORKDIR /app
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && \
-    apt-get -y install -y \
-    ca-certificates libssl1.1 vim htop iotop sysstat \
-    dstat strace lsof curl jq tzdata && \
-    rm -rf /var/cache/apt /var/lib/apt/lists/*
+COPY go.mod go.sum ./
+RUN go mod download
 
-RUN rm /etc/localtime && ln -snf /usr/share/zoneinfo/America/Montreal /etc/localtime && dpkg-reconfigure -f noninteractive tzdata
+COPY . ./
 
-RUN mkdir /tmp/wasmer-install && cd /tmp/wasmer-install && \
-    curl -L https://github.com/wasmerio/wasmer/releases/download/2.3.0/wasmer-linux-amd64.tar.gz | tar xzf - && \
-    mv lib/libwasmer.a lib/libwasmer.so /usr/lib/ && cd / && rm -rf /tmp/wasmer-install
+# to get buildinfo in golang
+RUN apk add git
+ARG VERSION="dev"
+RUN go build -v -ldflags "-X main.version=${VERSION}" ./cmd/fireantelope
 
-ADD /fireantelope /app/fireantelope
+####
 
-COPY tools/fireantelope/motd_generic /etc/
-COPY tools/fireantelope/motd_node_manager /etc/
-COPY tools/fireantelope/99-firehose.sh /etc/profile.d/
-COPY tools/fireantelope/scripts/* /usr/local/bin
+FROM ghcr.io/streamingfast/firehose-core:${COREVERSION} as core
+
+####
+
+FROM alpine:3
+
+ENV PATH "$PATH:/app"
+
+#COPY tools/fireeth/motd_generic /etc/motd
+#COPY tools/fireeth/99-fireeth.sh /etc/profile.d/
+#RUN echo ". /etc/profile.d/99-fireeth.sh" > /root/.bash_aliases
+
+RUN apk --no-cache add \
+        ca-certificates htop iotop sysstat \
+        strace lsof curl jq tzdata bash
+
+RUN mkdir -p /app/ && curl -Lo /app/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/v0.4.12/grpc_health_probe-linux-amd64 && chmod +x /app/grpc_health_probe
+
+WORKDIR /app
+
+COPY --from=build /app/fireantelope /app/fireantelope
+COPY --from=core /app/firecore /app/firecore
 
 ENTRYPOINT ["/app/fireantelope"]
