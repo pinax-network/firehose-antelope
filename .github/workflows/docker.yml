@@ -7,8 +7,6 @@ on:
     branches:
       - "dockerbuild"
       - "develop"
-      - "release/v*"
-      - "feature/*"
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
