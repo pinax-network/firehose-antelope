@@ -213,3 +213,5 @@ replace (
 	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem3
 	github.com/jhump/protoreflect => github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d
 )
+
+replace github.com/streamingfast/firehose-core => github.com/pinax-network/firehose-core v0.0.0-20240918101618-f9b0f32db19c
