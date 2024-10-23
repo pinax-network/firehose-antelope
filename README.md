@@ -40,12 +40,16 @@ Please have a look at the documentation [here](https://firehose.streamingfast.io
 Substreams stack. Note that indexing larger Antelope chains such as EOS or WAX requires parallel processing of the chain
 and a lot of resources to have the indexing done in a reasonable time frame.
 
+### Versioning
+
+In case you are running an Antelope chain on the leap codebase, please stay on the v1 releases. For spring nodes use v2.
+
 ### EOS EVM
 
 This implementation provides native Antelope blocks, including all Antelope specific block data. In case you are looking
 for operating Firehose & Substreams for EOS EVM, please have a look at
-the [firehose-ethereum](https://github.com/streamingfast/firehose-ethereum) repository; it provides a generic evm poller
-to poll the EVM blocks from an RPC node.
+the [firehose-ethereum](https://github.com/streamingfast/firehose-ethereum) repository; it provides a generic EVM poller
+that creates the Firehose blocks using an RPC node.
 
 ## Support
 
