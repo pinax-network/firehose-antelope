@@ -3,10 +3,6 @@ package:
   name: antelope
   version: v2.0.0
   url: https://github.com/pinax-network/firehose-antelope
-  doc: |
-    Protobuf definitions for Substreams modules on Antelope.
-
-    This package does not include any modules.
 
 protobuf:
   files:
