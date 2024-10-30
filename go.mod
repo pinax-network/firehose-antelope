@@ -4,13 +4,13 @@ go 1.22.4
 
 require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
-	github.com/eoscanada/eos-go v0.10.3-0.20231109144819-59afdfa3a37d
+	github.com/eoscanada/eos-go v0.10.3-0.20241029144540-014453830df8
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
 	github.com/streamingfast/bstream v0.0.2-0.20240916154503-c9c5c8bbeca0
-	github.com/streamingfast/dmetrics v0.0.0-20230919161904-206fa8ebd545
+	github.com/streamingfast/dmetrics v0.0.0-20240214191810-524a5c58fbaa
 	github.com/streamingfast/dstore v0.1.1-0.20241011152904-9acd6205dc14
 	github.com/streamingfast/firehose-core v1.6.5
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
@@ -215,5 +215,3 @@ replace (
 	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem3
 	github.com/jhump/protoreflect => github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d
 )
-
-replace github.com/eoscanada/eos-go => github.com/pinax-network/eos-go v0.0.0-20241029124922-b67e236524e9
