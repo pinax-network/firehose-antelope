@@ -561,8 +561,8 @@ github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c h1:6WjE2yInE+
 github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c/go.mod h1:dbfiy9ORrL8c6ldSq+L0H9pg8TOqqu/FsghsgUEWK54=
 github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1 h1:xJB7rXnOHLesosMjfwWsEL2i/40mFSkzenEb3M0qTyM=
 github.com/streamingfast/derr v0.0.0-20230515163924-8570aaa43fe1/go.mod h1:QSm/AfaDsE0k1xBYi0lW580YJ/WDV/FKZI628tkZR0Y=
-github.com/streamingfast/dgrpc v0.0.0-20250115215805-6f4ad2be7eef h1:He9qXjmnDtxVrJcHAOfFiWFA6An48zTezpU5iMnNHuY=
-github.com/streamingfast/dgrpc v0.0.0-20250115215805-6f4ad2be7eef/go.mod h1:bxRfCxRKQ0ZH2BGi6UcYdlH0nkj8yERm3kpP1jPLQLY=
+github.com/streamingfast/dgrpc v0.0.0-20250120175901-89d79176166e h1:6W507uNw9GMNTVGduVChzTImDiduYleQoMV+QwiWBCU=
+github.com/streamingfast/dgrpc v0.0.0-20250120175901-89d79176166e/go.mod h1:bxRfCxRKQ0ZH2BGi6UcYdlH0nkj8yERm3kpP1jPLQLY=
 github.com/streamingfast/dmetering v0.0.0-20241101155221-489f5a9d9139 h1:a22XzjeY7n9Xv+0yJMV2pzuPptALtOu6jdg69pOwuO4=
 github.com/streamingfast/dmetering v0.0.0-20241101155221-489f5a9d9139/go.mod h1:UqWuX3REU/IInBUaymFN2eLjuvz+/0SsoUFjeQlLNyI=
 github.com/streamingfast/dmetrics v0.0.0-20240214191810-524a5c58fbaa h1:PJkLMu6Own6V5qYwJDQHgRBCTTW2CxV4xxADMXfw+0M=
@@ -571,8 +571,8 @@ github.com/streamingfast/dstore v0.1.1-0.20241011152904-9acd6205dc14 h1:/2HxIOzA
 github.com/streamingfast/dstore v0.1.1-0.20241011152904-9acd6205dc14/go.mod h1:kNzxgv2MzYFn2T4kelBVpGp/yP/1njtr3+csWuqxK3w=
 github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb h1:XPuLw6gwN4k1DRxHEwRGbNYVVBf3Petx+Cv5GUx2vIU=
 github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb/go.mod h1:huOJyjMYS6K8upTuxDxaNd+emD65RrXoVBvh8f1/7Ns=
-github.com/streamingfast/firehose-core v1.7.0 h1:jBbFwGtLniXmddSP+3uhZOrrK2522+C+DMMdQydYOXw=
-github.com/streamingfast/firehose-core v1.7.0/go.mod h1:V1JaIfMtnK8fwdSRSNtm9vW6qtyf4P/wsptgSmcM21Y=
+github.com/streamingfast/firehose-core v1.7.1 h1:702OBXZ0NnON0Ehu7EYwWKUm9eR4rg4xljqZ9PbFmyM=
+github.com/streamingfast/firehose-core v1.7.1/go.mod h1:Je6AJIEbl8VPMsHfn4Y1TnSc7UZbzYbOhRYi3L6jNUo=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 h1:g8eEYbFSykyzIyuxNMmHEUGGUvJE0ivmqZagLDK42gw=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0/go.mod h1:cTNObq2Uofb330y05JbbZZ6RwE6QUXw5iVcHk1Fx3fk=
 github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
