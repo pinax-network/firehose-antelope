@@ -11,10 +11,10 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.8.1
 	github.com/spf13/pflag v1.0.5
-	github.com/streamingfast/bstream v0.0.2-0.20250129191551-5539724f4b12
+	github.com/streamingfast/bstream v0.0.2-0.20250221181559-fb0809660f91
 	github.com/streamingfast/dmetrics v0.0.0-20240214191810-524a5c58fbaa
 	github.com/streamingfast/dstore v0.1.1-0.20250217165048-d508dcc6b33e
-	github.com/streamingfast/firehose-core v1.8.0
+	github.com/streamingfast/firehose-core v1.9.0
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/streamingfast/pbgo v0.0.6-0.20250114182320-0b43084f4000
@@ -64,6 +64,7 @@ require (
 	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/bobg/go-generics/v3 v3.5.0 // indirect
 	github.com/bufbuild/protocompile v0.4.0 // indirect
+	github.com/bytecodealliance/wasmtime-go/v30 v30.0.0 // indirect
 	github.com/census-instrumentation/opencensus-proto v0.4.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/lipgloss v1.0.0 // indirect
@@ -169,7 +170,7 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.12.5-0.20250220140015-91e8dc3e5576 // indirect
+	github.com/streamingfast/substreams v1.14.0 // indirect
 	github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae // indirect
 	github.com/streamingfast/worker-pool-protocol v0.0.0-20250218145136-4ad271e36e39 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -227,6 +228,5 @@ require (
 
 replace (
 	github.com/ShinyTrinkets/overseer => github.com/streamingfast/overseer v0.2.1-0.20210326144022-ee491780e3ef
-	github.com/bytecodealliance/wasmtime-go/v4 => github.com/streamingfast/wasmtime-go/v4 v4.0.0-freemem3
 	github.com/jhump/protoreflect => github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d
 )
