@@ -587,8 +587,8 @@ github.com/streamingfast/dstore v0.1.1-0.20250609173504-95368d3441ee h1:f0fDCbCN
 github.com/streamingfast/dstore v0.1.1-0.20250609173504-95368d3441ee/go.mod h1:FKF6+noY/Qgf+1EgeyQdQllQpmCvKQ6bghSbqRYJhlw=
 github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb h1:XPuLw6gwN4k1DRxHEwRGbNYVVBf3Petx+Cv5GUx2vIU=
 github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb/go.mod h1:huOJyjMYS6K8upTuxDxaNd+emD65RrXoVBvh8f1/7Ns=
-github.com/streamingfast/firehose-core v1.9.11 h1:9RE9ENsxGGbqXE5YfW3VxbAvG1WAPyK7ho2ST7vwDkU=
-github.com/streamingfast/firehose-core v1.9.11/go.mod h1:zgKEbQ9YB2zszxAiV92MFDP/e2LqbXU7iesxN32I2BU=
+github.com/streamingfast/firehose-core v1.9.12 h1:NXoSITYoOWcfR56ZYrk653YSEBxQ1vscYkEQRVgJk+k=
+github.com/streamingfast/firehose-core v1.9.12/go.mod h1:oDD2iMr5tiSYTRErmAbl3ONlsnypEEvZwJjSrjFkYiM=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0 h1:g8eEYbFSykyzIyuxNMmHEUGGUvJE0ivmqZagLDK42gw=
 github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0/go.mod h1:cTNObq2Uofb330y05JbbZZ6RwE6QUXw5iVcHk1Fx3fk=
 github.com/streamingfast/logging v0.0.0-20210811175431-f3b44b61606a/go.mod h1:4GdqELhZOXj4xwc4IaBmzofzdErGynnaSzuzxy0ZIBo=
@@ -612,8 +612,8 @@ github.com/streamingfast/shutter v1.5.0 h1:NpzDYzj0HVpSiDJVO/FFSL6QIK/YKOxY0gJAt
 github.com/streamingfast/shutter v1.5.0/go.mod h1:B/T6efqdeMGbGwjzPS1ToXzYZI4kDzI5/u4I+7qbjY8=
 github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 h1:Y15G1Z4fpEdm2b+/70owI7TLuXadlqBtGM7rk4Hxrzk=
 github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0/go.mod h1:/Rnz2TJvaShjUct0scZ9kKV2Jr9/+KBAoWy4UMYxgv4=
-github.com/streamingfast/substreams v1.15.9-0.20250613181215-4aacedb1c87b h1:xb2W2obdxAWDlsn3pb7YAYEq5Brims1pYMEeUcpuJ2E=
-github.com/streamingfast/substreams v1.15.9-0.20250613181215-4aacedb1c87b/go.mod h1:q73jcxz8270osAXh8cNf+4WE/jGPPLcsyuRtSHjPYBk=
+github.com/streamingfast/substreams v1.15.9-0.20250616133405-432e58897ceb h1:YiRYVCPanvOhq4YYJYzXzT1lpnSOaMEIzimEcvTb23k=
+github.com/streamingfast/substreams v1.15.9-0.20250616133405-432e58897ceb/go.mod h1:q73jcxz8270osAXh8cNf+4WE/jGPPLcsyuRtSHjPYBk=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae h1:XRNPwqkhmsDRKmncN4oCxiTu3LpFswmVDOTmZdoKQkg=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae/go.mod h1:9btia9gJR6TKKdauYb5MyDAG/D2ye/NDXLHnyyD6mVc=
 github.com/streamingfast/worker-pool-protocol v0.0.0-20250218145136-4ad271e36e39 h1:NBBLx99rrGz/hxwHjHi+QyN07DfqcDC4zzuBEsH0/vE=
