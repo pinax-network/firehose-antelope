@@ -1,8 +1,6 @@
 module github.com/pinax-network/firehose-antelope
 
-go 1.24.2
-
-toolchain go1.24.4
+go 1.24.4
 
 require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
