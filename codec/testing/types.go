@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/v1"
 	"github.com/pinax-network/firehose-antelope/types"
 	"github.com/streamingfast/bstream"
 	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"

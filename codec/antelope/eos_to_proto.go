@@ -20,7 +20,7 @@ import (
 
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/ecc"
-	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/v1"
 	"github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

@@ -18,7 +18,7 @@ import (
 	"encoding/hex"
 	"testing"
 
-	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/v1"
 
 	"github.com/eoscanada/eos-go"
 	"github.com/stretchr/testify/require"

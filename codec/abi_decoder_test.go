@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/v1"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/eoscanada/eos-go"

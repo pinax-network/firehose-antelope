@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-json-experiment/json"
+	"github.com/go-json-experiment/json/v1"
 	"github.com/streamingfast/bstream"
 	"github.com/tidwall/gjson"
 )

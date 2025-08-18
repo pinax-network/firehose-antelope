@@ -8,5 +8,7 @@ model.
 Useful links:
 
 -
+
 Documentation: [https://substreams.streamingfast.io/](https://substreams.streamingfast.io/) ([Firehose Docs](https://firehose.streamingfast.io/))
+
 - Source: [https://github.com/pinax-network/firehose-antelope](https://github.com/pinax-network/firehose-antelope)
