@@ -13,8 +13,16 @@
     }
   ],
   "actions": [
-    { "name": "act3", "type": "value" }
+    {
+      "name": "act3",
+      "type": "value"
+    }
   ],
-  "ricardian_clauses": [{"id":"name", "body":"test.3.abi.json"}],
+  "ricardian_clauses": [
+    {
+      "id": "name",
+      "body": "test.3.abi.json"
+    }
+  ],
   "abi_extensions": []
 }

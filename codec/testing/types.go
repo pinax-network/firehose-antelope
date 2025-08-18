@@ -2,16 +2,17 @@ package ct
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
-	"github.com/pinax-network/firehose-antelope/types"
-	"github.com/streamingfast/bstream"
-	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json"
+	"github.com/pinax-network/firehose-antelope/types"
+	"github.com/streamingfast/bstream"
+	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"

@@ -15,9 +15,10 @@
 package codec
 
 import (
-	"github.com/pinax-network/firehose-antelope/codec/antelope"
 	"strings"
 	"testing"
+
+	"github.com/pinax-network/firehose-antelope/codec/antelope"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

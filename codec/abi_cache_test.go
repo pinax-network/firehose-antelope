@@ -1,11 +1,12 @@
 package codec
 
 import (
-	"encoding/json"
 	"errors"
 	"os"
 	"path"
 	"testing"
+
+	"github.com/go-json-experiment/json"
 
 	"github.com/eoscanada/eos-go"
 	"github.com/stretchr/testify/assert"

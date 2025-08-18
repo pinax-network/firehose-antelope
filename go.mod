@@ -5,6 +5,7 @@ go 1.24.4
 require (
 	github.com/andreyvit/diff v0.0.0-20170406064948-c7f18ee00883
 	github.com/eoscanada/eos-go v0.10.3-0.20241029144540-014453830df8
+	github.com/go-json-experiment/json v0.0.0-20250813233538-9b1f9ea2e11b
 	github.com/lytics/ordpool v0.0.0-20130426221837-8d833f097fe7
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.9.1
@@ -82,7 +83,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
-	github.com/go-json-experiment/json v0.0.0-20240524174822-2d9f40f7385b // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect

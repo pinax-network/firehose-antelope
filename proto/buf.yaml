@@ -3,7 +3,7 @@ name: buf.build/pinax/firehose-antelope
 
 build:
   excludes:
-  - google
+    - google
 
 lint:
   use:

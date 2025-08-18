@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	pbbstream "github.com/streamingfast/bstream/pb/sf/bstream/v1"
 	firecore "github.com/streamingfast/firehose-core"
 	"google.golang.org/protobuf/types/known/timestamppb"
-	"strconv"
-	"time"
 )
 
 var fixedTimestamp = timestamppb.New(time.Date(2006, 01, 02, 15, 04, 05, 0, time.UTC))

@@ -29,6 +29,11 @@
     }
   ],
   "tables": [],
-  "ricardian_clauses": [{"id":"name", "body":"nekot.1.abi.json"}],
+  "ricardian_clauses": [
+    {
+      "id": "name",
+      "body": "nekot.1.abi.json"
+    }
+  ],
   "abi_extensions": []
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/pinax-network/firehose-antelope/codec"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/spf13/cobra"

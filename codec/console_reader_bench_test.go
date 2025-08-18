@@ -17,11 +17,12 @@ package codec
 import (
 	"bytes"
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zaptest"
 	"io"
 	"os"
 	"testing"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest"
 )
 
 func BenchmarkConsoleReader(b *testing.B) {

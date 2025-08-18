@@ -15,11 +15,12 @@
 package pbantelope
 
 import (
-	"encoding/json"
-	"github.com/streamingfast/bstream"
-	"github.com/tidwall/gjson"
 	"strings"
 	"time"
+
+	"github.com/go-json-experiment/json"
+	"github.com/streamingfast/bstream"
+	"github.com/tidwall/gjson"
 )
 
 func (b *Block) ID() string {

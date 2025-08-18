@@ -2,11 +2,12 @@ package antelope
 
 import (
 	"encoding/hex"
+	"strings"
+	"testing"
+
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/logging"
 	"github.com/stretchr/testify/assert"
-	"strings"
-	"testing"
 )
 
 func TestDecodeAcceptedBlockV1(t *testing.T) {

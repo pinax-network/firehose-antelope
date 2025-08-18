@@ -3,14 +3,15 @@ package codec
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
-	"google.golang.org/protobuf/types/known/timestamppb"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/go-json-experiment/json"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"

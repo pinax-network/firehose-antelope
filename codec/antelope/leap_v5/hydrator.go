@@ -3,6 +3,7 @@ package antelope
 import (
 	"errors"
 	"fmt"
+
 	"github.com/pinax-network/firehose-antelope/codec/antelope"
 
 	"github.com/eoscanada/eos-go"

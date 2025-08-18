@@ -16,8 +16,9 @@ package codec
 
 import (
 	"fmt"
-	"github.com/pinax-network/firehose-antelope/codec/antelope"
 	"strings"
+
+	"github.com/pinax-network/firehose-antelope/codec/antelope"
 )
 
 type nodes []*node

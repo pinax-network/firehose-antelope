@@ -16,8 +16,9 @@ package antelope
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"testing"
+
+	"github.com/go-json-experiment/json"
 
 	"github.com/eoscanada/eos-go"
 	"github.com/stretchr/testify/require"

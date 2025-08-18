@@ -16,16 +16,17 @@ package codec
 import (
 	"encoding/base64"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
+	"math"
+	"strings"
+
 	"github.com/eoscanada/eos-go"
 	"github.com/eoscanada/eos-go/system"
+	"github.com/go-json-experiment/json"
 	"github.com/lytics/ordpool"
 	pbantelope "github.com/pinax-network/firehose-antelope/types/pb/sf/antelope/type/v1"
 	"github.com/streamingfast/bstream"
 	"go.uber.org/zap"
-	"math"
-	"strings"
 )
 
 var mostRecentActiveABI uint64 = math.MaxUint64
