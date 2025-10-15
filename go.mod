@@ -11,8 +11,8 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/streamingfast/bstream v0.0.2-0.20250903174843-9c884c3356fd
 	github.com/streamingfast/dmetrics v0.0.0-20250711072030-f023e918a175
-	github.com/streamingfast/dstore v0.1.1-0.20250609173504-95368d3441ee
-	github.com/streamingfast/firehose-core v1.11.2
+	github.com/streamingfast/dstore v0.1.1-0.20250929131642-07e4d13f2fda
+	github.com/streamingfast/firehose-core v1.11.3
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/streamingfast/pbgo v0.0.6-0.20250114182320-0b43084f4000
@@ -177,7 +177,7 @@ require (
 	github.com/streamingfast/dmetering v0.0.0-20250606124734-944cf3e4959e // indirect
 	github.com/streamingfast/dsession v0.0.0-20250904235523-ffe9952a12d3 // indirect
 	github.com/streamingfast/dtracing v0.0.0-20221011173312-3f74543e68eb // indirect
-	github.com/streamingfast/firehose-networks v0.2.1 // indirect
+	github.com/streamingfast/firehose-networks v0.2.2 // indirect
 	github.com/streamingfast/opaque v0.0.0-20210811180740-0c01d37ea308 // indirect
 	github.com/streamingfast/payment-gateway v0.0.0-20250910205031-eaa05d2fd1b7 // indirect
 	github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90 // indirect
