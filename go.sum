@@ -157,8 +157,8 @@ github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 h1:DDGfHa7BWjL4Yn
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=
 github.com/bobg/go-generics/v3 v3.5.0 h1:OdBXzCRCO4e3Z7FQz1maEN2Q5LFYHc7vIK8EXcS4xQQ=
 github.com/bobg/go-generics/v3 v3.5.0/go.mod h1:wGlMLQER92clsh3cJoQjbUtUEJ03FoxnGhZjaWhf4fM=
-github.com/bufbuild/protocompile v0.4.0 h1:LbFKd2XowZvQ/kajzguUp2DC9UEIQhIq77fZZlaQsNA=
-github.com/bufbuild/protocompile v0.4.0/go.mod h1:3v93+mbWn/v3xzN+31nwkJfrEpAUwp+BagBSZWx+TP8=
+github.com/bufbuild/protocompile v0.14.1 h1:iA73zAf/fyljNjQKwYzUHD6AD4R8KMasmwa/FBatYVw=
+github.com/bufbuild/protocompile v0.14.1/go.mod h1:ppVdAIhbr2H8asPk6k4pY7t9zB1OU5DoEw9xY/FUi1c=
 github.com/bytecodealliance/wasmtime-go/v36 v36.0.0 h1:AEapAro5dYIryZtIfS29QonBXAblVMCKEPH6fs7fOEE=
 github.com/bytecodealliance/wasmtime-go/v36 v36.0.0/go.mod h1:wysMJXQcKNOgby61jR/8+7VDuQfId27t9FrUQRwDdVo=
 github.com/cenkalti/backoff/v5 v5.0.2 h1:rIfFVxEf1QsI7E1ZHfp/B4DF/6QBAUhmgkxc0H7Zss8=
@@ -628,8 +628,8 @@ github.com/streamingfast/payment-gateway v0.0.0-20250910205031-eaa05d2fd1b7 h1:Q
 github.com/streamingfast/payment-gateway v0.0.0-20250910205031-eaa05d2fd1b7/go.mod h1:0ihbWHcZ53s2dR9oc0+DLaSaDAchqgB4yrt2nNscATw=
 github.com/streamingfast/pbgo v0.0.6-0.20250114182320-0b43084f4000 h1:1YdNfouYACMSCCWddsyBWZzX7c9s0tBUIoAbMb7mSAM=
 github.com/streamingfast/pbgo v0.0.6-0.20250114182320-0b43084f4000/go.mod h1:MHb9nR5zyNyvA1Zi2wud+hWpoILpll7vpLUijvh3YV0=
-github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d h1:33VIARqUqBUKXJcuQoOS1rVSms54tgxhhNCmrLptpLg=
-github.com/streamingfast/protoreflect v0.0.0-20231205191344-4b629d20ce8d/go.mod h1:aBJivEdekmFWYSQ29EE/fN9IanJWJXbtjy3ky0XD/jE=
+github.com/streamingfast/protoreflect v0.0.0-20250603172831-877850cbe7de h1:+PUn7XKNhn9Nx8Y8R+VJuMRlBtVjzeNohvu7Y42r9uQ=
+github.com/streamingfast/protoreflect v0.0.0-20250603172831-877850cbe7de/go.mod h1:9Qr0uV5zHajPK7YwnABI1AHxOQFN00Tb3jJlZNLKNGw=
 github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90 h1:94HllkX4ttYVilo8ZJv05b5z8JiMmqBvv4+Jdgk/+2A=
 github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90/go.mod h1:e6tKS/udlfXFUTQBYfDDdISfjULvQXet1kBrOeRfgI4=
 github.com/streamingfast/shutter v1.5.0 h1:NpzDYzj0HVpSiDJVO/FFSL6QIK/YKOxY0gJAtyaTOgs=
@@ -642,6 +642,8 @@ github.com/streamingfast/substreams-foundational-store v0.1.1-0.20251017155401-3
 github.com/streamingfast/substreams-foundational-store v0.1.1-0.20251017155401-352038f44dd2/go.mod h1:VPymz8cI6vAKE1xuTqf1Yg1pULKB8Vf9vyGm1+C0Evo=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae h1:XRNPwqkhmsDRKmncN4oCxiTu3LpFswmVDOTmZdoKQkg=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae/go.mod h1:9btia9gJR6TKKdauYb5MyDAG/D2ye/NDXLHnyyD6mVc=
+github.com/streamingfast/wazero v0.0.0-20241202185309-91287c3640ed h1:LU6/c376zP1cMAo9L6rFLyjo0W7RU+hIh7BegH8Zo5M=
+github.com/streamingfast/wazero v0.0.0-20241202185309-91287c3640ed/go.mod h1:yAI0XTsMBhREkM/YDAK/zNou3GoiAce1P6+rp/wQhjs=
 github.com/streamingfast/worker-pool-protocol v0.0.0-20250826200931-136a043ecece h1:TIVovgebbDP0JZBEn9PfDdSK+bze40to+gIZcxV7rsU=
 github.com/streamingfast/worker-pool-protocol v0.0.0-20250826200931-136a043ecece/go.mod h1:fq44dFx8K9S3/9QOoIVk0s+ptEscfpQmftLog/9WYU4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
@@ -668,8 +670,6 @@ github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf h1:Z2X3Os7oRzpdJ7
 github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf/go.mod h1:M8agBzgqHIhgj7wEn9/0hJUZcrvt9VY+Ln+S1I5Mha0=
 github.com/test-go/testify v1.1.4 h1:Tf9lntrKUMHiXQ07qBScBTSA0dhYQlu83hswqelv1iE=
 github.com/test-go/testify v1.1.4/go.mod h1:rH7cfJo/47vWGdi4GPj16x3/t1xGOj2YxzmNQzk2ghU=
-github.com/tetratelabs/wazero v1.8.0 h1:iEKu0d4c2Pd+QSRieYbnQC9yiFlMS9D+Jr0LsRmcF4g=
-github.com/tetratelabs/wazero v1.8.0/go.mod h1:yAI0XTsMBhREkM/YDAK/zNou3GoiAce1P6+rp/wQhjs=
 github.com/thedevsaddam/govalidator v1.9.6/go.mod h1:Ilx8u7cg5g3LXbSS943cx5kczyNuUn7LH/cK5MYuE90=
 github.com/thedevsaddam/govalidator v1.9.10 h1:m3dLRbSZ5Hts3VUWYe+vxLMG+FdyQuWOjzTeQRiMCvU=
 github.com/thedevsaddam/govalidator v1.9.10/go.mod h1:Ilx8u7cg5g3LXbSS943cx5kczyNuUn7LH/cK5MYuE90=
