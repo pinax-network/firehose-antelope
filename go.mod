@@ -12,7 +12,7 @@ require (
 	github.com/streamingfast/bstream v0.0.2-0.20250903174843-9c884c3356fd
 	github.com/streamingfast/dmetrics v0.0.0-20250711072030-f023e918a175
 	github.com/streamingfast/dstore v0.1.1-0.20250929131642-07e4d13f2fda
-	github.com/streamingfast/firehose-core v1.11.3
+	github.com/streamingfast/firehose-core v1.12.0
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v0.0.0-20230608130331-f22c91403091
 	github.com/streamingfast/pbgo v0.0.6-0.20250114182320-0b43084f4000
@@ -183,8 +183,8 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20240430173521-888827872b90 // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.16.6-0.20250924125432-bee8c3d20e4c // indirect
-	github.com/streamingfast/substreams-foundational-store v0.1.1-0.20250912144020-b075d35bf78a // indirect
+	github.com/streamingfast/substreams v1.17.0 // indirect
+	github.com/streamingfast/substreams-foundational-store v0.1.1-0.20251017155401-352038f44dd2 // indirect
 	github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae // indirect
 	github.com/streamingfast/worker-pool-protocol v0.0.0-20250826200931-136a043ecece // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
