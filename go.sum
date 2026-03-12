@@ -712,8 +712,8 @@ github.com/streamingfast/dummy-blockchain v1.7.3 h1:rPheajbwc+hwh4XVRMaroET/p/lv
 github.com/streamingfast/dummy-blockchain v1.7.3/go.mod h1:EP8X3OwOoGYjJfzhw+zD1A0GTNSDg+v1OKDwSTDhHyc=
 github.com/streamingfast/eth-go v0.0.0-20260216202159-4e2b7501894a h1:jHKRM0gM5Gh/vRzJTv5u0myac8zxlGgICZr71+QRPz0=
 github.com/streamingfast/eth-go v0.0.0-20260216202159-4e2b7501894a/go.mod h1:1szIYZI+rTjWWVYd1kFJomFiPCMvcZfBmylCwRaK8yY=
-github.com/streamingfast/firehose-core v1.13.1 h1:t8uIGSig9podqSYadOdC+Q0l/GIdCokCU2Q4nuAoZhg=
-github.com/streamingfast/firehose-core v1.13.1/go.mod h1:zXHRyIxT7ZjoEIxumxtevdRpUhAOfgdjKmhvLWt5lP0=
+github.com/streamingfast/firehose-core v1.13.3-0.20260312163540-7335737c687c h1:ON+bgERCnmO8DgBHAb0bQ/7poE/8nC1BYK/btbqW7JI=
+github.com/streamingfast/firehose-core v1.13.3-0.20260312163540-7335737c687c/go.mod h1:XjqgjAon88WBOLI/73quAeQEtIRH1yxD+JWsaJtI9Eg=
 github.com/streamingfast/firehose-ethereum/types v0.0.0-20251113151010-c9c94d64348a h1:qatil0YhFzTVAFQnH7iMcq+gpVUNEs9Se3lLq4eaof8=
 github.com/streamingfast/firehose-ethereum/types v0.0.0-20251113151010-c9c94d64348a/go.mod h1:CG22ObinxSbKIP19bAj0uro0a290kzZTiBbjL8VR0SE=
 github.com/streamingfast/firehose-networks v0.2.2 h1:araNCSHVa9C8+7hGrxNJYt8TlbK65kNDxQMBJuzBjxA=
@@ -741,8 +741,8 @@ github.com/streamingfast/shutter v1.5.0 h1:NpzDYzj0HVpSiDJVO/FFSL6QIK/YKOxY0gJAt
 github.com/streamingfast/shutter v1.5.0/go.mod h1:B/T6efqdeMGbGwjzPS1ToXzYZI4kDzI5/u4I+7qbjY8=
 github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 h1:Y15G1Z4fpEdm2b+/70owI7TLuXadlqBtGM7rk4Hxrzk=
 github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0/go.mod h1:/Rnz2TJvaShjUct0scZ9kKV2Jr9/+KBAoWy4UMYxgv4=
-github.com/streamingfast/substreams v1.18.3-0.20260310173935-1549f56a2608 h1:47UBFNhQy00VVYKryaXF6GZqFuPkE/QX1IjEQllFhpI=
-github.com/streamingfast/substreams v1.18.3-0.20260310173935-1549f56a2608/go.mod h1:5HrkeNW1yKqO3ZcL+yx8CS6hstcj4st+0ezb/ei1SYs=
+github.com/streamingfast/substreams v1.18.3-0.20260312163334-e27b44bd1c9d h1:oBmhFFBpTZQYI3vG2QY+o+XIq1rnyNvIAG8AxPLR/DE=
+github.com/streamingfast/substreams v1.18.3-0.20260312163334-e27b44bd1c9d/go.mod h1:5HrkeNW1yKqO3ZcL+yx8CS6hstcj4st+0ezb/ei1SYs=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae h1:XRNPwqkhmsDRKmncN4oCxiTu3LpFswmVDOTmZdoKQkg=
 github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae/go.mod h1:9btia9gJR6TKKdauYb5MyDAG/D2ye/NDXLHnyyD6mVc=
 github.com/streamingfast/wazero v0.0.0-20241202185309-91287c3640ed h1:LU6/c376zP1cMAo9L6rFLyjo0W7RU+hIh7BegH8Zo5M=
