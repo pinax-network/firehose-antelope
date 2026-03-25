@@ -11,10 +11,10 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/streamingfast/bstream v0.0.2-0.20260304190439-4cf7047a590f
 	github.com/streamingfast/dmetrics v0.0.0-20260109212625-35256f512c62
-	github.com/streamingfast/dstore v0.1.3-0.20260119134532-ee504d6a2655
-	github.com/streamingfast/firehose-core v1.13.3-0.20260312163540-7335737c687c
+	github.com/streamingfast/dstore v0.2.0
+	github.com/streamingfast/firehose-core v1.14.0
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
-	github.com/streamingfast/logging v0.0.0-20260108192805-38f96de0a641
+	github.com/streamingfast/logging v1.2.2
 	github.com/streamingfast/pbgo v0.0.6-0.20260206150405-2b95acf70437
 	github.com/stretchr/testify v1.11.1
 	github.com/tidwall/gjson v1.18.0
@@ -123,7 +123,7 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.3.7 // indirect
 	github.com/googleapis/gax-go/v2 v2.16.0 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
-	github.com/graphprotocol/substreams-data-service v0.0.0-20260224031909-c6ca40569c63 // indirect
+	github.com/graphprotocol/substreams-data-service v0.0.0-20260323141224-141602015bcf // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.27.3 // indirect
@@ -194,7 +194,7 @@ require (
 	github.com/spf13/viper v1.19.0 // indirect
 	github.com/spiffe/go-spiffe/v2 v2.6.0 // indirect
 	github.com/streamingfast/cli v0.0.4-0.20250815192146-d8a233ec3d0b // indirect
-	github.com/streamingfast/dauth v0.0.0-20260304175046-02898e30442d // indirect
+	github.com/streamingfast/dauth v0.0.0-20260318230957-4ab1e1d2ebc3 // indirect
 	github.com/streamingfast/dbin v0.9.1-0.20231117225723-59790c798e2c // indirect
 	github.com/streamingfast/derr v0.0.0-20250814163534-bd7407bd89d7 // indirect
 	github.com/streamingfast/dgrpc v0.0.0-20260224192836-e5cd6cffceff // indirect
