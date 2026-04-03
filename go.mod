@@ -9,10 +9,10 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/streamingfast/bstream v0.0.2-0.20260304190439-4cf7047a590f
+	github.com/streamingfast/bstream v0.0.2-0.20260402095814-607e840ece3d
 	github.com/streamingfast/dmetrics v0.0.0-20260109212625-35256f512c62
-	github.com/streamingfast/dstore v0.2.0
-	github.com/streamingfast/firehose-core v1.14.0
+	github.com/streamingfast/dstore v0.2.2
+	github.com/streamingfast/firehose-core v1.14.1
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v1.2.2
 	github.com/streamingfast/pbgo v0.0.6-0.20260206150405-2b95acf70437
@@ -210,7 +210,7 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20251218140752-bafd5572499f // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.18.3-0.20260312163334-e27b44bd1c9d // indirect
+	github.com/streamingfast/substreams v1.18.4 // indirect
 	github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae // indirect
 	github.com/streamingfast/worker-pool-protocol v0.0.0-20251029142144-b539534f3eb1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
