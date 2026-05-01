@@ -11,8 +11,8 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/streamingfast/bstream v0.0.2-0.20260402095814-607e840ece3d
 	github.com/streamingfast/dmetrics v0.0.0-20260109212625-35256f512c62
-	github.com/streamingfast/dstore v0.2.3
-	github.com/streamingfast/firehose-core v1.14.2
+	github.com/streamingfast/dstore v0.2.4-0.20260427175250-c0d9ab9f857e
+	github.com/streamingfast/firehose-core v1.14.3
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v1.2.2
 	github.com/streamingfast/pbgo v0.0.6-0.20260206150405-2b95acf70437
