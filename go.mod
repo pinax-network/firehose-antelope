@@ -9,10 +9,10 @@ require (
 	github.com/mitchellh/go-testing-interface v1.14.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
-	github.com/streamingfast/bstream v0.0.2-0.20260611155534-4edda1cff251
+	github.com/streamingfast/bstream v0.0.2-0.20260709191130-aecaf73e1c32
 	github.com/streamingfast/dmetrics v0.0.0-20260109212625-35256f512c62
-	github.com/streamingfast/dstore v0.2.4-0.20260520032149-6421410d7faa
-	github.com/streamingfast/firehose-core v1.15.0
+	github.com/streamingfast/dstore v0.2.4-0.20260709193311-122163592902
+	github.com/streamingfast/firehose-core v1.16.0
 	github.com/streamingfast/jsonpb v0.0.0-20210811021341-3670f0aa02d0
 	github.com/streamingfast/logging v1.2.2
 	github.com/streamingfast/pbgo v0.0.6-0.20260206150405-2b95acf70437
@@ -211,7 +211,7 @@ require (
 	github.com/streamingfast/sf-tracing v0.0.0-20251218140752-bafd5572499f // indirect
 	github.com/streamingfast/shutter v1.5.0 // indirect
 	github.com/streamingfast/snapshotter v0.0.0-20230316190750-5bcadfde44d0 // indirect
-	github.com/streamingfast/substreams v1.19.0 // indirect
+	github.com/streamingfast/substreams v1.20.1 // indirect
 	github.com/streamingfast/validator v0.0.0-20231124184318-71ec8080e4ae // indirect
 	github.com/streamingfast/worker-pool-protocol v0.0.0-20251029142144-b539534f3eb1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -224,6 +224,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869 // indirect
+	go.etcd.io/bbolt v1.4.3 // indirect
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/contrib/detectors/gcp v1.42.0 // indirect
